@@ -44,7 +44,7 @@ helpim.Client = function(cfg) {
         )
     );
 };
-goog.inherits(helpim.client, xmpptk.model);
+goog.inherits(helpim.Client, xmpptk.model);
 
 /**
  * @protected
