@@ -1,5 +1,7 @@
 goog.provide('helpim.Client');
 
+goog.require('helpim.Config');
+
 goog.require('xmpptk.model');
 goog.require('xmpptk.Client');
 
@@ -10,7 +12,7 @@ goog.require('goog.debug.Logger');
 /**
  * @constructor
  * @extends {xmpptk.model}
- * @param {{httpbase: string, xmppdomain: string, user: string, password: string, resource: string}} cfg A configuration
+ * @param {helpim.Config} cfg A configuration
  */
 helpim.Client = function(cfg) {
     xmpptk.model.call(this);
