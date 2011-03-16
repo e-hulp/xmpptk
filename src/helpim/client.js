@@ -3,12 +3,44 @@ goog.provide('helpim.Client');
 goog.require('xmpptk.model');
 goog.require('xmpptk.Client');
 
+goog.require('goog.events');
+goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 
+/**
+ * @constructor
+ * @extends {xmpptk.model}
+ * @param {{httpbase: string, xmppdomain: string, user: string, password: string, resource: string}} cfg A configuration
+ */
 helpim.Client = function(cfg) {
-    xmpptk.client.call(this);
+    xmpptk.model.call(this);
 
     this._client = new xmpptk.Client(cfg);
+
+    this._client.login(
+        function() {
+            this.logger.info("logged in successfully");
+            this._client.getRoster(
+                function(roster) {
+                    this.logger.info("got roster:" + roster);
+                }
+                this
+            );
+        },
+        this
+    );
+
+    goog.events.listen(
+        goog.dom.getElement('body'),
+        goog.events.EventType.UNLOAD,
+        goog.bind(
+            function() {
+                this.logger.info("logging out");
+                this._client.logout();
+            },
+            this
+        )
+    );
 };
 goog.inherits(helpim.client, xmpptk.model);
 
