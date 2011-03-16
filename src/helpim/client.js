@@ -23,7 +23,7 @@ helpim.Client = function(cfg) {
             this._client.getRoster(
                 function(roster) {
                     this.logger.info("got roster:" + roster);
-                }
+                },
                 this
             );
         },
