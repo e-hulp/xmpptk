@@ -16,6 +16,7 @@ goog.require('goog.debug.Logger');
  * @param {helpim.Config} cfg A configuration
  */
 helpim.Client = function(cfg) {
+    this.logger.info("starting up");
     xmpptk.model.call(this);
 
     this._client = new xmpptk.Client(cfg);
