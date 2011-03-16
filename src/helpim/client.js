@@ -5,6 +5,7 @@ goog.require('helpim.Config');
 goog.require('xmpptk.model');
 goog.require('xmpptk.Client');
 
+goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
@@ -33,7 +34,7 @@ helpim.Client = function(cfg) {
     );
 
     goog.events.listen(
-        goog.dom.getElement('body'),
+        goog.dom.getElementsByTagNameAndClass('body')[0],
         goog.events.EventType.UNLOAD,
         goog.bind(
             function() {
