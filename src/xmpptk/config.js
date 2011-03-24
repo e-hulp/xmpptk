@@ -1,9 +1,9 @@
-goog.provide('helpim.Config');
+goog.provide('xmpptk.Config');
 
 /**
  * @constructor
  */
-helpim.Config = function(obj) {
+xmpptk.Config = function(obj) {
     for (var i in obj) {
         if (obj.hasOwnProperty(i)) {
             this[i] = obj[i];
