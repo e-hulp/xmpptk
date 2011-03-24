@@ -1,7 +1,5 @@
 goog.provide('helpim.Client');
 
-goog.require('xmpptk.Model');
-goog.require('xmpptk.Config');
 goog.require('xmpptk.Client');
 
 goog.require('goog.dom');
@@ -11,22 +9,18 @@ goog.require('goog.debug.Logger');
 
 /**
  * @constructor
- * @extends {xmpptk.Model}
- * @param {xmpptk.Config} cfg A configuration
+ * @extends {xmpptk.Client}
  */
-helpim.Client = function(cfg) {
+helpim.Client = function() {
     this.logger.info("starting up");
-    xmpptk.Model.call(this);
+    xmpptk.Client.call(this);
 
-    this._client = new xmpptk.Client(cfg);
-
-    this._client.login(
+    this.login(
         function() {
             this.logger.info("logged in successfully");
             var room = new xmpptk.muc.Room({room:    cfg.muc_room,
                                             service: cfg.muc_service,
-                                            nick:    cfg.muc_nick},
-                                           this._client);
+                                            nick:    cfg.muc_nick});
 
             room.join();
         },
@@ -39,13 +33,14 @@ helpim.Client = function(cfg) {
         goog.bind(
             function() {
                 this.logger.info("logging out");
-                this._client.logout();
+                this.logout();
             },
             this
         )
     );
 };
-goog.inherits(helpim.Client, xmpptk.Model);
+goog.inherits(helpim.Client, xmpptk.Client);
+goog.addSingletonGetter(helpim.Client);
 
 /**
  * @protected
