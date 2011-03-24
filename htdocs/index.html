@@ -7,12 +7,15 @@
     <script>
 goog.require('helpim.start');
 var HELPIM_CONFIG = {
-authtype: 'saslanon'
+authtype: 'saslanon',
+muc_room: 'helpim',
+muc_service: 'muc.localhost',
+muc_nick: 'test1234'
 };
     </script>
   </head>
 
-  <body onload="helpim.start();">
+  <body onload="helpim.start(HELPIM_CONFIG);">
     <h1></h1>
 
 
