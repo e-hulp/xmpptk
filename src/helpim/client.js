@@ -23,7 +23,11 @@ helpim.Client = function(cfg) {
     this._client.login(
         function() {
             this.logger.info("logged in successfully");
-            
+            var room = new xmpptk.muc.Room({room:    cfg.muc_room,
+                                            service: cfg.muc_service,
+                                            nick:    cfg.muc_nick});
+
+            room.join();
         },
         this
     );
