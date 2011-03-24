@@ -1,6 +1,6 @@
 goog.provide('helpim.Client');
 
-goog.require('xmpptk.model');
+goog.require('xmpptk.Model');
 goog.require('xmpptk.Config');
 goog.require('xmpptk.Client');
 
@@ -11,12 +11,12 @@ goog.require('goog.debug.Logger');
 
 /**
  * @constructor
- * @extends {xmpptk.model}
+ * @extends {xmpptk.Model}
  * @param {xmpptk.Config} cfg A configuration
  */
 helpim.Client = function(cfg) {
     this.logger.info("starting up");
-    xmpptk.model.call(this);
+    xmpptk.Model.call(this);
 
     this._client = new xmpptk.Client(cfg);
 
@@ -45,7 +45,7 @@ helpim.Client = function(cfg) {
         )
     );
 };
-goog.inherits(helpim.Client, xmpptk.model);
+goog.inherits(helpim.Client, xmpptk.Model);
 
 /**
  * @protected
