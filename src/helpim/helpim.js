@@ -1,14 +1,18 @@
 goog.provide('helpim.start');
 
-goog.require('xmpptk.Config');
-goog.require('helpim.Client');
 goog.require('goog.debug.Console');
+goog.require('goog.object');
 
-helpim.start = function() {
+goog.require('xmpptk.Config');
+
+goog.require('helpim.Client');
+
+helpim.start = function(cfg) {
     if (goog.DEBUG) {
         new goog.debug.Console().setCapturing(true);
     }
-    new helpim.Client(new xmpptk.Config(HELPIM_CONFIG));
+    goog.object.extend(xmpptk.Config, cfg);
+    helpim.Client.getInstance();
 };
 
 goog.exportSymbol('helpim.start', helpim.start);
