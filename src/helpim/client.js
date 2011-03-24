@@ -23,12 +23,7 @@ helpim.Client = function(cfg) {
     this._client.login(
         function() {
             this.logger.info("logged in successfully");
-            this._client.getRoster(
-                function(roster) {
-                    this.logger.info("got roster:" + roster);
-                },
-                this
-            );
+            
         },
         this
     );
