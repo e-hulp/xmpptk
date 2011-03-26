@@ -18,7 +18,9 @@ helpim.Client = function() {
     this._logger.info("starting up");
     xmpptk.Client.call(this);
 
-    new helpim.ui.Client(this);
+    this.rooms = [];
+
+    this._view = new helpim.ui.Client(this);
 
     goog.events.listen(
         window,
@@ -43,20 +45,43 @@ helpim.Client.prototype.login = function() {
         'login', 
         function() {
             this._logger.info("logged in successfully");
-            this.room = new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
-                                             service: xmpptk.Config.muc_service,
-                                             nick:    xmpptk.Config.muc_nick},
-                                            this);
-            this.room.join();
+            this.addRoom(
+                new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
+                                     service: xmpptk.Config.muc_service,
+                                     nick:    xmpptk.Config.muc_nick},
+                                    this)
+            ).join();
         },
         this
     );
 };
 
+/**
+ * @param {xmpptk.muc.Room} room
+ */
+helpim.Client.prototype.addRoom = function(room) {
+    this.rooms.push(room);
+    this.notify();
+    return room;
+};
+
+/**
+ * @param {xmpptk.muc.Room} room
+ */
+helpim.Client.prototype.deleteRoom = function(room) {
+    goog.array.remove(this.rooms, room);
+    this.notify();
+    return room;
+};
+
 helpim.Client.prototype.logout = function() {
-    if (this.room) {
-        this.room.part();
-        delete this.room;
-    }
+    goog.array.forEach(
+        this.rooms,
+        function(room) {
+            room.part();
+        }
+    );
+    goog.array.clear(this.rooms);
+    this.notify();
     goog.base(this, 'logout');
 };

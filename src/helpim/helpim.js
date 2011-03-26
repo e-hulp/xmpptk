@@ -1,7 +1,9 @@
 goog.provide('helpim.start');
 
 goog.require('goog.debug.DivConsole');
-goog.require('goog.object');
+goog.require('goog.debug.Logger');
+goog.require('goog.debug.Logger.Level');
+goog.require('goog.debug.LogManager');
 
 goog.require('xmpptk.Config');
 
