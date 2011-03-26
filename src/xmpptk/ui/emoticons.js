@@ -1,20 +1,20 @@
-goog.provide('xmpptk.ui.emoticons');
+goog.provide('xmpptk.ui.Emoticons');
 
 goog.require('goog.object');
 
-xmpptk.ui.emoticons = {
+xmpptk.ui.Emoticons = {
 };
 
-xmpptk.ui.emoticons.path = "images/emoticons/";
+xmpptk.ui.Emoticons.path = "images/emoticons/";
 
-xmpptk.ui.emoticons.init = function(base_url) {
+xmpptk.ui.Emoticons.init = function(base_url) {
 
   if (typeof base_url != 'undefined') {
-    xmpptk.ui.emoticons.path = base_url + xmpptk.ui.emoticons.path;
+    xmpptk.ui.Emoticons.path = base_url + xmpptk.ui.Emoticons.path;
   }
 
   goog.object.foreach(
-    xmpptk.ui.emoticons,
+    xmpptk.ui.Emoticons,
     function(val, key) {
 
       var key_q = key.replace(/\\/g, '\\\\');
@@ -30,9 +30,9 @@ xmpptk.ui.emoticons.init = function(base_url) {
       key_q = key_q.replace(/\+/g, '\\+');
 
       var icon = new Image();
-      icon.src = xmpptk.ui.emoticons.path + val;
+      icon.src = xmpptk.ui.Emoticons.path + val;
 
-      xmpptk.ui.emoticons[key] = {regexp: eval("/\(\\s\|\^\)"+key_q+"\(\\s|\$\)/g"), icon: icon};
+      xmpptk.ui.Emoticons[key] = {regexp: eval("/\(\\s\|\^\)"+key_q+"\(\\s|\$\)/g"), icon: icon};
     }
   );
 };

@@ -1,15 +1,15 @@
-goog.provide('xmpptk.ui');
+goog.provide('xmpptk.ui.View');
 
-goog.require('xmpptk.observer');
-goog.require('xmpptk.ui.emoticons');
+goog.require('xmpptk.Observer');
+goog.require('xmpptk.ui.Emoticons');
 
 goog.require('goog.object');
 goog.require('goog.array');
 
-xmpptk.ui = function() {
-    xmpptk.observer.call(this);
+xmpptk.ui.View = function() {
+    xmpptk.Observer.call(this);
 };
-goog.inherits(xmpptk.ui, xmpptk.observer);
+goog.inherits(xmpptk.ui.View, xmpptk.Observer);
 
 xmpptk.ui.MAX_WORD_LENGTH = 28;
 
@@ -99,7 +99,7 @@ xmpptk.ui.msgFormat = function(msg) {
     // done by using a singleton
 
     goog.object.forEach(
-        xmpptk.ui.emoticons,
+        xmpptk.ui.Emoticons,
         function(key, item) {
             if (typeof item.icon.width != 'undefined' && item.icon.width && item.icon.width > 0 && item.icon.height > 0) {
 	        msg = msg.replace(item.regexp,"$1<img src=\""+item.icon.src+"\" width='"+item.icon.width+"' height='"+item.icon.height+"' alt=\""+key+"\" title=\""+key+"\">$2");
