@@ -7,7 +7,7 @@ goog.require('goog.debug.Logger');
 
 goog.require('xmpptk.Model');
 goog.require('xmpptk.muc.Client');
-goog.require('xmpptk.muc.Roster');
+goog.require('xmpptk.muc.Occupant');
 
 /** @typedef {{room: string, service: string, nick: string}} */
 xmpptk.muc.RoomJid;
