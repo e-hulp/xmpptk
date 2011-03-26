@@ -20,9 +20,9 @@ helpim.Client = function() {
         function() {
             this._logger.info("logged in successfully");
             this.room = new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
-                                            service: xmpptk.Config.muc_service,
-                                            nick:    xmpptk.Config.muc_nick},
-                                           this);
+                                             service: xmpptk.Config.muc_service,
+                                             nick:    xmpptk.Config.muc_nick},
+                                            this);
 
             this.room.join();
         },
