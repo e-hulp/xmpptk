@@ -50,13 +50,6 @@ helpim.ui.Client = function(client) {
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
 
-helpim.ui.Client.prototype.logEvent = function(e) {
-    var source =
-        typeof e.target.getCaption == 'function' && e.target.getCaption() ||
-        e.target.getId();
-    this._logger.info('"' + source + '" dispatched: ' + e.type);
-};
-
 /**
  * @type {goog.debug.Logger}
  * @protected
