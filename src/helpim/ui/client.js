@@ -39,13 +39,15 @@ helpim.ui.Client = function(client) {
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
-    goog.events.listen(this.tabBar, goog.ui.Component.EventType.SELECT,
-            function(e) {
-              var tabSelected = e.target;
-              var contentElement = goog.dom.getElement('tab_content');
-              goog.dom.setTextContent(contentElement,
-                  'You selected the "' + tabSelected.getCaption() + '" tab.');
-            });
+    goog.events.listen(
+        this.tabBar,
+        goog.ui.Component.EventType.SELECT,
+        function(e) {
+            var tabSelected = e.target;
+            var contentElement = goog.dom.getElement('tab_content');
+            goog.dom.setTextContent(contentElement,
+                                    'You selected the "' + tabSelected.getCaption() + '" tab.');
+        });
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
