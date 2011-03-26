@@ -34,6 +34,9 @@ xmpptk.muc.Room = function(room_jid, client) {
     /** @type {xmpptk.muc.Roster} */
     this.roster = new xmpptk.Collection(xmpptk.muc.Occupant, 'jid');
 
+    /** @type {string} */
+    this.subject = '';
+
     /** @private */
     this._client = new xmpptk.muc.Client(client);
 };
@@ -43,6 +46,12 @@ xmpptk.muc.Room.prototype._logger = goog.debug.Logger.getLogger('xmpptk.muc.Room
 
 xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
+
+    var subject = oMsg.getSubject();
+    if (subject) {
+        this._logger.info("got subject: "+subject);
+        this.set('subject', subject);
+    }
 };
 
 xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
