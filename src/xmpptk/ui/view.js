@@ -1,13 +1,18 @@
 goog.provide('xmpptk.ui.View');
 
 goog.require('xmpptk.Observer');
+goog.require('xmpptk.Model');
 goog.require('xmpptk.ui.Emoticons');
 
 goog.require('goog.object');
 goog.require('goog.array');
 
-xmpptk.ui.View = function() {
-    xmpptk.Observer.call(this);
+/**
+ * @constructor
+ * @param {xmpptk.Model} model
+ */
+xmpptk.ui.View = function(model) {
+    xmpptk.Observer.call(this, model);
 };
 goog.inherits(xmpptk.ui.View, xmpptk.Observer);
 
