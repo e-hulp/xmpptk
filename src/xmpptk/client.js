@@ -20,36 +20,6 @@ xmpptk.Client = function() {
     xmpptk.Model.call(this);
 
     this._ps = new goog.pubsub.PubSub();
-
-    this._con = new JSJaCHttpBindingConnection(xmpptk.Config);
-
-    this._con.registerHandler('onconnect',
-                              JSJaC.bind(this._handleConnected, this));
-
-    this._con.registerHandler('ondisconnect',
-                              JSJaC.bind(function() {
-                                  this._ps.publish('disconnected',
-                                                  this._con.status() == 'session-terminate-conflict');
-                              },this));
-
-    this._con.registerHandler('presence',
-                              JSJaC.bind(this._handlePresence, this));
-
-    this._con.registerHandler('message',
-                              JSJaC.bind(this._handleMessage, this));
-
-    this._con.registerIQSet('query',
-                            NS_ROSTER,
-                            JSJaC.bind(this._handleRosterPush, this));
-
-    this._con.registerHandler('packet_in',
-                              JSJaC.bind(function(packet) {
-                                  this._logger.fine("[IN]: "+packet.xml());
-                              }, this));
-    this._con.registerHandler('packet_out',
-                              JSJaC.bind(function(packet) {
-                                  this._logger.fine("[OUT]: "+packet.xml());
-                              }, this));
 };
 goog.inherits(xmpptk.Client, xmpptk.Model);
 goog.addSingletonGetter(xmpptk.Client);
@@ -111,6 +81,37 @@ xmpptk.Client.prototype.isConnected = function() {
 xmpptk.Client.prototype.login = function(callback, context) {
     this._logger.info("logging in with: " + goog.json.serialize(xmpptk.Config));
     this._ps.subscribeOnce('_login', callback, context);
+
+    this._con = new JSJaCHttpBindingConnection(xmpptk.Config);
+
+    this._con.registerHandler('onconnect',
+                              JSJaC.bind(this._handleConnected, this));
+
+    this._con.registerHandler('ondisconnect',
+                              JSJaC.bind(function() {
+                                  this._ps.publish('disconnected',
+                                                  this._con.status() == 'session-terminate-conflict');
+                              },this));
+
+    this._con.registerHandler('presence',
+                              JSJaC.bind(this._handlePresence, this));
+
+    this._con.registerHandler('message',
+                              JSJaC.bind(this._handleMessage, this));
+
+    this._con.registerIQSet('query',
+                            NS_ROSTER,
+                            JSJaC.bind(this._handleRosterPush, this));
+
+    this._con.registerHandler('packet_in',
+                              JSJaC.bind(function(packet) {
+                                  this._logger.fine("[IN]: "+packet.xml());
+                              }, this));
+    this._con.registerHandler('packet_out',
+                              JSJaC.bind(function(packet) {
+                                  this._logger.fine("[OUT]: "+packet.xml());
+                              }, this));
+
     this._con.connect(xmpptk.Config);
 };
 
