@@ -31,7 +31,7 @@ xmpptk.muc.Room = function(room_jid, client) {
     this.jid = this.room+'@'+this.service+'/'+this.nick;
 
     /** @type {xmpptk.muc.Roster} */
-    this.roster = new xmpptk.muc.Roster();
+    this.roster = new xmpptk.Collection(xmpptk.muc.Occupant, 'jid');
 
     /** @private */
     this._client = new xmpptk.muc.Client(client);
