@@ -24,7 +24,7 @@ xmpptk.muc.Client = function(client) {
 };
 
 /**
- * @param {xmpptk.muc.Room}
+ * @param {xmpptk.muc.Room} room
  */
 xmpptk.muc.Client.prototype.registerRoom = function(room) {
     this._logger.info("registering room with id "+room.id);
@@ -32,7 +32,7 @@ xmpptk.muc.Client.prototype.registerRoom = function(room) {
 };
 
 /**
- * @param {xmpptk.muc.Room}
+ * @param {xmpptk.muc.Room} room
  */
 xmpptk.muc.Client.prototype.unregisterRoom = function(room) {
     this._logger.info("unregistering room with id "+room.id);
