@@ -64,7 +64,7 @@ helpim.ui.Client.prototype.update = function() {
         this.subject.rooms,
         function(room) {
             if (!this.tabBar.getChild(room.id)) {
-                var tab = new goog.ui.Tab(room.id);
+                var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
                 tab.setId(room.id);
                 this.tabBar.addChild(tab, true);
             }
