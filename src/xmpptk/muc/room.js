@@ -49,7 +49,7 @@ xmpptk.muc.Room.prototype._logger = goog.debug.Logger.getLogger('xmpptk.muc.Room
 
 xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
-    try {
+
     var subject = oMsg.getSubject();
     if (subject) {
         this._logger.info("got subject: "+subject);
@@ -59,7 +59,6 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
         this.messages.push(oMsg);
         this.notify();
     }
-    } catch(e) { this._logger.severe(e); }
 };
 
 xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
