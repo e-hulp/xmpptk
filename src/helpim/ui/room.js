@@ -1,12 +1,16 @@
 goog.provide('helpim.ui.Room');
 
+goog.require('goog.debug.Logger');
+
 goog.require('xmpptk.ui.View');
 
 helpim.ui.Room = function(room) {
     xmpptk.ui.View.call(this, room);
 
+    this._logger.info("creating view for room with id "+room.id);
+
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
-    this._panel.id = room.jid + "_roomPanel";
+    this._panel.id = room.id + "_roomPanel";
     
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
@@ -17,6 +21,8 @@ helpim.ui.Room = function(room) {
     this._messagesAt = 0;
 };
 goog.inherits(helpim.ui.Room, xmpptk.ui.View);
+
+helpim.ui.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Room');
 
 helpim.ui.Room.prototype.update = function() {
     if (this.subject.subject != '') {

@@ -1,6 +1,7 @@
 goog.provide('helpim.ui.Client');
 
 goog.require('goog.dom');
+goog.require('goog.object');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.Button');
 goog.require('goog.ui.TabBar');
@@ -15,9 +16,6 @@ goog.require('xmpptk.ui.View');
  */
 helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
-
-    var EVENTS = goog.object.getValues(goog.ui.Component.EventType);
-    this._logger.fine('Listening for: ' + EVENTS.join(', ') + '.');
 
     this._rooms = {};
  
@@ -48,6 +46,7 @@ helpim.ui.Client = function(client) {
         goog.ui.Component.EventType.SELECT,
         goog.bind(function(e) {
             var tabSelected = e.target;
+            this._logger.info("tab selected for "+tabSelected.getId());
             var contentElement = goog.dom.getElement('tab_content');
             if (this._lastRoomSelected) {
                 goog.style.showElement(
@@ -62,6 +61,7 @@ helpim.ui.Client = function(client) {
             this._lastRoomSelected = tabSelected.getId();
         }, this)
     );
+
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
@@ -74,7 +74,7 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
-    goog.array.forEach(
+    goog.object.forEach(
         this.subject.rooms,
         function(room) {
             if (!this.tabBar.getChild(room.id)) {
@@ -91,12 +91,12 @@ helpim.ui.Client.prototype.update = function() {
     this.tabBar.forEachChild(
         function(tab) {
             var id = tab.getId();
-            if (!goog.array.some(this.subject.rooms, function(room) { return id == room.id; })) {
+            if (!goog.object.some(this.subject.rooms, function(room) { return id == room.id; })) {
                 this.tabBar.removeChild(tab, true);
             }
         },
         this
     );
 
-    goog.style.showElement(goog.dom.getElement('tab_content'), this.subject.rooms.length>0);
+    goog.style.showElement(goog.dom.getElement('tab_content'), !goog.object.isEmpty(this.subject.rooms));
 };

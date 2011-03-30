@@ -5,7 +5,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 
-goog.require('xmpptk.Client');
+goog.require('xmpptk.muc.Client');
 goog.require('xmpptk.muc.Room');
 
 goog.require('helpim.ui.Client');
@@ -13,13 +13,11 @@ goog.require('helpim.ui.Room');
 
 /**
  * @constructor
- * @extends {xmpptk.Client}
+ * @extends {xmpptk.muc.Client}
  */
 helpim.Client = function() {
     this._logger.info("starting up");
-    xmpptk.Client.call(this);
-
-    this.rooms = [];
+    xmpptk.muc.Client.call(this);
 
     this._view = new helpim.ui.Client(this);
 
@@ -33,7 +31,7 @@ helpim.Client = function() {
         this
     );
 };
-goog.inherits(helpim.Client, xmpptk.Client);
+goog.inherits(helpim.Client, xmpptk.muc.Client);
 goog.addSingletonGetter(helpim.Client);
 
 /**
@@ -49,43 +47,27 @@ helpim.Client.prototype.login = function() {
         'login', 
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-            this.addRoom(
-                new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
-                                     service: xmpptk.Config.muc_service,
-                                     nick:    xmpptk.Config.muc_nick},
-                                    this)
-            ).join();
+            new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
+                                 service: xmpptk.Config.muc_service,
+                                 nick:    xmpptk.Config.muc_nick},
+                                this).join();
+            new xmpptk.muc.Room({room:    'helpim2',
+                                 service: xmpptk.Config.muc_service,
+                                 nick:    xmpptk.Config.muc_nick},
+                                this).join();
         },
         this
     );
 };
 
-/**
- * @param {xmpptk.muc.Room} room
- */
-helpim.Client.prototype.addRoom = function(room) {
-    this.rooms.push(room);
-    this.notify();
-    return room;
-};
-
-/**
- * @param {xmpptk.muc.Room} room
- */
-helpim.Client.prototype.deleteRoom = function(room) {
-    goog.array.remove(this.rooms, room);
-    this.notify();
-    return room;
-};
-
 helpim.Client.prototype.logout = function() {
-    goog.array.forEach(
+    goog.object.forEach(
         this.rooms,
         function(room) {
             room.part();
         }
     );
-    goog.array.clear(this.rooms);
+    goog.object.clear(this.rooms);
     this.notify();
     goog.base(this, 'logout');
 };
