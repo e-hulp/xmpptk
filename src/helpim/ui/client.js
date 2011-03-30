@@ -17,6 +17,8 @@ goog.require('xmpptk.ui.View');
 helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
 
+    xmpptk.ui.Emoticons.init();
+
     this._rooms = {};
  
     var logInOutButton = new goog.ui.Button();
