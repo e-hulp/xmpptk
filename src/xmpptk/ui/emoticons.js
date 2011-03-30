@@ -13,7 +13,7 @@ xmpptk.ui.Emoticons.init = function(base_url) {
     xmpptk.ui.Emoticons.path = base_url + xmpptk.ui.Emoticons.path;
   }
 
-  goog.object.foreach(
+  goog.object.forEach(
     xmpptk.ui.Emoticons,
     function(val, key) {
 
