@@ -2,6 +2,7 @@ goog.provide('helpim.ui.Room');
 
 goog.require('goog.debug.Logger');
 
+goog.require('xmpptk.ui');
 goog.require('xmpptk.ui.View');
 
 helpim.ui.Room = function(room) {
@@ -10,7 +11,7 @@ helpim.ui.Room = function(room) {
     this._logger.info("creating view for room with id "+room.id);
 
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
-    this._panel.id = room.id + "_roomPanel";
+    this._panel.id = xmpptk.ui.fixID(room.id + "_roomPanel");
     
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
@@ -24,6 +25,16 @@ goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
 helpim.ui.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Room');
 
+helpim.ui.Room.prototype.getPanel = function() {
+    return this._panel;
+};
+
+helpim.ui.Room.prototype.formatMessage = function(oMsg) {
+    return '&lt;'+xmpptk.ui.htmlEnc(oMsg.getFromJID().getResource())+'&gt; '+
+        xmpptk.ui.msgFormat(oMsg.getBody());
+    
+};
+
 helpim.ui.Room.prototype.update = function() {
     if (this.subject.subject != '') {
         goog.style.showElement(this._subjectPanel, true);
@@ -35,19 +46,9 @@ helpim.ui.Room.prototype.update = function() {
         goog.style.showElement(this._subjectPanel, false);
     }
 
-    if (this._messagesAt < this.subject.messages.length) {
-        // we got new messages to display
-        
-        for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
-            goog.dom.appendChild(
-                this._messagesPanel, 
-                goog.dom.createDom('div', {class:'roomMessage'}, this.subject.messages[this._messagesAt].getBody())
-            );
-        }
+    for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
+        var roomMessage = goog.dom.createDom('div', {class:'roomMessage'});
+        roomMessage.innerHTML = this.formatMessage(this.subject.messages[this._messagesAt]);
+        goog.dom.appendChild(this._messagesPanel, roomMessage);
     }
-
-};
-
-helpim.ui.Room.prototype.getPanel = function() {
-    return this._panel;
 };
