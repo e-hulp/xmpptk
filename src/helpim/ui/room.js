@@ -33,7 +33,6 @@ helpim.ui.Room.prototype.update = function() {
         // we got new messages to display
         
         for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
-            console.log(this.subject.messages[this._messagesAt].getBody());
             goog.dom.appendChild(
                 this._messagesPanel, 
                 goog.dom.createDom('div', {class:'roomMessage'}, this.subject.messages[this._messagesAt].getBody())
