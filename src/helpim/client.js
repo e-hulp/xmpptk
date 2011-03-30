@@ -64,7 +64,6 @@ helpim.Client.prototype.login = function() {
  * @param {xmpptk.muc.Room} room
  */
 helpim.Client.prototype.addRoom = function(room) {
-    new helpim.ui.Room(room);
     this.rooms.push(room);
     this.notify();
     return room;

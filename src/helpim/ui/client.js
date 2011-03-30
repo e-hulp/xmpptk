@@ -18,6 +18,8 @@ helpim.ui.Client = function(client) {
 
     var EVENTS = goog.object.getValues(goog.ui.Component.EventType);
     this._logger.fine('Listening for: ' + EVENTS.join(', ') + '.');
+
+    this._rooms = {};
  
     var logInOutButton = new goog.ui.Button();
     logInOutButton.decorate(goog.dom.getElement('logInOutButton'));
@@ -39,16 +41,27 @@ helpim.ui.Client = function(client) {
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
+    this._lastRoomSelected = null;
+
     goog.events.listen(
         this.tabBar,
         goog.ui.Component.EventType.SELECT,
-        function(e) {
+        goog.bind(function(e) {
             var tabSelected = e.target;
             var contentElement = goog.dom.getElement('tab_content');
-            // goog.dom.setTextContent(contentElement,
-            //                         'You selected the "' + tabSelected.getCaption() + '" tab.')
-            ;
-        });
+            if (this._lastRoomSelected) {
+                goog.style.showElement(
+                    this._rooms[this._lastRoomSelected].getPanel(),
+                    false
+                );
+            }
+            goog.style.showElement(
+                this._rooms[tabSelected.getId()].getPanel(),
+                true
+            );
+            this._lastRoomSelected = tabSelected.getId();
+        }, this)
+    );
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
@@ -65,6 +78,8 @@ helpim.ui.Client.prototype.update = function() {
         this.subject.rooms,
         function(room) {
             if (!this.tabBar.getChild(room.id)) {
+                this._rooms[room.id] = new helpim.ui.Room(room);
+
                 var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
                 tab.setId(room.id);
                 this.tabBar.addChild(tab, true);
