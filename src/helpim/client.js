@@ -22,6 +22,8 @@ helpim.Client = function() {
 
     this._view = new helpim.ui.Client(this);
 
+    this.login();
+
     goog.events.listen(
         window,
         goog.events.EventType.UNLOAD,
