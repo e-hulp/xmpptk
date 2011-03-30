@@ -8,20 +8,27 @@ goog.require('xmpptk.Client');
 
 /**
  * @constructor
+ * @inherits {xmpptk.Client}
  */
-xmpptk.muc.Client = function(client) {
-    // will it blend?
-    goog.object.extend(this, client);
+xmpptk.muc.Client = function() {
+    xmpptk.Client.call(this);
 
     this._logger = goog.debug.Logger.getLogger('xmpptk.muc.Client');
     this._logger.info("instantiated");
 
     this.rooms = {};
 
+};
+goog.inherits(xmpptk.muc.Client, xmpptk.Client);
+goog.addSingletonGetter(xmpptk.muc.Client);
+
+xmpptk.muc.Client.prototype.login = function(callback, context) {
+    goog.base(this, 'login', callback, context);
+
     // register handlers
     this._con.registerHandler('message', '*', '*', 'groupchat', goog.bind(this._handleGroupchatPacket, this));
     this._con.registerHandler('presence', 'x', xmpptk.muc.NS.USER, goog.bind(this._handleGroupchatPacket, this));
-};
+}
 
 /**
  * @param {xmpptk.muc.Room} room
@@ -29,6 +36,7 @@ xmpptk.muc.Client = function(client) {
 xmpptk.muc.Client.prototype.registerRoom = function(room) {
     this._logger.info("registering room with id "+room.id);
     this.rooms[room.id] = room;
+    this.notify();
 };
 
 /**
@@ -37,6 +45,7 @@ xmpptk.muc.Client.prototype.registerRoom = function(room) {
 xmpptk.muc.Client.prototype.unregisterRoom = function(room) {
     this._logger.info("unregistering room with id "+room.id);
     delete this.rooms[room.id];
+    this.notify();
 };
 
 

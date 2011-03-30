@@ -17,7 +17,7 @@ xmpptk.muc.RoomJid;
  * @constructor
  * @inherits {xmpptk.Model}
  * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
- * @param {xmpptk.Client} client
+ * @param {xmpptk.muc.Client} client
  */
 xmpptk.muc.Room = function(room_jid, client) {
     this._logger.info("creating room " + goog.json.serialize(room_jid));
@@ -41,7 +41,7 @@ xmpptk.muc.Room = function(room_jid, client) {
     this.messages = [];
 
     /** @private */
-    this._client = new xmpptk.muc.Client(client);
+    this._client = client;
 };
 goog.inherits(xmpptk.muc.Room, xmpptk.Model);
 
@@ -55,7 +55,6 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
         this._logger.info("got subject: "+subject);
         this.set('subject', subject);
     } else {
-        this._logger.info(this.messages);
         this.messages.push(oMsg);
         this.notify();
     }
