@@ -6,9 +6,10 @@
     display: none;
 }
 
-.messagePanel {
+.messagesPanel {
     margin-right: 230px;
     overflow: auto;
+    height: 450px;
     border: 1px solid black;
     padding: 10px;
 }
@@ -16,6 +17,7 @@
 .rosterPanel {
     float: right;
     width: 200px;
+    height: 450px;
     border: 1px solid black;
     padding: 10px;
 }
@@ -65,8 +67,9 @@ border: 1px solid #369;
 }
  
 .goog-tab-content {
-height: 9em;
-margin: 0;
+/*height: 9em;*/
+/*height: 100%;*/
+/*margin: 0;*/
 border: 1px solid #6b90da;
 border-top: 0;
 padding: 4px 8px;

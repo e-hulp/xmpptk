@@ -21,10 +21,11 @@ xmpptk.muc.RoomJid;
  */
 xmpptk.muc.Room = function(room_jid, client) {
     this._logger.info("creating room " + goog.json.serialize(room_jid));
-    xmpptk.Model.call(this);
 
     // keep calm! it's better than you think, isn't it?
     goog.object.extend(this, room_jid);
+
+    xmpptk.Model.call(this);
 
     this.id = this.room+'@'+this.service;
 
@@ -37,6 +38,8 @@ xmpptk.muc.Room = function(room_jid, client) {
     /** @type {string} */
     this.subject = '';
 
+    this.messages = [];
+
     /** @private */
     this._client = new xmpptk.muc.Client(client);
 };
@@ -46,12 +49,17 @@ xmpptk.muc.Room.prototype._logger = goog.debug.Logger.getLogger('xmpptk.muc.Room
 
 xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
-
+    try {
     var subject = oMsg.getSubject();
     if (subject) {
         this._logger.info("got subject: "+subject);
         this.set('subject', subject);
+    } else {
+        this._logger.info(this.messages);
+        this.messages.push(oMsg);
+        this.notify();
     }
+    } catch(e) { this._logger.severe(e); }
 };
 
 xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {

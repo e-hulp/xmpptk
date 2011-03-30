@@ -64,9 +64,7 @@ helpim.Client.prototype.login = function() {
  * @param {xmpptk.muc.Room} room
  */
 helpim.Client.prototype.addRoom = function(room) {
-    try {
-        new helpim.ui.Room(room);
-    } catch(e) { this._logger.severe("failed creating view", e); }
+    new helpim.ui.Room(room);
     this.rooms.push(room);
     this.notify();
     return room;
