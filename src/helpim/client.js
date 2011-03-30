@@ -42,11 +42,12 @@ goog.addSingletonGetter(helpim.Client);
 helpim.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.Client');
 
 helpim.Client.prototype.login = function() {
+    var timer = goog.now();
     goog.base(
         this,
         'login', 
         function() {
-            this._logger.info("logged in successfully");
+            this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
             this.addRoom(
                 new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
                                      service: xmpptk.Config.muc_service,
