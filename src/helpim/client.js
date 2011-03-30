@@ -9,6 +9,7 @@ goog.require('xmpptk.Client');
 goog.require('xmpptk.muc.Room');
 
 goog.require('helpim.ui.Client');
+goog.require('helpim.ui.Room');
 
 /**
  * @constructor
@@ -63,6 +64,9 @@ helpim.Client.prototype.login = function() {
  * @param {xmpptk.muc.Room} room
  */
 helpim.Client.prototype.addRoom = function(room) {
+    try {
+        new helpim.ui.Room(room);
+    } catch(e) { this._logger.severe("failed creating view", e); }
     this.rooms.push(room);
     this.notify();
     return room;

@@ -45,8 +45,9 @@ helpim.ui.Client = function(client) {
         function(e) {
             var tabSelected = e.target;
             var contentElement = goog.dom.getElement('tab_content');
-            goog.dom.setTextContent(contentElement,
-                                    'You selected the "' + tabSelected.getCaption() + '" tab.');
+            // goog.dom.setTextContent(contentElement,
+            //                         'You selected the "' + tabSelected.getCaption() + '" tab.')
+            ;
         });
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
 };
