@@ -67,6 +67,7 @@ helpim.ui.Client.prototype.update = function() {
                 var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
                 tab.setId(room.id);
                 this.tabBar.addChild(tab, true);
+                this.tabBar.setSelectedTab(tab);
             }
         },
         this
