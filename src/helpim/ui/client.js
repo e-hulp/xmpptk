@@ -4,6 +4,7 @@ goog.require('goog.dom');
 goog.require('goog.object');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.Button');
+goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.TabBar');
 goog.require('goog.ui.Tab');
 goog.require('goog.ui.RoundedTabRenderer');
@@ -21,17 +22,21 @@ helpim.ui.Client = function(client) {
 
     this._rooms = {};
  
-    var logInOutButton = new goog.ui.Button();
-    logInOutButton.decorate(goog.dom.getElement('logInOutButton'));
+    var logoutButton = new goog.ui.Button('logout', 
+                                            goog.ui.FlatButtonRenderer.getInstance());
+    logoutButton.render(goog.dom.getElement('logoutButton'));
+    logoutButton.setValue('logout');
     goog.events.listen(
-        logInOutButton,
+        logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            if (logInOutButton.getValue() == 'logout') {
-                logInOutButton.setValue('login');
+            if (logoutButton.getValue() == 'logout') {
+                logoutButton.setValue('login');
+                logoutButton.setCaption('login');
                 client.logout();
             } else {
-                logInOutButton.setValue('logout');
+                logoutButton.setCaption('logout');
+                logoutButton.setValue('logout');
                 client.login();
             }
         },
