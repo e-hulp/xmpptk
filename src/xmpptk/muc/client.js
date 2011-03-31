@@ -39,6 +39,16 @@ xmpptk.muc.Client.prototype.registerRoom = function(room) {
     this.notify();
 };
 
+xmpptk.Client.prototype.sendMessage = function(jid, message) {
+    var m = new JSJaCMessage();
+    m.setTo(jid);
+    m.setType('groupchat');
+    m.setBody(message);
+
+    this._con.send(m);
+};
+
+
 /**
  * @param {xmpptk.muc.Room} room
  */

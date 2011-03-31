@@ -100,3 +100,7 @@ xmpptk.muc.Room.prototype.part = function() {
     // send presence
     this._client.sendPresence('unavailable', undefined, this.jid);
 };
+
+xmpptk.muc.Room.prototype.sendMessage = function(msg) {
+    this._client.sendMessage(this.id, msg);
+};
