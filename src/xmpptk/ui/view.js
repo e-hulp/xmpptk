@@ -1,3 +1,4 @@
+goog.provide('xmpptk.ui');
 goog.provide('xmpptk.ui.View');
 
 goog.require('xmpptk.Observer');
