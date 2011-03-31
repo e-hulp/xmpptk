@@ -39,10 +39,9 @@ helpim.ui.Room = function(room) {
         this._sendTextarea.getContentElement(),
         goog.events.EventType.KEYPRESS,
         goog.bind(function(e) {
-            this._logger.info(e.charCode);
-            this._logger.info(this._sendTextarea.getValue());
             if (e.charCode == 13) { // return key
                 try {
+                    this._logger.info(this._sendTextarea.getValue());
                     room.sendMessage(this._sendTextarea.getValue());
                     this._sendTextarea.setValue('');
                     e.preventDefault();
@@ -78,7 +77,7 @@ helpim.ui.Room.prototype.update = function() {
     }
 
     for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
-        var roomMessage = goog.dom.createDom('div', {class:'roomMessage'});
+        var roomMessage = goog.dom.createDom('div', {'class':'roomMessage'});
         roomMessage.innerHTML = this.formatMessage(this.subject.messages[this._messagesAt]);
         goog.dom.appendChild(this._messagesPanel, roomMessage);
     }
