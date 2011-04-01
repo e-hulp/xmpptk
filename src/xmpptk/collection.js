@@ -47,7 +47,7 @@ xmpptk.Collection.prototype.getItems = function() {
     var items = {};
     goog.object.forEach(
         this.items,
-        function(id, item) {
+        function(item, id) {
             items[id] = item.get();
         }
     );
