@@ -16,14 +16,13 @@
 
 .sendPanel {
     margin-right: 230px;
-    margin-top: 10px;
-    border: 1px solid black;
-    padding: 10px;
-    height: 18px;
 }
 
-.sendTextarea textarea {
-    height: 1.2em;
+.sendPanel textarea {
+    margin-top: 9px;
+    border: 1px solid black;
+    padding: 10px;
+    height: 200px;
     width: 100%;
 }
 
