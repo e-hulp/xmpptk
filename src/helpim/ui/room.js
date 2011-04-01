@@ -22,8 +22,9 @@ helpim.ui.Room = function(room) {
 
     this._subjectPanel  = goog.dom.getElementByClass('subjectPanel', this._panel);
     this._messagesPanel = goog.dom.getElementByClass('messagesPanel', this._panel);
+    this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
     this._sendTextarea = new goog.ui.Textarea("Type here to send a message");
-    this._sendTextarea.render(goog.dom.getElementByClass('sendTextarea', this._panel));
+    this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
     this._sendTextarea._firstClick = true;    
     goog.events.listen(
         this._sendTextarea.getContentElement(),
@@ -81,4 +82,22 @@ helpim.ui.Room.prototype.update = function() {
         roomMessage.innerHTML = this.formatMessage(this.subject.messages[this._messagesAt]);
         goog.dom.appendChild(this._messagesPanel, roomMessage);
     }
+
+    goog.dom.removeChildren(this._rosterPanel);
+    goog.object.forEach(
+        this.subject.roster.getItems(),
+        function(item) {
+            console.log(item);
+            if (item.role == xmpptk.muc.Occupant.Role.NONE) {
+                return;
+            }
+            goog.dom.append(
+                this._rosterPanel,
+                goog.dom.createDom('div',
+                                   {'class': 'rosterItem'},
+                                   (new JSJaCJID(item.jid)).getResource())
+            );
+        },
+        this
+    );
 };
