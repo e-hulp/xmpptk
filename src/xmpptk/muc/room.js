@@ -56,8 +56,8 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
         this.set('subject', subject);
     } else {
         this.messages.push(oMsg);
-        this.notify();
     }
+    this.notify();
 };
 
 xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
@@ -68,19 +68,21 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
         }
-        return;
+    } else {
+
+        var occupant = this.roster.getItem(from);
+
+        var item = oPres.getChild('item', xmpptk.muc.NS.USER);
+        if (item) {
+            occupant.set({
+                affiliation: item.getAttribute('affiliation'),
+                role:        item.getAttribute('role'),
+                real_jid:    item.getAttribute('jid')
+            });
+        }
     }
 
-    var occupant = this.roster.getItem(from);
-
-    var item = oPres.getChild('item', xmpptk.muc.NS.USER);
-    if (item) {
-        occupant.set({
-            affiliation: item.getAttribute('affiliation'),
-            role:        item.getAttribute('role'),
-            real_jid:    item.getAttribute('jid')
-        });
-    }
+    this.notify();
 };
 
 xmpptk.muc.Room.prototype.join = function() {
