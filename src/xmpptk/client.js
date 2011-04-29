@@ -151,7 +151,7 @@ xmpptk.Client.prototype.sendPresence = function(state, message, jid, extra) {
         p.setStatus(message);
     }
     if (extra && typeof extra == 'function') {
-        p.appendNode(extra(p));
+        extra(p);
     }
     this._con.send(p);
 };

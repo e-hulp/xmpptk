@@ -98,7 +98,7 @@ xmpptk.muc.Room.prototype.join = function() {
     // send presence to rooms jid
     if (this.password != '') { 
         var extra = function(p) {
-            return p.buildNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password);
+            return p.appendNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password);
         }
     }
 
