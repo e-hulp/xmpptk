@@ -97,10 +97,11 @@ xmpptk.muc.Room.prototype.join = function() {
 
     // send presence to rooms jid
     if (this.password != '') { 
-        var extra = function(p) {
-            return p.appendNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password);
-        }
-    }
+        var extra = goog.bind(function(p) {
+            return p.appendNode('x', {'xmlns': xmpptk.muc.NS.BASE}, 
+                                [p.buildNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password)]);
+        }, this);
+    } 
 
     this._client.sendPresence('available', undefined, this.jid, extra);
 };
