@@ -50,10 +50,7 @@ helpim.Client.prototype.login = function() {
             new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
                                  service: xmpptk.Config.muc_service,
                                  nick:    xmpptk.Config.muc_nick},
-                                this).join();
-            new xmpptk.muc.Room({room:    'helpim2',
-                                 service: xmpptk.Config.muc_service,
-                                 nick:    xmpptk.Config.muc_nick},
+                                xmpptk.Config.muc_password,
                                 this).join();
         },
         this
