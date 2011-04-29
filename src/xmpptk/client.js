@@ -135,7 +135,7 @@ xmpptk.Client.prototype.rosterItemSet = function(item, callback) {
     this._con.sendIQ(iq, {error_handler: callback, result_handler: callback});
 };
 
-xmpptk.Client.prototype.sendPresence = function(state, message, jid, payload) {
+xmpptk.Client.prototype.sendPresence = function(state, message, jid, extra) {
     var p = new JSJaCPresence();
     p.setTo(jid);
 
@@ -150,8 +150,8 @@ xmpptk.Client.prototype.sendPresence = function(state, message, jid, payload) {
     if (message) {
         p.setStatus(message);
     }
-    if (payload) {
-        p.appendNode(payload);
+    if (extra && typeof extra == 'function') {
+        p.appendNode(extra(p));
     }
     this._con.send(p);
 };
