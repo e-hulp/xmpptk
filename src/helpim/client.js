@@ -57,7 +57,7 @@ helpim.Client.prototype.login = function() {
     );
 };
 
-helpim.Client.prototype.logout = function() {
+helpim.Client.prototype.logout = function(cb) {
     goog.object.forEach(
         this.rooms,
         function(room) {
@@ -67,4 +67,8 @@ helpim.Client.prototype.logout = function() {
     goog.object.clear(this.rooms);
     this.notify();
     goog.base(this, 'logout');
+
+    if (cb && typeof cb == 'function') {
+        cb();
+    }
 };

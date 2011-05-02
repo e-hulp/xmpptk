@@ -30,15 +30,9 @@ helpim.ui.Client = function(client) {
         logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            if (logoutButton.getValue() == 'logout') {
-                logoutButton.setValue('login');
-                logoutButton.setCaption('login');
-                client.logout();
-            } else {
-                logoutButton.setCaption('logout');
-                logoutButton.setValue('logout');
-                client.login();
-            }
+            client.logout(function() {
+                document.location.replace(xmpptk.Config.logout_redirect);
+            });
         },
         false,
         this);
