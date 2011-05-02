@@ -44,6 +44,8 @@ xmpptk.muc.Room = function(room_jid, client, password) {
 
     this.messages = [];
 
+    this.events = [];
+
     /** @private */
     this._client = client;
 };
@@ -59,7 +61,14 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
         this._logger.info("got subject: "+subject);
         this.set('subject', subject);
     } else {
-        this.messages.push(oMsg);
+        if (oMsg.getBody() == '') {
+            return;
+        }
+        this.messages.push(
+            {from: oMsg.getFromJID().getResource(),
+             body: oMsg.getBody(),
+             type: oMsg.getType()}
+        );
     }
     this.notify();
 };
@@ -71,6 +80,8 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
     if (oPres.getType() == 'unavailable') {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
+            this.events.push({type: 'occupant_left',
+                              from: oPres.getFromJID().getResource()});
         }
     } else {
 
@@ -83,6 +94,8 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
                 role:        item.getAttribute('role'),
                 real_jid:    item.getAttribute('jid')
             });
+            this.events.push({type: 'occupant_joined',
+                              from: oPres.getFromJID().getResource()});
         }
     }
 

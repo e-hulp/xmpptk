@@ -34,6 +34,10 @@
     padding: 10px;
 }
 
+.roomEvent {
+    font-weight: bold;
+}
+
 .goog-tab-bar {
   border: 0;
   cursor: default;

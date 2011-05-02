@@ -17,7 +17,7 @@ helpim.ui.Room = function(room) {
 
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
     this._panel.id = xmpptk.ui.fixID(room.id + "_roomPanel");
-    
+
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
 
@@ -26,7 +26,7 @@ helpim.ui.Room = function(room) {
     this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
     this._sendTextarea = new goog.ui.Textarea("Type here to send a message");
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
-    this._sendTextarea._firstClick = true;    
+    this._sendTextarea._firstClick = true;
     goog.events.listen(
         this._sendTextarea.getContentElement(),
         goog.events.EventType.CLICK,
@@ -52,6 +52,7 @@ helpim.ui.Room = function(room) {
         }, this)
     );
     this._messagesAt = 0;
+    this._eventsAt = 0;
 
     if (xmpptk.Config.mode == 'light') {
         // sir hide-a-lot
@@ -65,14 +66,24 @@ goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
 helpim.ui.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Room');
 
+helpim.ui.Room.prototype.appendMessage = function(html, extraClasses) {
+    var classes = 'roomMessage';
+    if (goog.isString(extraClasses)) {
+        classes += ' ' + extraClasses;
+    }
+    var roomMessage = goog.dom.createDom('div', {'class':classes});
+    roomMessage.innerHTML = html;
+    goog.dom.appendChild(this._messagesPanel, roomMessage);
+}
+
 helpim.ui.Room.prototype.getPanel = function() {
     return this._panel;
 };
 
-helpim.ui.Room.prototype.formatMessage = function(oMsg) {
-    return '&lt;'+xmpptk.ui.htmlEnc(oMsg.getFromJID().getResource())+'&gt; '+
-        xmpptk.ui.msgFormat(oMsg.getBody());
-    
+helpim.ui.Room.prototype.formatMessage = function(msg) {
+    return '&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
+        xmpptk.ui.msgFormat(msg.body);
+
 };
 
 helpim.ui.Room.prototype.update = function() {
@@ -87,9 +98,27 @@ helpim.ui.Room.prototype.update = function() {
     }
 
     for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
-        var roomMessage = goog.dom.createDom('div', {'class':'roomMessage'});
-        roomMessage.innerHTML = this.formatMessage(this.subject.messages[this._messagesAt]);
-        goog.dom.appendChild(this._messagesPanel, roomMessage);
+        this.appendMessage(this.formatMessage(this.subject.messages[this._messagesAt]));
+    }
+
+    for (var l=this.subject.events.length; this._eventsAt<l; this._eventsAt++) {
+        var event = this.subject.events[this._eventsAt];
+        this._logger.info(goog.json.serialize(event));
+
+        if (event.from != xmpptk.Config.bot_nick) {
+            var html = '';
+            switch (event.type) {
+            case 'occupant_joined':
+                html = event.from + " has joined";
+                break;
+            case 'occupant_left':
+                html = event.from + " has left";
+                break;
+            }
+            this.appendMessage(html, 'roomEvent');
+        } else {
+            this._logger.info("not showing events from bot");
+        }
     }
 
     goog.dom.removeChildren(this._rosterPanel);
