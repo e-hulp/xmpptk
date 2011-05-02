@@ -1,6 +1,7 @@
 goog.provide('helpim.ui.Room');
 
 goog.require('goog.debug.Logger');
+goog.require('goog.style');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.ui.Textarea');
@@ -51,6 +52,14 @@ helpim.ui.Room = function(room) {
         }, this)
     );
     this._messagesAt = 0;
+
+    if (xmpptk.Config.mode == 'light') {
+        // sir hide-a-lot
+        goog.style.showElement(this._rosterPanel, false);
+        goog.style.showElement(this._subjectPanel, false);
+        goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
+        goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
+    }
 };
 goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 

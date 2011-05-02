@@ -70,6 +70,11 @@ helpim.ui.Client = function(client) {
     );
 
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
+
+    if (xmpptk.Config.mode == 'light') {
+        goog.style.showElement(goog.dom.getElement('tabBar'), false);
+    }
+
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
 
