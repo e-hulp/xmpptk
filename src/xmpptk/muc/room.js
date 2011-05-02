@@ -15,7 +15,7 @@ xmpptk.muc.RoomJid;
 
 /**
  * @constructor
- * @inherits {xmpptk.Model}
+ * @extends {xmpptk.Model}
  * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
  * @param {xmpptk.muc.Client} client
  * @param {?string} password

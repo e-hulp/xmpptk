@@ -3,6 +3,10 @@ goog.provide('xmpptk.Model');
 goog.require('xmpptk.Subject');
 goog.require('goog.object');
 
+/**
+ * @constructor
+ * @extends {xmpptk.Subject}
+ */
 xmpptk.Model = function() {
     xmpptk.Subject.call(this);
 };

@@ -5,7 +5,7 @@ goog.require('xmpptk.Model');
 
 /**
  * @constructor
- * @inherits {xmpptk.Model}
+ * @extends {xmpptk.Model}
  * @param {function(object)} itemClass classname of items to build collection of
  * @param {string} itemID the key id to differentiate items with (aka primary key)
 */

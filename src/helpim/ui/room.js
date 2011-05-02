@@ -10,6 +10,12 @@ goog.require('goog.ui.TextareaRenderer');
 goog.require('xmpptk.ui');
 goog.require('xmpptk.ui.View');
 
+/**
+ * View for a muc room.
+ * @param {xmpptk.muc.Room} room a room object
+ * @constructor
+ * @extends {xmpptk.ui.View}
+ */
 helpim.ui.Room = function(room) {
     xmpptk.ui.View.call(this, room);
 

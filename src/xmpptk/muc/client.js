@@ -8,7 +8,7 @@ goog.require('xmpptk.Client');
 
 /**
  * @constructor
- * @inherits {xmpptk.Client}
+ * @extends {xmpptk.Client}
  */
 xmpptk.muc.Client = function() {
     xmpptk.Client.call(this);

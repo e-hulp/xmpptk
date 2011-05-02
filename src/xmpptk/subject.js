@@ -4,8 +4,8 @@ goog.require('goog.array');
 
 /**
  * This is part of the observer pattern. A subject to observer.
+ * @constructor
  */
-
 xmpptk.Subject = function() {
     this._observers = [];
 };

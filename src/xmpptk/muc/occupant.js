@@ -6,7 +6,7 @@ goog.require('xmpptk.Model');
 
 /**
  * @constructor
- * @inherits {xmpptk.Model}
+ * @extends {xmpptk.Model}
  */
 xmpptk.muc.Occupant = function(jid) {
     xmpptk.Model.call(this);

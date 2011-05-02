@@ -7,7 +7,7 @@ all: clean deps jsjac build
 
 build:
 	@echo "building helpim";
-	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=lib/jsjac/src --root=src/ --namespace="helpim.start" --output_mode=compiled --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
+	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=src/ --namespace="helpim.start" --output_mode=compiled -f '--compilation_level=ADVANCED_OPTIMIZATIONS' -f '--externs=jsjac_externs.js' --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
 
 jsjac:
 	@echo "building jsjac";
