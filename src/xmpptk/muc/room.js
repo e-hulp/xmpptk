@@ -28,10 +28,10 @@ xmpptk.muc.Room = function(room_jid, client, password) {
 
     xmpptk.Model.call(this);
 
-    this.id = this.room+'@'+this.service;
+    this.id = this['room']+'@'+this['service'];
 
     /** @type {string} */
-    this.jid = this.room+'@'+this.service+'/'+this.nick;
+    this.jid = this['room']+'@'+this['service']+'/'+this['nick'];
 
     /** @type {string} */
     this.password = password || '';
