@@ -17,8 +17,8 @@ xmpptk.muc.RoomJid;
  * @constructor
  * @extends {xmpptk.Model}
  * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
- * @param {xmpptk.muc.Client} client
- * @param {?string} password
+ * @param {xmpptk.muc.Client} client a muc enabled xmpp client
+ * @param {?string} password an optional password to access to room with
  */
 xmpptk.muc.Room = function(room_jid, client, password) {
     this._logger.info("creating room " + goog.json.serialize(room_jid));
@@ -28,6 +28,7 @@ xmpptk.muc.Room = function(room_jid, client, password) {
 
     xmpptk.Model.call(this);
 
+    /** @type {string} */
     this.id = this['room']+'@'+this['service'];
 
     /** @type {string} */
@@ -42,11 +43,15 @@ xmpptk.muc.Room = function(room_jid, client, password) {
     /** @type {string} */
     this.subject = '';
 
+    /** @type {array} */
     this.messages = [];
 
+    /** @type {array} */
     this.events = [];
 
-    /** @private */
+    /**
+     * @type {xmpptk.muc.Client}
+     * @private */
     this._client = client;
 };
 goog.inherits(xmpptk.muc.Room, xmpptk.Model);
@@ -65,9 +70,9 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
             return;
         }
         this.messages.push(
-            {from: oMsg.getFromJID().getResource(),
-             body: oMsg.getBody(),
-             type: oMsg.getType()}
+            {'from': oMsg.getFromJID().getResource(),
+             'body': oMsg.getBody(),
+             'type': oMsg.getType()}
         );
     }
     this.notify();
@@ -80,8 +85,8 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
     if (oPres.getType() == 'unavailable') {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
-            this.events.push({type: 'occupant_left',
-                              from: oPres.getFromJID().getResource()});
+            this.events.push({'type': 'occupant_left',
+                              'from': oPres.getFromJID().getResource()});
         }
     } else {
 
@@ -90,12 +95,12 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
         var item = oPres.getChild('item', xmpptk.muc.NS.USER);
         if (item) {
             occupant.set({
-                affiliation: item.getAttribute('affiliation'),
-                role:        item.getAttribute('role'),
-                real_jid:    item.getAttribute('jid')
+                'affiliation': item.getAttribute('affiliation'),
+                'role':        item.getAttribute('role'),
+                'real_jid':    item.getAttribute('jid')
             });
-            this.events.push({type: 'occupant_joined',
-                              from: oPres.getFromJID().getResource()});
+            this.events.push({'type': 'occupant_joined',
+                              'from': oPres.getFromJID().getResource()});
         }
     }
 
@@ -103,7 +108,7 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
 };
 
 xmpptk.muc.Room.prototype.join = function() {
-    this._logger.info("joining room "+this.jid);
+    this._logger.info("joining room "+this.jid+" with password "+this.password);
 
     // register handlers
     this._client.registerRoom(this);
