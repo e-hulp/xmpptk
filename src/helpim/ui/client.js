@@ -31,7 +31,7 @@ helpim.ui.Client = function(client) {
         goog.ui.Component.EventType.ACTION,
         function() {
             client.logout(function() {
-                document.location.replace(xmpptk.Config.logout_redirect);
+                document.location.replace(xmpptk.Config['logout_redirect']);
             });
         },
         false,
@@ -65,7 +65,7 @@ helpim.ui.Client = function(client) {
 
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
 
-    if (xmpptk.Config.mode == 'light') {
+    if (xmpptk.Config['mode'] == 'light') {
         goog.style.showElement(goog.dom.getElement('tabBar'), false);
     }
 

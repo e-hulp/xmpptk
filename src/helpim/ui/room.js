@@ -60,7 +60,7 @@ helpim.ui.Room = function(room) {
     this._messagesAt = 0;
     this._eventsAt = 0;
 
-    if (xmpptk.Config.mode == 'light') {
+    if (xmpptk.Config['mode'] == 'light') {
         // sir hide-a-lot
         goog.style.showElement(this._rosterPanel, false);
         goog.style.showElement(this._subjectPanel, false);
@@ -111,7 +111,7 @@ helpim.ui.Room.prototype.update = function() {
         var event = this.subject.events[this._eventsAt];
         this._logger.info(goog.json.serialize(event));
 
-        if (event.from != xmpptk.Config.bot_nick) {
+        if (event.from != xmpptk.Config['bot_nick']) {
             var html = '';
             switch (event.type) {
             case 'occupant_joined':

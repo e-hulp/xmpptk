@@ -52,7 +52,7 @@ helpim.Client.prototype.login = function() {
                                  'service': xmpptk.Config['muc_service'],
                                  'nick':    xmpptk.Config['muc_nick']},
                                 this,
-                                xmpptk.Config.muc_password).join();
+                                xmpptk.Config['muc_password']).join();
         },
         this
     );
