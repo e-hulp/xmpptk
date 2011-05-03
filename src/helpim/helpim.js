@@ -9,6 +9,9 @@ goog.require('xmpptk.Config');
 
 goog.require('helpim.Client');
 
+/**
+ * @param {xmpptk.Config} cfg a configuration 
+ */
 helpim.start = function(cfg) {
     if (goog.DEBUG) {
         goog.debug.LogManager.getRoot().setLevel(goog.debug.Logger.Level.ALL);

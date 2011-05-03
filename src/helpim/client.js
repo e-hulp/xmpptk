@@ -5,6 +5,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 
+goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
 goog.require('xmpptk.muc.Room');
 
@@ -47,9 +48,9 @@ helpim.Client.prototype.login = function() {
         'login', 
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-            new xmpptk.muc.Room({room:    xmpptk.Config.muc_room,
-                                 service: xmpptk.Config.muc_service,
-                                 nick:    xmpptk.Config.muc_nick},
+            new xmpptk.muc.Room({'room':    xmpptk.Config['muc_room'],
+                                 'service': xmpptk.Config['muc_service'],
+                                 'nick':    xmpptk.Config['muc_nick']},
                                 this,
                                 xmpptk.Config.muc_password).join();
         },
