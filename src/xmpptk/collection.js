@@ -16,7 +16,7 @@ xmpptk.Collection =  function(itemClass, itemID) {
 
     xmpptk.Model.call(this);
 
-    this.items = {};
+    this['items'] = {};
     this._itemClass = itemClass;
     this._itemID = itemID;
 };
@@ -46,7 +46,7 @@ xmpptk.Collection.prototype.getItem = function(id) {
 xmpptk.Collection.prototype.getItems = function() {
     var items = {};
     goog.object.forEach(
-        this.items,
+        this['items'],
         function(item, id) {
             items[id] = item.get();
         }
@@ -78,11 +78,11 @@ xmpptk.Collection.prototype.removeItem = function(id) {
 xmpptk.Collection.prototype.setItems = function(items) {
     this.items = {}; // reset my own items
     if (items) {
-        goog.object.forEach( 
-            items, 
+        goog.object.forEach(
+            items,
             goog.bind(
                 function(item) {
-                    try { 
+                    try {
                         this.add(new this._itemClass(item), true);
                     } catch(e) { }
                 },

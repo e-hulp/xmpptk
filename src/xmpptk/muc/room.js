@@ -58,7 +58,27 @@ goog.inherits(xmpptk.muc.Room, xmpptk.Model);
 
 xmpptk.muc.Room.prototype._logger = goog.debug.Logger.getLogger('xmpptk.muc.Room');
 
-xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
+/**
+ * handle a JSJaCPacket directed to this room
+ * @param {JSJaCPacket} oPacket a JSJaCPacket to handle
+ */
+xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket) {
+    // actually looking for a more elegant solution, but hey, saw the
+    // ponies?
+    this._logger.info(oPacket.pType());
+    switch (oPacket.pType()) {
+    case 'presence': return this._handleGroupchatPresence(oPacket);
+    case 'message': return this._handleGroupchatMessage(oPacket);
+    }
+};
+
+/**
+ * handles a message packet directed to this room
+ * @private
+ * @param {JSJaCMessage} oMsg a presence packet
+ * @return {boolean}
+ */
+xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
 
     var subject = oMsg.getSubject();
@@ -78,7 +98,13 @@ xmpptk.muc.Room.prototype.handleGroupchat_message = function(oMsg) {
     this.notify();
 };
 
-xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
+/**
+ * handles a presence packet directed to this room
+ * @private
+ * @param {JSJaCPresence} oPres a presence packet
+ * @return {boolean}
+ */
+xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
     this._logger.info("room got a presence: "+oPres.xml());
 
     var from = oPres.getFrom();
@@ -89,7 +115,6 @@ xmpptk.muc.Room.prototype.handleGroupchat_presence = function(oPres) {
                               'from': oPres.getFromJID().getResource()});
         }
     } else {
-
         var occupant = this.roster.getItem(from);
 
         var item = oPres.getChild('item', xmpptk.muc.NS.USER);
