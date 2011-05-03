@@ -87,8 +87,8 @@ helpim.ui.Room.prototype.getPanel = function() {
 };
 
 helpim.ui.Room.prototype.formatMessage = function(msg) {
-    return '&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
-        xmpptk.ui.msgFormat(msg.body);
+    return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
+        xmpptk.ui.msgFormat(msg['body']);
 
 };
 
@@ -109,16 +109,15 @@ helpim.ui.Room.prototype.update = function() {
 
     for (var l=this.subject.events.length; this._eventsAt<l; this._eventsAt++) {
         var event = this.subject.events[this._eventsAt];
-        this._logger.info(goog.json.serialize(event));
 
-        if (event.from != xmpptk.Config['bot_nick']) {
+        if (event['from'] != xmpptk.Config['bot_nick']) {
             var html = '';
-            switch (event.type) {
+            switch (event['type']) {
             case 'occupant_joined':
-                html = event.from + " has joined";
+                html = event['from'] + " has joined";
                 break;
             case 'occupant_left':
-                html = event.from + " has left";
+                html = event['from'] + " has left";
                 break;
             }
             this.appendMessage(html, 'roomEvent');
@@ -131,7 +130,6 @@ helpim.ui.Room.prototype.update = function() {
     goog.object.forEach(
         this.subject.roster.getItems(),
         function(item) {
-            console.log(item);
             if (item.role == xmpptk.muc.Occupant.Role.NONE) {
                 return;
             }
@@ -139,7 +137,7 @@ helpim.ui.Room.prototype.update = function() {
                 this._rosterPanel,
                 goog.dom.createDom('div',
                                    {'class': 'rosterItem'},
-                                   (new JSJaCJID(item.jid)).getResource())
+                                   (new JSJaCJID(item['jid'])).getResource())
             );
         },
         this
