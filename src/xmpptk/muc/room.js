@@ -49,6 +49,9 @@ xmpptk.muc.Room = function(room_jid, client, password) {
     /** @type {array} */
     this.events = [];
 
+    /** @type {array} */
+    this.chatStates = {};
+
     /**
      * @type {xmpptk.muc.Client}
      * @private */
@@ -82,15 +85,23 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
 
     var subject = oMsg.getSubject();
+    var from = oMsg.getFromJID().getResource();
+
     if (subject) {
         this._logger.info("got subject: "+subject);
         this.set('subject', subject);
     } else {
+        var chatState = oMsg.getChatState();
+        if (chatState != '') {
+            this.chatStates[from] = chatState;
+        }
+        this._logger.info("got a chatState from "+from+": "+chatState);
         if (oMsg.getBody() == '') {
             return;
         }
+        this.chatStates[from] = '';
         this.messages.push(
-            {'from': oMsg.getFromJID().getResource(),
+            {'from': from,
              'body': oMsg.getBody(),
              'type': oMsg.getType()}
         );

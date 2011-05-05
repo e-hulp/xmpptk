@@ -91,7 +91,6 @@ helpim.ui.Room.prototype.getPanel = function() {
 helpim.ui.Room.prototype.formatMessage = function(msg) {
     return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
         xmpptk.ui.msgFormat(msg['body']);
-
 };
 
 helpim.ui.Room.prototype.update = function() {
@@ -127,6 +126,14 @@ helpim.ui.Room.prototype.update = function() {
             this._logger.info("not showing events from bot");
         }
     }
+
+    goog.object.forEach(
+        this.subject.chatStates,
+        function(from, state) {
+            this._logger.info("chat state > "+from +":"+state);
+        },
+        this
+    );
 
     goog.dom.removeChildren(this._rosterPanel);
     goog.object.forEach(
