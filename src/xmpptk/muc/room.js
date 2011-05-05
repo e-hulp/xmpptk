@@ -160,3 +160,7 @@ xmpptk.muc.Room.prototype.part = function() {
 xmpptk.muc.Room.prototype.sendMessage = function(msg) {
     this._client.sendMessage(this.id, msg);
 };
+
+xmpptk.muc.Room.prototype.sendComposing = function() {
+    this._client.sendComposing(this.id);
+};

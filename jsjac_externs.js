@@ -43,6 +43,8 @@ JSJaCMessage.prototype.getFromJID = function() {};
 JSJaCMessage.prototype.getBody = function() {};
 JSJaCMessage.prototype.getSubject = function() {};
 JSJaCMessage.prototype.getType = function() {};
+JSJaCMessage.prototype.getChatState = function() {};
+JSJaCMessage.prototype.setChatState = function(state) {};
 
 var JSJaCIQ = function() {};
 JSJaCIQ.prototype.setType = function(str) {};

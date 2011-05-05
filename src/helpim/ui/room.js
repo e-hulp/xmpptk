@@ -54,6 +54,8 @@ helpim.ui.Room = function(room) {
                     this._sendTextarea.setValue('');
                     e.preventDefault();
                 } catch(e) { this._logger.severe("failed sending message", e); }
+            } else {
+                room.sendComposing();
             }
         }, this)
     );
