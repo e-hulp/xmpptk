@@ -96,6 +96,7 @@ helpim.Client.prototype.sendMessage = function(jid, message) {
     m.setTo(jid);
     m.setType('groupchat');
     m.setBody(message);
+    m.setChatState('active');
     this._con.send(m);
 };
 
