@@ -148,7 +148,7 @@ helpim.ui.Room.prototype.update = function() {
                     goog.dom.removeNode(el);
                     break;
                 case 'paused':
-                        goog.dom.setTextContent(el, from+" stopped composing");
+                    goog.dom.setTextContent(el, from+" stopped composing");
                     break;
                 case 'composing':
                     var msg = from + " is composing a message";
