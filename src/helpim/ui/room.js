@@ -134,6 +134,11 @@ helpim.ui.Room.prototype.update = function() {
         this.subject.chatStates,
         function(state, from) {
             this._logger.info("chat state > "+from +":"+state);
+            this._logger.info(this.subject['nick']);
+            if (from == this.subject['nick']) {
+                this._logger.info("skipping my own chat state")
+                return;
+            }
             var id = xmpptk.ui.fixID(this.subject.id+from+"_composingMessage");
             var el = goog.dom.getElement(id);
             try {
