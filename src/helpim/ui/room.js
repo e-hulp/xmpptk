@@ -74,12 +74,15 @@ goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
 helpim.ui.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Room');
 
-helpim.ui.Room.prototype.appendMessage = function(html, extraClasses) {
+helpim.ui.Room.prototype.appendMessage = function(html, extraClasses, id) {
     var classes = 'roomMessage';
     if (goog.isString(extraClasses)) {
         classes += ' ' + extraClasses;
     }
     var roomMessage = goog.dom.createDom('div', {'class':classes});
+    if (id) {
+        roomMessage.id = id;
+    }
     roomMessage.innerHTML = html;
     goog.dom.appendChild(this._messagesPanel, roomMessage);
 }
@@ -129,8 +132,31 @@ helpim.ui.Room.prototype.update = function() {
 
     goog.object.forEach(
         this.subject.chatStates,
-        function(from, state) {
+        function(state, from) {
             this._logger.info("chat state > "+from +":"+state);
+            var id = xmpptk.ui.fixID(this.subject.id+from+"_composingMessage");
+            var el = goog.dom.getElement(id);
+            try {
+                switch (state) {
+                case '':
+                case 'active':
+                    goog.dom.removeNode(el);
+                    break;
+                case 'paused':
+                        goog.dom.setTextContent(el, from+" stopped composing");
+                    break;
+                case 'composing':
+                    var msg = from + " is composing a message";
+                    if (el) {
+                        goog.dom.setTextContent(el, msg);
+                    } else {
+                        this.appendMessage(
+                            msg,
+                            "composingMessage",
+                            id);
+                    }
+                }
+            } catch(e) { this._logger.severe("failed show chat state", e); }
         },
         this
     );
