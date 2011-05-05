@@ -21,8 +21,8 @@ helpim.Client = function() {
     this._logger.info("starting up");
     xmpptk.muc.Client.call(this);
 
-    this._composingSent = [];
-    this._composingTimeout = [];
+    this._composingSent = {};
+    this._composingTimeout = {};
     this._view = new helpim.ui.Client(this);
 
     this.login();
