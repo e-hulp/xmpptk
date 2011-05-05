@@ -101,8 +101,6 @@ xmpptk.ui.msgFormat = function(msg) {
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
         function(item, key) {
-            console.log(item.icon.src);
-            console.log(item.regexp.toString());
             if (typeof item.icon.width != 'undefined' && item.icon.width && item.icon.width > 0 && item.icon.height > 0) {
 	        msg = msg.replace(item.regexp,"$1<img src=\""+item.icon.src+"\" width='"+item.icon.width+"' height='"+item.icon.height+"' alt=\""+key+"\" title=\""+key+"\">$2");
             } else {
