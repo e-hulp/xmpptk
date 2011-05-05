@@ -3,7 +3,7 @@ goog.provide('xmpptk.ui.View');
 
 goog.require('xmpptk.Observer');
 goog.require('xmpptk.Model');
-goog.require('xmpptk.ui.Emoticons');
+goog.require('xmpptk.ui.emoticons');
 
 goog.require('goog.object');
 goog.require('goog.array');
@@ -96,17 +96,13 @@ xmpptk.ui.msgFormat = function(msg) {
     }
 
     msg = xmpptk.ui.htmlEnc(msg);
-
     msg = xmpptk.ui.cropLongWords(msg, xmpptk.ui.MAX_WORD_LENGTH);
 
-    // TODO
-
-    // make sure xmpptk.emoticons is initialized already, could be
-    // done by using a singleton
-
     goog.object.forEach(
-        xmpptk.ui.Emoticons,
+        xmpptk.ui.emoticons.replacements,
         function(item, key) {
+            console.log(item.icon.src);
+            console.log(item.regexp.toString());
             if (typeof item.icon.width != 'undefined' && item.icon.width && item.icon.width > 0 && item.icon.height > 0) {
 	        msg = msg.replace(item.regexp,"$1<img src=\""+item.icon.src+"\" width='"+item.icon.width+"' height='"+item.icon.height+"' alt=\""+key+"\" title=\""+key+"\">$2");
             } else {
