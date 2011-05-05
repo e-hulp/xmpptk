@@ -18,7 +18,7 @@ goog.require('xmpptk.ui.View');
 helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
 
-    xmpptk.ui.emoticons.init('/static/');
+    xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
 
     this._rooms = {};
  
