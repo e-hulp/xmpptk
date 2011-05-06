@@ -88,6 +88,11 @@ helpim.Client.prototype.logout = function(cb) {
  * @inheritDoc
  */
 helpim.Client.prototype.sendMessage = function(jid, message) {
+    if (!goog.isString(message) || message == '') {
+        this._logger.info("not sending empty message");
+        return;
+    }
+
     // make sure we don't send 'paused' state by accident
     this._clearComposingTimeout(jid);
     this._composingSent[jid] = false;
