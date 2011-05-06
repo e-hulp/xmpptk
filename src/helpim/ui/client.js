@@ -20,10 +20,23 @@ goog.require('xmpptk.ui.sound');
 helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
 
+    this._rooms = {};
+
     xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
     xmpptk.ui.sound.init(xmpptk.Config['static_url']);
 
-    this._rooms = {};
+    goog.events.listen(
+        goog.dom.getElement('soundButton'),
+        goog.events.EventType.CLICK,
+        goog.bind(function(e) {
+            if (xmpptk.ui.sound.enabled) {
+                e.target.src = '/static/images/stock_volume-mute.png';
+            } else {
+                e.target.src = '/static/images/stock_volume.png';
+            }
+            xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
+        }, this)
+    );
  
     var logoutButton = new goog.ui.Button('logout', 
                                             goog.ui.FlatButtonRenderer.getInstance());

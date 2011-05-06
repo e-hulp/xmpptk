@@ -27,13 +27,18 @@ xmpptk.ui.sound.init = function(base_url) {
     }
 };
 
+/** @type {boolean} */
+xmpptk.ui.sound.enabled = true;
+
 /**
  * @param {string} event event to play sound for
  */
 xmpptk.ui.sound.play = function(event) {
-    var target = frames['soundIFrame'].document;
-    var html = '<embed src="'+xmpptk.ui.sound.path+xmpptk.ui.sound.FILES[event]+'" width="1" height="1" quality="high" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash">';
-    target.open();
-    target.write(html);
-    target.close();
+    if (xmpptk.ui.sound.enabled) {
+        var target = frames['soundIFrame'].document;
+        var html = '<embed src="'+xmpptk.ui.sound.path+xmpptk.ui.sound.FILES[event]+'" width="1" height="1" quality="high" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash">';
+        target.open();
+        target.write(html);
+        target.close();
+    }
 };
