@@ -84,7 +84,14 @@ helpim.ui.Room.prototype.appendMessage = function(html, extraClasses, id) {
         roomMessage.id = id;
     }
     roomMessage.innerHTML = html;
+
+    var scrollBottom = this._messagesPanel.scrollTop+this._messagesPanel.clientHeight>=this._messagesPanel.scrollHeight;
+    this._logger.info("scrollBottom: "+scrollBottom);
+
     goog.dom.appendChild(this._messagesPanel, roomMessage);
+    if (scrollBottom) {
+        this._messagesPanel.scrollTop = this._messagesPanel.scrollHeight;
+    }
 }
 
 helpim.ui.Room.prototype.getPanel = function() {
