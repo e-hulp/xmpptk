@@ -10,6 +10,8 @@ goog.require('goog.ui.Tab');
 goog.require('goog.ui.RoundedTabRenderer');
 
 goog.require('xmpptk.ui.View');
+goog.require('xmpptk.ui.emoticons');
+goog.require('xmpptk.ui.sound');
 
 /**
  * @constructor
@@ -19,6 +21,7 @@ helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
 
     xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
+    xmpptk.ui.sound.init(xmpptk.Config['static_url']);
 
     this._rooms = {};
  

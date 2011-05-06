@@ -9,6 +9,7 @@ goog.require('goog.ui.TextareaRenderer');
 
 goog.require('xmpptk.ui');
 goog.require('xmpptk.ui.View');
+goog.require('xmpptk.ui.sound');
 
 /**
  * View for a muc room.
@@ -172,6 +173,9 @@ helpim.ui.Room.prototype.update = function() {
 
     for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
         this.appendMessage(this.formatMessage(this.subject.messages[this._messagesAt]));
+        if (this.subject.messages[this._messagesAt]['from'] != this.subject['nick']) {
+            xmpptk.ui.sound.play('chat_recv');
+        }
     }
 
     for (var l=this.subject.events.length; this._eventsAt<l; this._eventsAt++) {
@@ -182,6 +186,9 @@ helpim.ui.Room.prototype.update = function() {
             switch (event['type']) {
             case 'occupant_joined':
                 html = event['from'] + " has joined";
+                if (event['from'] != this.subject['nick']) {
+                    xmpptk.ui.sound.play('ring');
+                }
                 break;
             case 'occupant_left':
                 html = event['from'] + " has left";
