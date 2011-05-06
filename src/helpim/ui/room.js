@@ -59,6 +59,28 @@ helpim.ui.Room = function(room) {
             }
         }, this)
     );
+    goog.array.forEach(
+        goog.dom.getElementsByTagNameAndClass('img', undefined, this._panel),
+        goog.bind(function(img) {
+            goog.events.listen(
+                img,
+                goog.events.EventType.CLICK,
+                goog.bind(function(e) {
+                    if (this._sendTextarea._firstClick) {
+                        this._sendTextarea.setValue(e.target.title);
+                        this._sendTextarea._firstClick = false;
+                        return
+                    }
+                    var emotxt = e.target.title;
+                    if (this._sendTextarea.getValue() != '') {
+                        emotxt = ' ' + emotxt;
+                    }
+                    this._sendTextarea.setValue(this._sendTextarea.getValue()+emotxt);
+                }, this)
+            );
+        }, this)
+    );
+
     this._messagesAt = 0;
     this._eventsAt = 0;
 

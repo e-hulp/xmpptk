@@ -6,6 +6,10 @@
     display: none;
 }
 
+.emoticonsPanel {
+    padding: 10px;
+}
+
 .messagesPanel {
     margin-right: 230px;
     overflow: auto;
