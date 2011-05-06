@@ -67,15 +67,49 @@ helpim.ui.Room = function(room) {
                 goog.events.EventType.CLICK,
                 goog.bind(function(e) {
                     if (this._sendTextarea._firstClick) {
-                        this._sendTextarea.setValue(e.target.title);
+                        this._sendTextarea.setValue('');
                         this._sendTextarea._firstClick = false;
-                        return
                     }
-                    var emotxt = e.target.title;
-                    if (this._sendTextarea.getValue() != '') {
-                        emotxt = ' ' + emotxt;
+
+                    var emoticon = e.target.title;
+
+                    var setSelectionRange = function(input, selectionStart, selectionEnd) {
+                        if (input.setSelectionRange) {
+                            input.focus();
+                            input.setSelectionRange(selectionStart, selectionEnd);
+                        }
+                        else if (input.createTextRange) {
+                            var range = input.createTextRange();
+                            range.collapse(true);
+                            range.moveEnd('character', selectionEnd);
+                            range.moveStart('character', selectionStart);
+                            range.select();
+                        }
+                    };
+
+                    input = this._sendTextarea.getContentElement();
+                    if (input.setSelectionRange) {
+                        var selectionStart = input.selectionStart;
+                        var selectionEnd = input.selectionEnd;
+                        input.value = input.value.substring(0, selectionStart) + emoticon + input.value.substring(selectionEnd);
+                        if (selectionStart != selectionEnd) { // has there been a selection
+                            setSelectionRange(input, selectionStart, selectionStart + emoticon.length);
+                        }
+                        else { // set caret
+                            setSelectionRange(input, selectionStart + emoticon.length, selectionStart + emoticon.length);
+                        }
                     }
-                    this._sendTextarea.setValue(this._sendTextarea.getValue()+emotxt);
+                    else if (input.createTextRange && input.caretPos) {
+                        var caretPos = input.caretPos;
+                        caretPos.text = (caretPos.text.charAt(caretPos.text.length - 1)==' '?emoticon+' ':emoticon);
+                        input.focus();
+                    }
+                    else {
+                        input.value += emoticon;
+                        input.focus();
+                    }
+
+
                 }, this)
             );
         }, this)
