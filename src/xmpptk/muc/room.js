@@ -129,19 +129,25 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
     } else {
         var occupant = this.roster.getItem(from);
 
-        var item = oPres.getChild('item', xmpptk.muc.NS.USER);
-        if (item) {
-            occupant.set({
-                'affiliation': item.getAttribute('affiliation'),
-                'role':        item.getAttribute('role'),
-                'real_jid':    item.getAttribute('jid')
-            });
-            this.events.push({'type': 'occupant_joined',
-                              'from': oPres.getFromJID().getResource()});
+        var x = oPres.getChild('x', xmpptk.muc.NS.USER);
+        if (x) {
+            var item = x.getElementsByTagName('item').item(0);
+            if (item) {
+                occupant.set({
+                    'affiliation': item.getAttribute('affiliation'),
+                    'role':        item.getAttribute('role'),
+                    'real_jid':    item.getAttribute('jid')
+                });
+                this.events.push({'type': 'occupant_joined',
+                                  'from': oPres.getFromJID().getResource()});
+            }
+        } else {
+            this._logger.info("no item found for "+xmpptk.muc.NS.USER);
         }
     }
 
     this.notify();
+    this._logger.info("done handling presence");
 };
 
 xmpptk.muc.Room.prototype.join = function() {
