@@ -28,14 +28,14 @@ helpim.ui.Client = function(client) {
     goog.events.listen(
         goog.dom.getElement('soundButton'),
         goog.events.EventType.CLICK,
-        goog.bind(function(e) {
+        function(e) {
             if (xmpptk.ui.sound.enabled) {
                 e.target.src = '/static/images/stock_volume-mute.png';
             } else {
                 e.target.src = '/static/images/stock_volume.png';
             }
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
-        }, this)
+        }
     );
  
     var logoutButton = new goog.ui.Button('logout', 
