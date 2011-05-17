@@ -1,5 +1,7 @@
 goog.provide('helpim.jsjac_ext');
 
+goog.require('goog.array');
+
 /**
  * @type {string}
  * @const
@@ -13,7 +15,7 @@ helpim.jsjac_ext.NS_CHAT_STATE = 'http://jabber.org/protocol/chatstates';
 helpim.jsjac_ext.CHAT_STATES = ['active', 'inactive', 'composing', 'paused', 'gone'];
 
 JSJaCMessage.prototype.setChatState = function(state) {
-    if (helpim.jsjac_ext.CHAT_STATES.indexOf(state) != -1) {
+    if (goog.array.contains(helpim.jsjac_ext.CHAT_STATES, state)) {
 	this.appendNode(state, {'xmlns': helpim.jsjac_ext.NS_CHAT_STATE});
     }
     return this;
