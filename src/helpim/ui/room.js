@@ -60,9 +60,21 @@ helpim.ui.Room = function(room) {
             }
         }, this)
     );
-    goog.array.forEach(
-        goog.dom.getElementsByTagNameAndClass('img', undefined, this._panel),
-        goog.bind(function(img) {
+    var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
+    var seenEmoticon = {};
+    goog.object.forEach(
+        xmpptk.ui.emoticons.replacements,
+        goog.bind(function(replacement, key) {
+            var img = replacement.icon;
+            if (seenEmoticon[img.src]) {
+                return;
+            }
+            seenEmoticon[img.src] = true;
+            img.title = key;
+            img.className = 'emoticonBtn';
+
+            emoticonsPanel.appendChild(img);
+
             goog.events.listen(
                 img,
                 goog.events.EventType.CLICK,
