@@ -54,7 +54,7 @@ helpim.ui.Room = function(room) {
                     room.sendMessage(this._sendTextarea.getValue());
                     this._sendTextarea.setValue('');
                     e.preventDefault();
-                } catch(e) { this._logger.severe("failed sending message", e); }
+                } catch(e) { this._logger.severe("failed sending message", e.message); }
             } else {
                 room.sendComposing();
             }
@@ -243,7 +243,7 @@ helpim.ui.Room.prototype.update = function() {
                             id);
                     }
                 }
-            } catch(e) { this._logger.severe("failed show chat state", e); }
+            } catch(e) { this._logger.severe("failed show chat state", e.message); }
         },
         this
     );
