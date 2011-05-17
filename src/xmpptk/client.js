@@ -79,7 +79,7 @@ xmpptk.Client.prototype.isConnected = function() {
 };
 
 xmpptk.Client.prototype.login = function(callback, context) {
-    this._logger.info("logging in with: " + goog.json.serialize(xmpptk.Config));
+//    this._logger.info("logging in with: " + goog.json.serialize(xmpptk.Config));
     this._ps.subscribeOnce('_login', callback, context);
 
     this._con = new JSJaCHttpBindingConnection(xmpptk.Config);
