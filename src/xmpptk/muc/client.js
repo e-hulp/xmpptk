@@ -45,7 +45,7 @@ xmpptk.muc.Client.prototype.registerRoom = function(room) {
  * @param {string} jid a room's jid
  * @param {string} message the body of the message to send
  */
-xmpptk.Client.prototype.sendMessage = function(jid, message) {
+xmpptk.muc.Client.prototype.sendMessage = function(jid, message) {
     var m = new JSJaCMessage();
     m.setTo(jid);
     m.setType('groupchat');
