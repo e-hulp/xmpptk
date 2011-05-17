@@ -25,40 +25,41 @@ xmpptk.ui.emoticons.init = function(base_url) {
         xmpptk.ui.emoticons.path + 'icondef.xml',
         function(e) {
             var xhr = /** @type {goog.net.XhrIo} */ (e.target);
-            try {
-                goog.array.forEach(
-                    xhr.getResponseXml().getElementsByTagName('icon'),
-                    function(iconEl) {
-                        var src = iconEl.getElementsByTagName('graphic').item(0).firstChild.nodeValue;
-                        goog.array.forEach(
-                            iconEl.getElementsByTagName('text'),
-                            function(textEl) {
-                                var key = textEl.firstChild.nodeValue;
+            goog.array.forEach(
+                xhr.getResponseXml().getElementsByTagName('icon'),
+                function(iconEl) {
+                    var src = iconEl.getElementsByTagName('graphic').item(0).firstChild.nodeValue;
+                    goog.array.forEach(
+                        iconEl.getElementsByTagName('text'),
+                        function(textEl) {
+                            var key = textEl.firstChild.nodeValue;
 
-                                var key_q = key.replace(/\\/g, '\\\\');
-                                key_q = key_q.replace(/\)/g, '\\)');
-                                key_q = key_q.replace(/\(/g, '\\(');
-                                key_q = key_q.replace(/\[/g, '\\[');
-                                key_q = key_q.replace(/\]/g, '\\]');
-                                key_q = key_q.replace(/\}/g, '\\}');
-                                key_q = key_q.replace(/\{/g, '\\{');
-                                key_q = key_q.replace(/\//g, '\\/');
-                                key_q = key_q.replace(/\|/g, '\\|');
-                                key_q = key_q.replace(/\*/g, '\\*');
-                                key_q = key_q.replace(/\+/g, '\\+');
+                            var key_q = key.replace(/\\/g, '\\\\');
+                            key_q = key_q.replace(/\)/g, '\\)');
+                            key_q = key_q.replace(/\(/g, '\\(');
+                            key_q = key_q.replace(/\[/g, '\\[');
+                            key_q = key_q.replace(/\]/g, '\\]');
+                            key_q = key_q.replace(/\}/g, '\\}');
+                            key_q = key_q.replace(/\{/g, '\\{');
+                            key_q = key_q.replace(/\//g, '\\/');
+                            key_q = key_q.replace(/\|/g, '\\|');
+                            key_q = key_q.replace(/\*/g, '\\*');
+                            key_q = key_q.replace(/\+/g, '\\+');
 
-                                var icon = new Image();
-                                icon.src = xmpptk.ui.emoticons.path + src;
+                            var icon = new Image();
+                            icon.src = xmpptk.ui.emoticons.path + src;
 
-                                xmpptk.ui.emoticons.replacements[key] = {
-                                    regexp: eval("/\(\\s\|\^\)"+key_q+"\(\\s|\$\)/g"),
-                                    icon: icon
-                                };
-                            }
-                        );
-                    }
-                );
-            } catch(e) { if (typeof console != 'undefined' && typeof console.error == 'function') console.error(e); }
+                            xmpptk.ui.emoticons.replacements[key] = {
+                                regexp: eval("/\(\\s\|\^\)"+key_q+"\(\\s|\$\)/g"),
+                                icon: icon
+                            };
+                        }
+                    );
+                }
+            );
+            xmpptk.ui.emoticons._logger.info("done initializing emoticons");
         }
     );
 };
+
+xmpptk.ui.emoticons._logger = goog.debug.Logger.getLogger('xmpptk.ui.emoticons');

@@ -62,6 +62,7 @@ helpim.ui.Room = function(room) {
     );
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
+    this._logger.info("creating emoticonsPanel");
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
         goog.bind(function(replacement, key) {
