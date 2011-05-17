@@ -139,6 +139,10 @@ helpim.ui.Room = function(room) {
         goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
         goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
     }
+
+    this._focused = true;
+    window.onblur = goog.bind(function() { this._focused = false; }, this);
+    window.onfocus = goog.bind(function() { this._focused = true; }, this);
 };
 goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
@@ -174,6 +178,8 @@ helpim.ui.Room.prototype.formatMessage = function(msg) {
 };
 
 helpim.ui.Room.prototype.update = function() {
+    this._logger.info("update called");
+
     if (this.subject.subject != '') {
         goog.style.showElement(this._subjectPanel, true);
         goog.dom.setTextContent(
@@ -193,13 +199,30 @@ helpim.ui.Room.prototype.update = function() {
 
     for (var l=this.subject.events.length; this._eventsAt<l; this._eventsAt++) {
         var event = this.subject.events[this._eventsAt];
-
+        this._logger.info("handling event "+event['type']+" for "+event['from']);
         if (event['from'] != xmpptk.Config['bot_nick']) {
             var html = '';
             switch (event['type']) {
             case 'occupant_joined':
                 html = event['from'] + " has joined";
                 if (event['from'] != this.subject['nick']) {
+                    if (!this._focused) {
+                        window.focus();
+                    }
+                    // taken from
+                    // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+                    // combined with
+                    // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+                    var oldTitle = document.title;
+                    var msg = "Ring! Ring!";
+                    var timeoutId = setInterval(function() {
+                        document.title = document.title == msg ? ' ' : msg;
+                    }, 1000);
+                    document.onmousemove = function() {
+                        clearInterval(timeoutId);
+                        document.title = oldTitle;
+                        document.onmousemove = null;
+                    };
                     xmpptk.ui.sound.play('ring');
                 }
                 break;
