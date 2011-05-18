@@ -150,6 +150,9 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
     this._logger.info("done handling presence");
 };
 
+/**
+ * actually join the room
+ */
 xmpptk.muc.Room.prototype.join = function() {
     this._logger.info("joining room "+this.jid+" with password "+this.password);
 

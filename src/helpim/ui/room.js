@@ -132,13 +132,14 @@ helpim.ui.Room = function(room) {
     this._messagesAt = 0;
     this._eventsAt = 0;
 
-    if (xmpptk.Config['mode'] == 'light') {
+    if (xmpptk.Config['is_one2one']) {
         // sir hide-a-lot
         goog.style.showElement(this._rosterPanel, false);
-        goog.style.showElement(this._subjectPanel, false);
         goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
         goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
     }
+
+    goog.style.showElement(this._subjectPanel, false);
 
     this._focused = true;
     window.onblur = goog.bind(function() { this._focused = false; }, this);
