@@ -36,6 +36,7 @@ JSJaCPresence.prototype.getType = function() {};
 var JSJaCMessage = function() {};
 JSJaCMessage.prototype.setTo = function(str) {};
 JSJaCMessage.prototype.setType = function(str) {};
+JSJaCMessage.prototype.setSubject = function(str) {};
 JSJaCMessage.prototype.setBody = function(str) {};
 JSJaCMessage.prototype.buildNode = function(str, obj, val) {};
 JSJaCMessage.prototype.appendNode = function(str, obj, val) {};

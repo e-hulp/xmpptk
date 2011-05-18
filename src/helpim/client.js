@@ -7,9 +7,9 @@ goog.require('goog.debug.Logger');
 
 goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
-goog.require('xmpptk.muc.Room');
 
 goog.require('helpim.jsjac_ext');
+goog.require('helpim.muc.Room');
 goog.require('helpim.ui.Client');
 goog.require('helpim.ui.Room');
 
@@ -58,7 +58,7 @@ helpim.Client.prototype.login = function() {
         'login', 
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-            new xmpptk.muc.Room({'room':    xmpptk.Config['muc_room'],
+            new helpim.muc.Room({'room':    xmpptk.Config['muc_room'],
                                  'service': xmpptk.Config['muc_service'],
                                  'nick':    xmpptk.Config['muc_nick']},
                                 this,
