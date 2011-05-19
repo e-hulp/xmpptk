@@ -220,14 +220,18 @@ helpim.ui.Room.prototype.update = function() {
                     var oldTitle = document.title;
                     var msg = "Ring! Ring!";
                     var timeoutId = setInterval(function() {
-                        document.title = document.title == msg ? ' ' : msg;
+                        if (document.title == 'msg') {
+                            document.title = '';
+                        } else {
+                            document.title = msg;
+                            xmpptk.ui.sound.play('ring');
+                        }
                     }, 1000);
                     document.onmousemove = function() {
                         clearInterval(timeoutId);
                         document.title = oldTitle;
                         document.onmousemove = null;
                     };
-                    xmpptk.ui.sound.play('ring');
                 }
                 break;
             case 'occupant_left':
