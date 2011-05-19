@@ -19,16 +19,19 @@ helpim.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.muc.Room
 /**
  * @inheritDoc
  */
-helpim.muc.Room.prototype.join = function() {
-    helpim.muc.Room.superClass_.join.call(this);
-    if (!xmpptk.Config['is_staff'] && xmpptk.Config['muc_subject'] || true) {
-        this._logger.info("sending subject: "+xmpptk.Config['muc_subject']);
-        var m = new JSJaCMessage();
-        m.setTo(this.id);
-        m.setType('groupchat');
-//        m.setSubject(xmpptk.Config['muc_subject']);
-        m.setSubject("ahllow welt");
-        this._client._con.send(m);
+helpim.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
+    var admitted = this.admitted;
+    helpim.muc.Room.superClass_._handleGroupchatPresence.call(this, oPres);
+    if (!admitted && this.admitted) {
+        // we're now admitted to the room, send subject if we're a
+        // care seeker
+        if (!xmpptk.Config['is_staff'] && xmpptk.Config['muc_subject']) {
+            this._logger.info("sending subject: "+xmpptk.Config['muc_subject']);
+            var m = new JSJaCMessage();
+            m.setTo(this.id);
+            m.setType('groupchat');
+            m.setSubject(xmpptk.Config['muc_subject']);
+            this._client._con.send(m);
+        }
     }
 }
-

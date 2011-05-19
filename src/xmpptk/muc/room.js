@@ -43,6 +43,12 @@ xmpptk.muc.Room = function(room_jid, client, password) {
     /** @type {string} */
     this.subject = '';
 
+    /**
+     * indicates whether we've been admitted to room or not
+     * @type {boolean}
+     */
+    this.admitted = false;
+
     /** @type {array} */
     this.messages = [];
 
@@ -84,12 +90,12 @@ xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket) {
 xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
     this._logger.info("room got a message: "+oMsg.xml());
 
-    var subject = oMsg.getSubject();
+    var roomSubject = oMsg.getSubject();
     var from = oMsg.getFromJID().getResource();
 
-    if (subject) {
-        this._logger.info("got subject: "+subject);
-        this.set('subject', subject);
+    if (goog.isString(roomSubject)) {
+        this._logger.info("got subject: "+roomSubject);
+        this.subject = roomSubject;
     } else {
         var chatState = oMsg.getChatState();
         if (chatState != '') {
@@ -114,7 +120,6 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
  * handles a presence packet directed to this room
  * @private
  * @param {JSJaCPresence} oPres a presence packet
- * @return {boolean}
  */
 xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
     this._logger.info("room got a presence: "+oPres.xml());
@@ -140,6 +145,16 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                 });
                 this.events.push({'type': 'occupant_joined',
                                   'from': oPres.getFromJID().getResource()});
+
+                if (from == this.jid) {
+                    // it's my own presence, check if we're part of the game now
+                    var role = occupant.get('role');
+                    if (!this.admitted) {
+                        if (role != 'none' && role != 'outcast') {
+                            this.admitted = true;
+                        }
+                    }
+                }
             }
         } else {
             this._logger.info("no item found for "+xmpptk.muc.NS.USER);

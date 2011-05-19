@@ -181,13 +181,16 @@ helpim.ui.Room.prototype.formatMessage = function(msg) {
 helpim.ui.Room.prototype.update = function() {
     this._logger.info("update called");
 
-    if (this.subject.subject != '') {
+    var roomSubject = this.subject.subject;
+    if (xmpptk.Config['is_staff'] && roomSubject != '') {
+        this._logger.info('showing subject: '+roomSubject);
         goog.style.showElement(this._subjectPanel, true);
         goog.dom.setTextContent(
             goog.dom.getElementByClass('roomSubject', this._panel),
-            this.subject.subject
+            roomSubject
         );
     } else {
+        this._logger.info('hiding subject');
         goog.style.showElement(this._subjectPanel, false);
     }
 
