@@ -76,6 +76,9 @@ xmpptk.muc.Client.prototype._handleGroupchatPacket = function(oJSJaCPacket) {
         try {
             this.rooms[room_id].handleGroupchatPacket(oJSJaCPacket);
         } catch(e) {
+            if (console && console.error) {
+                console.error(e);
+            }
             this._logger.severe("failed to call room's handleGroupchatPacket", e.message);
         }
     } else {
