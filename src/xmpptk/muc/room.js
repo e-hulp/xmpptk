@@ -100,6 +100,7 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
         var chatState = oMsg.getChatState();
         if (chatState != '') {
             this.chatStates[from] = chatState;
+            this.set('chatStates', this.chatStates);
         }
         this._logger.info("got a chatState from "+from+": "+chatState);
         if (oMsg.getBody() == '') {
@@ -107,11 +108,13 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
             return;
         }
         this.chatStates[from] = '';
+        this.set('chatStates', this.chatStates);
         this.messages.push(
             {'from': from,
              'body': oMsg.getBody(),
              'type': oMsg.getType()}
         );
+        this.set('messages', this.messages);
     }
     this.notify();
 };
@@ -130,6 +133,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
             this.roster.removeItem(from);
             this.events.push({'type': 'occupant_left',
                               'from': oPres.getFromJID().getResource()});
+            this.set('events', this.events);
         }
     } else {
         var occupant = this.roster.getItem(from);
@@ -145,6 +149,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                 });
                 this.events.push({'type': 'occupant_joined',
                                   'from': oPres.getFromJID().getResource()});
+                this.set('events', this.events);
 
                 if (from == this.jid) {
                     // it's my own presence, check if we're part of the game now
@@ -175,12 +180,12 @@ xmpptk.muc.Room.prototype.join = function() {
     this._client.registerRoom(this);
 
     // send presence to rooms jid
-    if (this.password != '') { 
+    if (this.password != '') {
         var extra = goog.bind(function(p) {
-            return p.appendNode('x', {'xmlns': xmpptk.muc.NS.BASE}, 
+            return p.appendNode('x', {'xmlns': xmpptk.muc.NS.BASE},
                                 [p.buildNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password)]);
         }, this);
-    } 
+    }
 
     this._client.sendPresence('available', undefined, this.jid, extra);
 };
