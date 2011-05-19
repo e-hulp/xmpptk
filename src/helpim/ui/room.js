@@ -34,6 +34,7 @@ helpim.ui.Room = function(room) {
     this._sendTextarea = new goog.ui.Textarea("Type here to send a message");
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
     this._sendTextarea._firstClick = true;
+
     goog.events.listen(
         this._sendTextarea.getContentElement(),
         goog.events.EventType.CLICK,
@@ -44,6 +45,7 @@ helpim.ui.Room = function(room) {
             }
         }, this)
     );
+
     goog.events.listen(
         this._sendTextarea.getContentElement(),
         goog.events.EventType.KEYPRESS,
@@ -60,6 +62,7 @@ helpim.ui.Room = function(room) {
             }
         }, this)
     );
+
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
     this._logger.info("creating emoticonsPanel");
@@ -129,9 +132,6 @@ helpim.ui.Room = function(room) {
         }, this)
     );
 
-    this._messagesAt = 0;
-    this._eventsAt = 0;
-
     if (xmpptk.Config['is_one2one']) {
         // sir hide-a-lot
         goog.style.showElement(this._rosterPanel, false);
@@ -145,8 +145,13 @@ helpim.ui.Room = function(room) {
     window.onblur = goog.bind(function() { this._focused = false; }, this);
     window.onfocus = goog.bind(function() { this._focused = true; }, this);
 
+    this._messagesAt = 0;
+    this._eventsAt = 0;
 
     room.attachPropertyhandler('subject', this._subjectChanged, this);
+    room.attachPropertyhandler('events', this._eventsChanged, this);
+    room.attachPropertyhandler('messages', this._messagesChanged, this);
+    room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
 };
 goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
@@ -184,15 +189,44 @@ helpim.ui.Room.prototype.formatMessage = function(msg) {
 helpim.ui.Room.prototype.update = function() {
     this._logger.info("update called");
 
-    for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
-        this.appendMessage(this.formatMessage(this.subject.messages[this._messagesAt]));
-        if (this.subject.messages[this._messagesAt]['from'] != this.subject['nick']) {
-            xmpptk.ui.sound.play('chat_recv');
-        }
+    if (!xmpptk.Config['is_one2one']) {
+        goog.dom.removeChildren(this._rosterPanel);
+        goog.object.forEach(
+            this.subject.roster.getItems(),
+            function(item) {
+                if (item.role == xmpptk.muc.Occupant.Role.NONE) {
+                    return;
+                }
+                goog.dom.append(
+                    this._rosterPanel,
+                    goog.dom.createDom('div',
+                                       {'class': 'rosterItem'},
+                                       (new JSJaCJID(item['jid'])).getResource())
+                );
+            },
+            this
+        );
     }
+};
 
-    for (var l=this.subject.events.length; this._eventsAt<l; this._eventsAt++) {
-        var event = this.subject.events[this._eventsAt];
+helpim.ui.Room.prototype._subjectChanged = function(roomSubject) {
+    if (xmpptk.Config['is_staff'] && roomSubject != '') {
+        this._logger.info('showing subject: '+roomSubject);
+        goog.style.showElement(this._subjectPanel, true);
+        goog.dom.setTextContent(
+            goog.dom.getElementByClass('roomSubject', this._panel),
+            roomSubject
+        );
+    } else {
+        this._logger.info('hiding subject');
+        goog.style.showElement(this._subjectPanel, false);
+    }
+};
+
+helpim.ui.Room.prototype._eventsChanged = function(events) {
+    this._logger.info("an event occured");
+    for (var l=events.length; this._eventsAt<l; this._eventsAt++) {
+        var event = events[this._eventsAt];
         this._logger.info("handling event "+event['type']+" for "+event['from']);
         if (event['from'] != xmpptk.Config['bot_nick']) {
             var html = '';
@@ -238,9 +272,20 @@ helpim.ui.Room.prototype.update = function() {
             this._logger.info("not showing events from bot");
         }
     }
+};
 
+helpim.ui.Room.prototype._messagesChanged = function(messages) {
+    for (var l=messages.length; this._messagesAt<l;this._messagesAt++) {
+        this.appendMessage(this.formatMessage(messages[this._messagesAt]));
+        if (messages[this._messagesAt]['from'] != this.subject['nick']) {
+            xmpptk.ui.sound.play('chat_recv');
+        }
+    }
+};
+
+helpim.ui.Room.prototype._chatStatesChanged = function(chatStates) {
     goog.object.forEach(
-        this.subject.chatStates,
+        chatStates,
         function(state, from) {
             this._logger.info("chat state > "+from +":"+state);
             this._logger.info(this.subject['nick']);
@@ -274,35 +319,4 @@ helpim.ui.Room.prototype.update = function() {
         },
         this
     );
-
-    goog.dom.removeChildren(this._rosterPanel);
-    goog.object.forEach(
-        this.subject.roster.getItems(),
-        function(item) {
-            if (item.role == xmpptk.muc.Occupant.Role.NONE) {
-                return;
-            }
-            goog.dom.append(
-                this._rosterPanel,
-                goog.dom.createDom('div',
-                                   {'class': 'rosterItem'},
-                                   (new JSJaCJID(item['jid'])).getResource())
-            );
-        },
-        this
-    );
 };
-
-helpim.ui.Room.prototype._subjectChanged = function(roomSubject) {
-    if (xmpptk.Config['is_staff'] && roomSubject != '') {
-        this._logger.info('showing subject: '+roomSubject);
-        goog.style.showElement(this._subjectPanel, true);
-        goog.dom.setTextContent(
-            goog.dom.getElementByClass('roomSubject', this._panel),
-            roomSubject
-        );
-    } else {
-        this._logger.info('hiding subject');
-        goog.style.showElement(this._subjectPanel, false);
-    }
-};    
