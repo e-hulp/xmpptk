@@ -144,6 +144,9 @@ helpim.ui.Room = function(room) {
     this._focused = true;
     window.onblur = goog.bind(function() { this._focused = false; }, this);
     window.onfocus = goog.bind(function() { this._focused = true; }, this);
+
+
+    room.attachPropertyhandler('subject', this._subjectChanged, this);
 };
 goog.inherits(helpim.ui.Room, xmpptk.ui.View);
 
@@ -180,19 +183,6 @@ helpim.ui.Room.prototype.formatMessage = function(msg) {
 
 helpim.ui.Room.prototype.update = function() {
     this._logger.info("update called");
-
-    var roomSubject = this.subject.subject;
-    if (xmpptk.Config['is_staff'] && roomSubject != '') {
-        this._logger.info('showing subject: '+roomSubject);
-        goog.style.showElement(this._subjectPanel, true);
-        goog.dom.setTextContent(
-            goog.dom.getElementByClass('roomSubject', this._panel),
-            roomSubject
-        );
-    } else {
-        this._logger.info('hiding subject');
-        goog.style.showElement(this._subjectPanel, false);
-    }
 
     for (var l=this.subject.messages.length; this._messagesAt<l;this._messagesAt++) {
         this.appendMessage(this.formatMessage(this.subject.messages[this._messagesAt]));
@@ -302,3 +292,17 @@ helpim.ui.Room.prototype.update = function() {
         this
     );
 };
+
+helpim.ui.Room.prototype._subjectChanged = function(roomSubject) {
+    if (xmpptk.Config['is_staff'] && roomSubject != '') {
+        this._logger.info('showing subject: '+roomSubject);
+        goog.style.showElement(this._subjectPanel, true);
+        goog.dom.setTextContent(
+            goog.dom.getElementByClass('roomSubject', this._panel),
+            roomSubject
+        );
+    } else {
+        this._logger.info('hiding subject');
+        goog.style.showElement(this._subjectPanel, false);
+    }
+};    
