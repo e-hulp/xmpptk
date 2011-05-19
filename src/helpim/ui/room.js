@@ -220,13 +220,13 @@ helpim.ui.Room.prototype.update = function() {
                         // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
                         var oldTitle = document.title;
                         var msg = "Ring! Ring!";
+                        var ring = 0;
                         var timeoutId = setInterval(function() {
-                            if (document.title == msg) {
-                                document.title = '';
-                            } else {
-                                document.title = msg;
+                            document.title = (document.title == msg)?'':msg;
+                            if ((ring % 5) == 0) {
                                 xmpptk.ui.sound.play('ring');
                             }
+                            ring++;
                         }, 1000);
                         document.onmousemove = function() {
                             clearInterval(timeoutId);
