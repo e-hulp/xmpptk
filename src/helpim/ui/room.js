@@ -208,37 +208,42 @@ helpim.ui.Room.prototype.update = function() {
             var html = '';
             switch (event['type']) {
             case 'occupant_joined':
-                html = event['from'] + " has joined";
                 if (event['from'] != this.subject['nick']) {
+                    this.appendMessage(event['from'] + " has joined", 'roomEvent');
                     if (!this._focused) {
                         window.focus();
                     }
-                    // taken from
-                    // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-                    // combined with
-                    // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-                    var oldTitle = document.title;
-                    var msg = "Ring! Ring!";
-                    var timeoutId = setInterval(function() {
-                        if (document.title == 'msg') {
-                            document.title = '';
-                        } else {
-                            document.title = msg;
-                            xmpptk.ui.sound.play('ring');
-                        }
-                    }, 1000);
-                    document.onmousemove = function() {
-                        clearInterval(timeoutId);
-                        document.title = oldTitle;
-                        document.onmousemove = null;
-                    };
+                    if (xmpptk.Config['is_staff']) {
+                        // taken from
+                        // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+                        // combined with
+                        // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+                        var oldTitle = document.title;
+                        var msg = "Ring! Ring!";
+                        var timeoutId = setInterval(function() {
+                            if (document.title == msg) {
+                                document.title = '';
+                            } else {
+                                document.title = msg;
+                                xmpptk.ui.sound.play('ring');
+                            }
+                        }, 1000);
+                        document.onmousemove = function() {
+                            clearInterval(timeoutId);
+                            document.title = oldTitle;
+                            document.onmousemove = null;
+                        };
+                    }
+                } else {
+                    if (xmpptk.Config['is_staff']) {
+                        this.appendMessage('Welcome '+this.subject.get('nick')+', now wait for a client to join!', 'roomEvent');
+                    }
                 }
                 break;
             case 'occupant_left':
-                html = event['from'] + " has left";
+                this.appendMessage(event['from'] + " has left", 'roomEvent');
                 break;
             }
-            this.appendMessage(html, 'roomEvent');
         } else {
             this._logger.info("not showing events from bot");
         }
