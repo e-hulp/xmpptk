@@ -151,7 +151,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                     var role = occupant.get('role');
                     if (!this.admitted) {
                         if (role != 'none' && role != 'outcast') {
-                            this.admitted = true;
+                            this.set('admitted', true);
                         }
                     }
                 }
