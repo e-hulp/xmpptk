@@ -18,7 +18,7 @@ goog.inherits(xmpptk.Model, xmpptk.Subject);
 /**
  * Attach a handler to a property.
  * @param {string} property the property to attach to
- * @param {function(string, object)} handler the handler to be called when property is being updated
+ * @param {function(object, string)} handler the handler to be called when property is being updated
  * @param {?object} context context to bind handler to (the this reference within the handler)
  */
 xmpptk.Model.prototype.attachPropertyhandler = function(property, handler, context) {
@@ -94,7 +94,7 @@ xmpptk.Model.prototype.set = function(prop, value, skip_notify) {
             goog.array.forEach(
                 this._propertyHandlers[prop],
                 goog.bind(function(handler) {
-                    handler(prop, this.get(prop));
+                    handler(this.get(prop), prop);
                 }, this)
             );
         }
