@@ -1,4 +1,4 @@
-goog.provide('helpim.start');
+goog.provide('helpim');
 
 goog.require('goog.debug.DivConsole');
 goog.require('goog.debug.Logger');
@@ -22,5 +22,4 @@ helpim.start = function(cfg) {
     goog.object.extend(xmpptk.Config, cfg);
     helpim.Client.getInstance();
 };
-
 goog.exportSymbol('helpim.start', helpim.start);
