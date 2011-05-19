@@ -95,7 +95,7 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
 
     if (roomSubject != '') {
         this._logger.info("got subject: "+roomSubject);
-        this.subject = roomSubject;
+        this.set('subject', roomSubject);
     } else {
         var chatState = oMsg.getChatState();
         if (chatState != '') {
