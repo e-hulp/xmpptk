@@ -93,7 +93,7 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
     var roomSubject = oMsg.getSubject();
     var from = oMsg.getFromJID().getResource();
 
-    if (goog.isString(roomSubject)) {
+    if (roomSubject != '') {
         this._logger.info("got subject: "+roomSubject);
         this.subject = roomSubject;
     } else {
