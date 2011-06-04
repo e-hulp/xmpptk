@@ -5,12 +5,10 @@ goog.require('xmpptk.muc.Room');
 /**
  * @constructor
  * @extends {xmpptk.muc.Room}
- * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
- * @param {xmpptk.muc.Client} client a muc enabled xmpp client
- * @param {?string} password an optional password to access to room with
+ * @inheritDoc
  */
-helpim.muc.Room = function(room_jid, client, password) {
-    xmpptk.muc.Room.call(this, room_jid, client, password);
+helpim.muc.Room = function(client, room_jid, password) {
+    xmpptk.muc.Room.call(this, client, room_jid, password);
 
     this.attachPropertyhandler(
         'admitted',

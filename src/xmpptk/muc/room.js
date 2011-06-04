@@ -16,11 +16,11 @@ xmpptk.muc.RoomJid;
 /**
  * @constructor
  * @extends {xmpptk.Model}
- * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
  * @param {xmpptk.muc.Client} client a muc enabled xmpp client
+ * @param {xmpptk.muc.RoomJID} room_jid Config to denote the rooms identity
  * @param {?string} password an optional password to access to room with
  */
-xmpptk.muc.Room = function(room_jid, client, password) {
+xmpptk.muc.Room = function(client, room_jid, password) {
     this._logger.info("creating room " + goog.json.serialize(room_jid));
 
     // keep calm! it's better than you think, isn't it?
