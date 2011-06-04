@@ -5,6 +5,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 goog.require('goog.net.cookies');
+goog.require('goog.json');
 
 goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
@@ -22,7 +23,7 @@ helpim.Client = function() {
     this._logger.info("starting up");
     xmpptk.muc.Client.call(this);
 
-    if (goog.isNumber(xmpptk.Config['composing_timeout']) {
+    if (goog.isNumber(xmpptk.Config['composing_timeout'])) {
         helpim.Client.COMPOSING_TIMEOUT = xmpptk.Config['composing_timeout'];
     }
 
@@ -75,8 +76,8 @@ helpim.Client.prototype.login = function() {
                 room_password = goog.net.cookies.get('room_password');
             }
 
-            new helpim.muc.Room(room_jid,
-                                this,
+            new helpim.muc.Room(this,
+                                room_jid,
                                 room_password).join();
         },
         this
