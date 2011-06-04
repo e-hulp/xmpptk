@@ -52,6 +52,13 @@ goog.addSingletonGetter(helpim.Client);
 helpim.Client.COMPOSING_TIMEOUT = 10;
 
 /**
+ * seconds till cookie will expire for a staff member
+ * @type {boolean}
+ * @const
+ */
+helpim.Client.COOKIE_EXPIRES_FOR_STAFF = 86400;
+
+/**
  * @protected
  * @type {goog.debug.Logger}
  */
@@ -67,21 +74,11 @@ helpim.Client.prototype.login = function() {
             var room_jid = {'room':    xmpptk.Config['muc_room'],
                             'service': xmpptk.Config['muc_service'],
                             'nick':    xmpptk.Config['muc_nick']};
-            if (goog.net.cookies.containsKey('room_jid')) {
-                try {
-                    room_jid = goog.json.parse(goog.net.cookies.get('room_jid'));
-                    this._logger.info("restoring room from cookie");
-                } catch(e) {
-                    this._logger.severe("failed to parse 'room_jid' from cookie: "+goog.net.cookies.get('room_jid'), e);
-                }
-            } else {
-                this._logger.info("no cookie 'room_jid' found in: "+goog.json.serialize(goog.net.cookies.getKeys()));
-            }
-            var room_password = goog.net.cookies.get('room_password',
-                                                     xmpptk.Config['muc_password']);
+            var room_password = xmpptk.Config['muc_password'];
             
-            goog.net.cookies.set('room_jid', goog.json.serialize(room_jid));
-            goog.net.cookies.set('room_password', room_password);
+            var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
+            goog.net.cookies.set('room_jid', goog.json.serialize(room_jid), expires);
+            goog.net.cookies.set('room_password', room_password, expires);
 
             new helpim.muc.Room(this,
                                 room_jid,
