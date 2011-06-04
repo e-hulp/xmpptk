@@ -4,6 +4,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
+goog.require('goog.net.cookies');
 
 goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
@@ -62,11 +63,21 @@ helpim.Client.prototype.login = function() {
         'login', 
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-            new helpim.muc.Room({'room':    xmpptk.Config['muc_room'],
-                                 'service': xmpptk.Config['muc_service'],
-                                 'nick':    xmpptk.Config['muc_nick']},
+
+            var room_jid = {'room':    xmpptk.Config['muc_room'],
+                            'service': xmpptk.Config['muc_service'],
+                            'nick':    xmpptk.Config['muc_nick']};
+            var room_password = xmpptk.Config['muc_password'];
+
+            if (goog.net.cookies.containsKey('room_jid') &&
+                goog.net.cookies.containsKey('room_password')) {
+                room_jid = goog.json.parse(goog.net.cookies.get('room_jid'));
+                room_password = goog.net.cookies.get('room_password');
+            }
+
+            new helpim.muc.Room(room_jid,
                                 this,
-                                xmpptk.Config['muc_password']).join();
+                                room_password).join();
         },
         this
     );
