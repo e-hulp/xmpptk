@@ -21,6 +21,10 @@ helpim.Client = function() {
     this._logger.info("starting up");
     xmpptk.muc.Client.call(this);
 
+    if (goog.isNumber(xmpptk.Config['composing_timeout']) {
+        helpim.Client.COMPOSING_TIMEOUT = xmpptk.Config['composing_timeout'];
+    }
+
     this._composingSent = {};
     this._composingTimeout = {};
     this._view = new helpim.ui.Client(this);
