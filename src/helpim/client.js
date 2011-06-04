@@ -34,7 +34,7 @@ helpim.Client = function() {
         window,
         goog.events.EventType.UNLOAD,
         this.logout,
-        false, 
+        false,
         this
     );
 };
@@ -65,30 +65,31 @@ helpim.Client.prototype.login = function() {
     var timer = goog.now();
     goog.base(
         this,
-        'login', 
+        'login',
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
             var room_jid = {'room':    xmpptk.Config['muc_room'],
                             'service': xmpptk.Config['muc_service'],
                             'nick':    xmpptk.Config['muc_nick']};
             var room_password = xmpptk.Config['muc_password'];
-            
-            var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
-            goog.net.cookies.set('room_jid', goog.json.serialize(room_jid), expires);
-            goog.net.cookies.set('room_password', room_password, expires);
 
-            new helpim.muc.Room(this,
-                                room_jid,
-                                room_password).join();
+            room = new helpim.muc.Room(this,
+                                       room_jid,
+                                       room_password);
+            room.join();
+
+            var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
+            goog.net.cookies.set('room_id', room.id, expires);
+            if (!xmpptk.Config['is_staff']) {
+                goog.net.cookies.set('room_nick', xmpptk.Config['muc_nick']);
+                goog.net.cookies.set('room_subject', xmpptk.Config['muc_subject']);
+            }
         },
         this
     );
 };
 
 helpim.Client.prototype.logout = function(cb) {
-    goog.net.cookies.remove('room_jid');
-    goog.net.cookies.remove('room_password');
-
     goog.object.forEach(
         this.rooms,
         function(room) {
@@ -151,7 +152,7 @@ helpim.Client.prototype.sendComposing = function(jid) {
                 this._con.send(m);
             },
             this
-        ), 
+        ),
         this._composingTimeout*1000
     );
 };
