@@ -23,12 +23,9 @@ helpim.Client = function() {
     this._logger.info("starting up");
     xmpptk.muc.Client.call(this);
 
-    if (goog.isNumber(xmpptk.Config['composing_timeout'])) {
-        helpim.Client.COMPOSING_TIMEOUT = xmpptk.Config['composing_timeout'];
-    }
-
+    this._composingTimeout = xmpptk.getConfig('composing_timeout', helpim.Client.COMPOSING_TIMEOUT);
     this._composingSent = {};
-    this._composingTimeout = {};
+    this._composingTimeouts = {};
     this._view = new helpim.ui.Client(this);
 
     this.login();
@@ -155,18 +152,18 @@ helpim.Client.prototype.sendComposing = function(jid) {
             },
             this
         ), 
-        helpim.Client.COMPOSING_TIMEOUT*1000
+        this._composingTimeout*1000
     );
 };
 
 helpim.Client.prototype._setComposingTimeout = function(jid, callback, timeout) {
     this._clearComposingTimeout(jid);
-    this._composingTimeout[jid] = setTimeout(callback, timeout)
+    this._composingTimeouts[jid] = setTimeout(callback, timeout)
 };
 
 helpim.Client.prototype._clearComposingTimeout = function(jid) {
-    if (this._composingTimeout[jid]) {
-        clearTimeout(this._composingTimeout[jid]);
+    if (this._composingTimeouts[jid]) {
+        clearTimeout(this._composingTimeouts[jid]);
     }
-    this._composingTimeout[jid] = false;
+    this._composingTimeouts[jid] = false;
 };
