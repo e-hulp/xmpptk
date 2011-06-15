@@ -125,13 +125,11 @@ helpim.ui.Room = function(room) {
                         input.value += emoticon;
                         input.focus();
                     }
-
-
                 },
                 false,
                 this
             );
-        }, 
+        },
         this
     );
 
