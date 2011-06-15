@@ -45,6 +45,8 @@ xmpptk.ui.emoticons.init = function(base_url) {
                             key_q = key_q.replace(/\|/g, '\\|');
                             key_q = key_q.replace(/\*/g, '\\*');
                             key_q = key_q.replace(/\+/g, '\\+');
+                            key_q = key_q.replace(/\?/g, '\\?');
+                            key_q = key_q.replace(/\./g, '\\.');
                             key_q = key_q.replace(/>/g, '\\&gt;');
                             key_q = key_q.replace(/</g, '\\&lt;');
 
@@ -52,7 +54,7 @@ xmpptk.ui.emoticons.init = function(base_url) {
                             icon.src = xmpptk.ui.emoticons.path + src;
 
                             xmpptk.ui.emoticons.replacements[key] = {
-                                regexp: eval("/\(\\s\|\^\)"+key_q+"\(\\s|\$\)/g"),
+                                regexp: eval("/\(\\s\|\^\|)"+key_q+"\(\\s|\$\|)/g"),
                                 icon: icon
                             };
                         }
