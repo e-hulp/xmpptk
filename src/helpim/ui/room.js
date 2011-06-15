@@ -139,10 +139,14 @@ helpim.ui.Room = function(room) {
                         }
                     };
 
-                    input = this._sendTextarea.getContentElement();
+                    var input = this._sendTextarea.getContentElement();
+
                     if (input.setSelectionRange) {
                         var selectionStart = input.selectionStart;
                         var selectionEnd = input.selectionEnd;
+                        if (input.value.charAt(input.selectionStart-1) != ' ' && input.value.charAt(input.selectionStart-1) != '') {
+                            emoticon = ' ' + emoticon;
+                        }
                         input.value = input.value.substring(0, selectionStart) + emoticon + input.value.substring(selectionEnd);
                         if (selectionStart != selectionEnd) { // has there been a selection
                             setSelectionRange(input, selectionStart, selectionStart + emoticon.length);
