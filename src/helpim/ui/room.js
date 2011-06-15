@@ -68,7 +68,7 @@ helpim.ui.Room = function(room) {
     this._logger.info("creating emoticonsPanel");
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
-        goog.bind(function(replacement, key) {
+        function(replacement, key) {
             var img = replacement.icon;
             if (seenEmoticon[img.src]) {
                 return;
@@ -82,7 +82,7 @@ helpim.ui.Room = function(room) {
             goog.events.listen(
                 img,
                 goog.events.EventType.CLICK,
-                goog.bind(function(e) {
+                function(e) {
                     if (this._sendTextarea._firstClick) {
                         this._sendTextarea.setValue('');
                         this._sendTextarea._firstClick = false;
@@ -127,9 +127,12 @@ helpim.ui.Room = function(room) {
                     }
 
 
-                }, this)
+                },
+                false,
+                this
             );
-        }, this)
+        }, 
+        this
     );
 
     if (xmpptk.Config['is_one2one']) {
