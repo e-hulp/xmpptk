@@ -6,6 +6,8 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.ui.Textarea');
 goog.require('goog.ui.TextareaRenderer');
+goog.require('goog.fx.dom.FadeInAndShow');
+goog.require('goog.fx.dom.FadeOutAndHide');
 
 goog.require('xmpptk.ui');
 goog.require('xmpptk.ui.View');
@@ -65,6 +67,7 @@ helpim.ui.Room = function(room) {
 
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
+    var numEmoticonsProcessed = 0;
     this._logger.info("creating emoticonsPanel");
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
@@ -77,7 +80,39 @@ helpim.ui.Room = function(room) {
             img.title = key;
             img.className = 'emoticonBtn';
 
-            emoticonsPanel.appendChild(img);
+            numEmoticonsProcessed++;
+            if (numEmoticonsProcessed==10) {
+                var oldEmoticonsPanel = emoticonsPanel;
+                emoticonsPanel = goog.dom.createElement('span');
+                goog.dom.appendChild(oldEmoticonsPanel, emoticonsPanel);
+                goog.style.showElement(emoticonsPanel, false);
+                var plus = goog.dom.createElement('span');
+                plus.className = 'emoticonsExpandBtn';
+                plus.title = 'Click to see even more emoticons';
+                goog.dom.appendChild(plus, goog.dom.createTextNode('>'));
+                goog.dom.appendChild(oldEmoticonsPanel, plus);
+                plus.shown = false;
+                goog.events.listen(
+                    plus,
+                    goog.events.EventType.CLICK,
+                    function(e) {
+                        this._logger.info('click');
+                        if (plus.shown) {
+                            plus.innerHTML = '>';
+                            plus.title = 'Click to see even more emoticons';
+                            (new goog.fx.dom.FadeOutAndHide(emoticonsPanel, 200)).play();
+                        } else {
+                            plus.innerHTML = '<';
+                            plus.title = 'Click to collapse emoticons';
+                            (new goog.fx.dom.FadeInAndShow(emoticonsPanel, 200)).play();
+                        }
+                        plus.shown = !plus.shown;
+                    },
+                    false,
+                    this
+                );
+            }
+            goog.dom.appendChild(emoticonsPanel, img);
 
             goog.events.listen(
                 img,

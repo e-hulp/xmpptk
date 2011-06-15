@@ -52,6 +52,10 @@
     margin: 2px;
 }
 
+.emoticonsExpandBtn {
+    cursor: pointer;
+};
+
 .roomEvent {
     font-weight: bold;
 }
