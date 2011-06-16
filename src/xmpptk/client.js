@@ -62,12 +62,12 @@ xmpptk.Client.prototype.getState = function(callback, context) {
     iq.setType('get');
     var query = iq.setQuery(NS_PRIVATE);
 
-    query.appendChild(iq.buildNode('xmpptk', {xmlns: xmpptk.Client.ns.XMPPTK_STATE}));
+    query.appendChild(iq.buildNode('xmpptk', {xmlns: xmpptk.Client.NS.XMPPTK_STATE}));
 
     this._con.sendIQ(iq,
                      {result_handler:
                       function(resIQ) {
-                          var state = resIQ.getChildVal('xmpptk', xmpptk.Client.ns.XMPPTK_STATE);
+                          var state = resIQ.getChildVal('xmpptk', xmpptk.Client.NS.XMPPTK_STATE);
                           xmpptk.call(callback, context, state);
                       }
                      });
@@ -172,7 +172,7 @@ xmpptk.Client.prototype.sendState = function(state) {
         appendChild(
             iq.buildNode(
                 'xmpptk',
-                {xmlns: xmpptk.Client.ns.XMPPTK_STATE},
+                {xmlns: xmpptk.Client.NS.XMPPTK_STATE},
                 state
             )
         );
@@ -292,6 +292,6 @@ xmpptk.Client.prototype._handleRosterPush = function(resIQ) {
     );
 };
 
-xmpptk.Client.ns = {
+xmpptk.Client.NS = {
     XMPPTK_STATE: 'xmpptk:state'
 };
