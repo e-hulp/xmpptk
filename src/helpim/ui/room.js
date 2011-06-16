@@ -89,7 +89,7 @@ helpim.ui.Room = function(room) {
                 var plus = goog.dom.createElement('span');
                 plus.className = 'emoticonsExpandBtn';
                 plus.title = 'Click to see even more emoticons';
-                goog.dom.appendChild(plus, goog.dom.createTextNode('>'));
+                goog.dom.appendChild(plus, goog.dom.createTextNode(' more >'));
                 goog.dom.appendChild(oldEmoticonsPanel, plus);
                 plus.shown = false;
                 goog.events.listen(
@@ -98,11 +98,11 @@ helpim.ui.Room = function(room) {
                     function(e) {
                         this._logger.info('click');
                         if (plus.shown) {
-                            plus.innerHTML = '>';
+                            plus.innerHTML = ' more >';
                             plus.title = 'Click to see even more emoticons';
                             (new goog.fx.dom.FadeOutAndHide(emoticonsPanel, 200)).play();
                         } else {
-                            plus.innerHTML = '<';
+                            plus.innerHTML = '< less ';
                             plus.title = 'Click to collapse emoticons';
                             (new goog.fx.dom.FadeInAndShow(emoticonsPanel, 200)).play();
                         }
