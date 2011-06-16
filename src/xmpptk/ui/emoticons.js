@@ -54,7 +54,7 @@ xmpptk.ui.emoticons.init = function(base_url) {
                             icon.src = xmpptk.ui.emoticons.path + src;
 
                             xmpptk.ui.emoticons.replacements[key] = {
-                                regexp: eval("/\(\\s\|\^\|)"+key_q+"\(\\s|\$\)/g"),
+                                regexp: new RegExp("(\\s\|\^)"+key_q+"(\\s|\$)", "g"),
                                 icon: icon
                             };
                         }
