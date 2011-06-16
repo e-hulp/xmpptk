@@ -54,13 +54,19 @@ xmpptk.ui.emoticons.init = function(base_url) {
                             icon.src = xmpptk.ui.emoticons.path + src;
 
                             xmpptk.ui.emoticons.replacements[key] = {
-                                regexp: new RegExp("(\\s\|\^)"+key_q+"(\\s|\$)", "g"),
+                                regexp: new RegExp("(\\s\|\^|)"+key_q+"(\\s|\$)", "g"),
                                 icon: icon
                             };
                         }
                     );
                 }
             );
+            xmpptk.ui.emoticons.sortedReplacements = {};
+            goog.array.forEach(
+                goog.object.getKeys(xmpptk.ui.emoticons.replacements).sort(function(a,b) { return a.length < b.length}),
+                function(key) {
+                    xmpptk.ui.emoticons.sortedReplacements[key] = xmpptk.ui.emoticons.replacements[key];
+                });
             xmpptk.ui.emoticons._logger.info("done initializing emoticons");
         }
     );
