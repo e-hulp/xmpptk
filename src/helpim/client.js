@@ -56,6 +56,14 @@ helpim.Client.COMPOSING_TIMEOUT = 10;
 helpim.Client.COOKIE_EXPIRES_FOR_STAFF = 86400;
 
 /**
+ * our well known namespaces
+ * @const
+ */
+helpim.Client.NS = {
+    HELPIM_ROOMS: "http://helpim.org/protocol/rooms"
+};
+
+/**
  * @protected
  * @type {goog.debug.Logger}
  */
@@ -68,15 +76,32 @@ helpim.Client.prototype.login = function() {
         'login',
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-            var room_jid = {'room':    xmpptk.Config['muc_room'],
-                            'service': xmpptk.Config['muc_service'],
-                            'nick':    xmpptk.Config['muc_nick']};
-            var room_password = xmpptk.Config['muc_password'];
 
-            room = new helpim.muc.Room(this,
-                                       room_jid,
-                                       room_password);
-            room.join();
+            this._logger.info('bot_jid: '+xmpptk.Config['bot_jid']);
+            // ask bot for a room
+            var iq = new JSJaCIQ();
+            iq.setIQ(xmpptk.Config['bot_jid'], 'get', 'room1');
+            var q = iq.setQuery(helpim.Client.NS.HELPIM_ROOMS);
+            q.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, xmpptk.Config['token']));
+            this._con.sendIQ(
+                iq,
+                {result_handler: goog.bind(function(resIq) {
+                    this._logger.info('result: '+resIq.xml());
+                    new helpim.muc.Room(
+                        this,
+                        {room: resIq.getChildVal('room',
+                                                 helpim.Client.NS.HELPIM_ROOMS),
+                         service: resIq.getChildVal('service',
+                                                 helpim.Client.NS.HELPIM_ROOMS),
+                         nick: xmpptk.Config['muc_nick']},
+                        resIq.getChildVal('password',
+                                          helpim.Client.NS.HELPIM_ROOMS)).join()
+                }, this),
+                 error_handler: goog.bind(function(errIq) {
+                     this._logger.info('error: '+errIq.xml());
+                 }, this)
+                }
+            );
 
             var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
             goog.net.cookies.set('room_id', room.id, expires);
