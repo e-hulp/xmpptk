@@ -12,7 +12,7 @@ helpim.muc.Room = function(client, room_jid, password) {
 
     this.attachPropertyhandler(
         'admitted',
-        function(prop, val) {
+        function(val, prop) {
             this._logger.info('we\'re admitted to the room '+prop+':'+val);
             if (!xmpptk.Config['is_staff'] && xmpptk.Config['muc_subject']) {
                 this._logger.info("sending subject: "+xmpptk.Config['muc_subject']);
