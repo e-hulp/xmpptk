@@ -6,7 +6,6 @@ goog.require('xmpptk.Model');
 
 goog.require('goog.array');
 goog.require('goog.object');
-goog.require('goog.pubsub.PubSub');
 goog.require('goog.debug.Logger');
 
 goog.require('goog.json');
@@ -18,8 +17,6 @@ goog.require('goog.json');
  */
 xmpptk.Client = function() {
     xmpptk.Model.call(this);
-
-    this._ps = new goog.pubsub.PubSub();
 };
 goog.inherits(xmpptk.Client, xmpptk.Model);
 goog.addSingletonGetter(xmpptk.Client);
@@ -80,7 +77,7 @@ xmpptk.Client.prototype.isConnected = function() {
 
 xmpptk.Client.prototype.login = function(callback, context) {
 //    this._logger.info("logging in with: " + goog.json.serialize(xmpptk.Config));
-    this._ps.subscribeOnce('_login', callback, context);
+    this.subscribeOnce('_login', callback, context);
 
     this._con = new JSJaCHttpBindingConnection(xmpptk.Config);
 
@@ -89,7 +86,7 @@ xmpptk.Client.prototype.login = function(callback, context) {
 
     this._con.registerHandler('ondisconnect',
                               JSJaC.bind(function() {
-                                  this._ps.publish('disconnected',
+                                  this.publish('disconnected',
                                                   this._con.status() == 'session-terminate-conflict');
                               },this));
 
@@ -195,8 +192,8 @@ xmpptk.Client.prototype.suspend = function() {
 };
 
 xmpptk.Client.prototype._handleConnected = function() {
-    this._ps.publish('connected');
-    this._ps.publish('_login');
+    this.publish('connected');
+    this.publish('_login');
 };
 
 xmpptk.Client.prototype._handleMessage = function(m) {
@@ -226,7 +223,7 @@ xmpptk.Client.prototype._handleMessage = function(m) {
         );
     }
 
-    this._ps.publish('message', message);
+    this.publish('message', message);
 };
 
 xmpptk.Client.prototype._handlePresence = function(p) {
@@ -236,7 +233,7 @@ xmpptk.Client.prototype._handlePresence = function(p) {
     }
     if (p.getType() && p.getType().match(/subscribe/)) {
         // it's got to do sth with subscriptions
-        return this._ps.publish(
+        return this.publish(
             'subscription',
             {
                 from    : p.getFromJID().removeResource().toString(),
@@ -253,7 +250,7 @@ xmpptk.Client.prototype._handlePresence = function(p) {
             state = p.getShow();
         }
     }
-    this._ps.publish(
+    this.publish(
         'presence',
         {
             from: p.getFrom(),
@@ -271,7 +268,7 @@ xmpptk.Client.prototype._handleRosterPush = function(resIQ) {
         resIQ.getQuery().children,
         goog.bind(
             function(i, item) {
-                this._ps.publish(
+                this.publish(
                     'roster_push',
                     {
                         jid          : item.getAttribute('jid'),

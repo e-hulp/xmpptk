@@ -1,14 +1,18 @@
 goog.provide('xmpptk.Subject');
 
 goog.require('goog.array');
+goog.require('goog.pubsub.PubSub');
 
 /**
  * This is part of the observer pattern. A subject to observer.
  * @constructor
+ * @extends {goog.pubsub.PubSub}
  */
 xmpptk.Subject = function() {
+    goog.pubsub.PubSub.call(this);
     this._observers = [];
 };
+goog.inherits(xmpptk.Subject, goog.pubsub.PubSub);
 
 /**
  * attach an observer to this subject
