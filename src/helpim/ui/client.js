@@ -8,10 +8,13 @@ goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.TabBar');
 goog.require('goog.ui.Tab');
 goog.require('goog.ui.RoundedTabRenderer');
+goog.require('goog.ui.Dialog');
 
 goog.require('xmpptk.ui.View');
 goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
+
+goog.require('helpim.Client');
 
 /**
  * @constructor
@@ -55,6 +58,24 @@ helpim.ui.Client = function(client) {
 
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
+
+    client.subscribeOnce(
+        helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
+        function(cond) {
+            var dialog = new goog.ui.Dialog(null, true);
+            dialog.setTitle('An error occured');
+            dialog.setContent(cond);
+            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                document.location.replace(xmpptk.Config['logout_redirect']);
+            });
+
+            dialog.setVisible(true);
+        }
+    );
 
     this._lastRoomSelected = null;
 

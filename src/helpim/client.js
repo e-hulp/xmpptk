@@ -81,8 +81,8 @@ helpim.Client.prototype.login = function() {
             // ask bot for a room
             var iq = new JSJaCIQ();
             iq.setIQ(xmpptk.Config['bot_jid'], 'get', 'room1');
-            var q = iq.setQuery(helpim.Client.NS.HELPIM_ROOMS);
-            q.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, xmpptk.Config['token']));
+            var query = iq.setQuery(helpim.Client.NS.HELPIM_ROOMS);
+            query.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, xmpptk.Config['token']));
             this._con.sendIQ(
                 iq,
                 {result_handler: goog.bind(function(resIq) {
@@ -99,16 +99,13 @@ helpim.Client.prototype.login = function() {
                 }, this),
                  error_handler: goog.bind(function(errIq) {
                      this._logger.info('error: '+errIq.xml());
+                     this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', errIq.getChild('error').firstChild.tagName);
                  }, this)
                 }
             );
 
             var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
-            goog.net.cookies.set('room_id', room.id, expires);
-            if (!xmpptk.Config['is_staff']) {
-                goog.net.cookies.set('room_nick', xmpptk.Config['muc_nick']);
-                goog.net.cookies.set('room_subject', xmpptk.Config['muc_subject']);
-            }
+            goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
         },
         this
     );
