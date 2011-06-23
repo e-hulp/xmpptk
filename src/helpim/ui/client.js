@@ -71,7 +71,6 @@ helpim.ui.Client = function(client) {
             dialog.render(goog.dom.getElement("dialog"));
 
             goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                console.log(e);
                 if (e.key == 'ok') {
                     // get nick and subject from form submitted
                     var nick = goog.dom.getElement('muc_nick').value;
@@ -110,6 +109,21 @@ helpim.ui.Client = function(client) {
             // bad-request -> bad xml was sent (hu?)
             // item-not-found -> no room available 
             // not-authorized -> token sent was invalid
+
+            switch(cond) {
+            case 'service-unavailable':
+                cond = 'Service not available';
+                break;
+            case 'bad-request':
+                cond = 'Bad Request';
+                break;
+            case 'item-not-found':
+                cond = "Sorry, currently there's no room available. Please return later!";
+                break;
+            case 'not-authorized':
+                cond = "Sorry, you're not allowed to access this service";
+                break;
+            }
 
             var dialog = new goog.ui.Dialog();
             dialog.setTitle('An error occured');
