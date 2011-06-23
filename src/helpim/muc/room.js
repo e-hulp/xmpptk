@@ -30,10 +30,10 @@ goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
 helpim.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.muc.Room');
 
-helpim.muc.Room.prototype.part = function() {
+helpim.muc.Room.prototype.part = function(cb) {
     // unregister handlers
     this._client.unregisterRoom(this);
 
     // send presence
-    this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
+    if (cb) { cb(this); }
 };

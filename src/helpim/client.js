@@ -100,18 +100,33 @@ helpim.Client.prototype.login = function() {
                                               helpim.Client.NS.HELPIM_ROOMS)).join();
 
                     } else {
-                        // indicate ui to ask for nick and subject
-                        this.publish(
-                            helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-                            {room: resIq.getChildVal(
-                                'room',
-                                helpim.Client.NS.HELPIM_ROOMS),
-                             service: resIq.getChildVal(
-                                 'service',
-                                 helpim.Client.NS.HELPIM_ROOMS),
-                             password: resIq.getChildVal(
-                                 'password',
-                                 helpim.Client.NS.HELPIM_ROOMS)});
+                        var nick = resIq.getChildVal('nick',
+                                                     helpim.Client.NS.HELPIM_ROOMS)
+                        if (nick && nick!='') {
+                            new helpim.muc.Room(
+                                this,
+                                {room: resIq.getChildVal('room',
+                                                         helpim.Client.NS.HELPIM_ROOMS),
+                                 service: resIq.getChildVal('service',
+                                                            helpim.Client.NS.HELPIM_ROOMS),
+                                 nick: nick},
+                                resIq.getChildVal('password',
+                                                  helpim.Client.NS.HELPIM_ROOMS)).join();
+                        } else {
+
+                            // indicate ui to ask for nick and subject
+                            this.publish(
+                                helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
+                                {room: resIq.getChildVal(
+                                    'room',
+                                    helpim.Client.NS.HELPIM_ROOMS),
+                                 service: resIq.getChildVal(
+                                     'service',
+                                     helpim.Client.NS.HELPIM_ROOMS),
+                                 password: resIq.getChildVal(
+                                     'password',
+                                     helpim.Client.NS.HELPIM_ROOMS)});
+                        }
                     }
                 }, this),
                  error_handler: goog.bind(function(errIq) {
@@ -129,11 +144,11 @@ helpim.Client.prototype.login = function() {
     );
 };
 
-helpim.Client.prototype.logout = function(cb) {
+helpim.Client.prototype.logout = function(cb, partCb) {
     goog.object.forEach(
         this.rooms,
         function(room) {
-            room.part();
+            room.part(partCb);
         }
     );
     goog.object.clear(this.rooms);

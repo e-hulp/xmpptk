@@ -49,9 +49,17 @@ helpim.ui.Client = function(client) {
         logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            client.logout(function() {
-                document.location.replace(xmpptk.Config['logout_redirect']);
-            });
+            // send presence
+            client.logout(
+                function() {
+                    client.subscribeOnce('disconnected', function() {
+                        document.location.replace(xmpptk.Config['logout_redirect']);
+                    });
+                },
+                function (room) {
+                    client.sendPresence('unavailable', 'Clean Exit', room.jid);
+                }
+            );
         },
         false,
         this);
