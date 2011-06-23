@@ -87,19 +87,37 @@ helpim.Client.prototype.login = function() {
                 iq,
                 {result_handler: goog.bind(function(resIq) {
                     this._logger.info('result: '+resIq.xml());
-                    new helpim.muc.Room(
-                        this,
-                        {room: resIq.getChildVal('room',
+                    if (xmpptk.Config['is_staff']) {
+                        // just go straight to the room
+                        new helpim.muc.Room(
+                            this,
+                            {room: resIq.getChildVal('room',
                                                  helpim.Client.NS.HELPIM_ROOMS),
-                         service: resIq.getChildVal('service',
-                                                 helpim.Client.NS.HELPIM_ROOMS),
-                         nick: xmpptk.Config['muc_nick']},
-                        resIq.getChildVal('password',
-                                          helpim.Client.NS.HELPIM_ROOMS)).join()
+                             service: resIq.getChildVal('service',
+                                                        helpim.Client.NS.HELPIM_ROOMS),
+                             nick: xmpptk.Config['muc_nick']},
+                            resIq.getChildVal('password',
+                                              helpim.Client.NS.HELPIM_ROOMS)).join();
+
+                    } else {
+                        // indicate ui to ask for nick and subject
+                        this.publish(
+                            helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
+                            {room: resIq.getChildVal(
+                                'room',
+                                helpim.Client.NS.HELPIM_ROOMS),
+                             service: resIq.getChildVal(
+                                 'service',
+                                 helpim.Client.NS.HELPIM_ROOMS),
+                             password: resIq.getChildVal(
+                                 'password',
+                                 helpim.Client.NS.HELPIM_ROOMS)});
+                    }
                 }, this),
                  error_handler: goog.bind(function(errIq) {
                      this._logger.info('error: '+errIq.xml());
-                     this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', errIq.getChild('error').firstChild.tagName);
+                     this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
+                                  errIq.getChild('error').firstChild.tagName);
                  }, this)
                 }
             );

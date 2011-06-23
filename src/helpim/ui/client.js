@@ -60,9 +60,58 @@ helpim.ui.Client = function(client) {
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
     client.subscribeOnce(
+        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',        
+        function(params) {
+
+            var dialog = new goog.ui.Dialog();
+            dialog.setTitle('Join Chat');
+            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">Nickname: </label><input id="muc_nick"/></div><div><label for="muc_subject">Subject: </label><input id="muc_subject"/></div></form>');
+            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                console.log(e);
+                if (e.key == 'ok') {
+                    // get nick and subject from form submitted
+                    var nick = goog.dom.getElement('muc_nick').value;
+                    this._logger.info(nick);
+                    if (!nick || nick == '') {
+                        goog.dom.setTextContent(
+                            goog.dom.getElement('form_error'),
+                            'Please provide a nickname!');
+                        return false;
+                    }
+
+                    var room = new helpim.muc.Room(
+                        client,
+                        {room: params.room,
+                         service: params.service,
+                         nick: nick},
+                        params.password);
+                    room._room_subject_desired = goog.dom.getElement('muc_subject').value;;
+                    room.join();
+                } else {
+                    document.location.replace(xmpptk.Config['logout_redirect']);
+                }
+            }, false, this);
+
+            dialog.setVisible(true);
+        },
+        this
+    );
+
+    client.subscribeOnce(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
-            var dialog = new goog.ui.Dialog(null, true);
+
+            // known conditions are:
+            // service-unavailable -> bot is down
+            // bad-request -> bad xml was sent (hu?)
+            // item-not-found -> no room available 
+            // not-authorized -> token sent was invalid
+
+            var dialog = new goog.ui.Dialog();
             dialog.setTitle('An error occured');
             dialog.setContent(cond);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());

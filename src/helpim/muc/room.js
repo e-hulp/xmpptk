@@ -14,12 +14,12 @@ helpim.muc.Room = function(client, room_jid, password) {
         'admitted',
         function(val, prop) {
             this._logger.info('we\'re admitted to the room '+prop+':'+val);
-            if (!xmpptk.Config['is_staff'] && xmpptk.Config['muc_subject']) {
-                this._logger.info("sending subject: "+xmpptk.Config['muc_subject']);
+            if (!xmpptk.Config['is_staff'] && this._room_subject_desired && this._room_subject_desired!='') {
+                this._logger.info("sending subject: "+this._room_subject_desired);
                 var m = new JSJaCMessage();
                 m.setTo(this.id);
                 m.setType('groupchat');
-                m.setSubject(xmpptk.Config['muc_subject']);
+                m.setSubject(this._room_subject_desired);
                 this._client._con.send(m);
             }
         },
