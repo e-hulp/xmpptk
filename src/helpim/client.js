@@ -13,7 +13,6 @@ goog.require('xmpptk.muc.Client');
 goog.require('helpim.jsjac_ext');
 goog.require('helpim.muc.Room');
 goog.require('helpim.ui.Client');
-goog.require('helpim.ui.Room');
 
 /**
  * @constructor

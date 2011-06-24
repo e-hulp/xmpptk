@@ -1,4 +1,4 @@
-goog.provide('helpim.ui.Room');
+goog.provide('helpim.ui.muc.Room');
 
 goog.require('goog.debug.Logger');
 goog.require('goog.style');
@@ -19,7 +19,7 @@ goog.require('xmpptk.ui.sound');
  * @constructor
  * @extends {xmpptk.ui.View}
  */
-helpim.ui.Room = function(room) {
+helpim.ui.muc.Room = function(room) {
     xmpptk.ui.View.call(this, room);
 
     this._logger.info("creating view for room with id "+room.id);
@@ -193,11 +193,11 @@ helpim.ui.Room = function(room) {
     room.attachPropertyhandler('messages', this._messagesChanged, this);
     room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
 };
-goog.inherits(helpim.ui.Room, xmpptk.ui.View);
+goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
-helpim.ui.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Room');
+helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
 
-helpim.ui.Room.prototype.appendMessage = function(html, extraClasses, id) {
+helpim.ui.muc.Room.prototype.appendMessage = function(html, extraClasses, id) {
     var classes = 'roomMessage';
     if (goog.isString(extraClasses)) {
         classes += ' ' + extraClasses;
@@ -217,16 +217,16 @@ helpim.ui.Room.prototype.appendMessage = function(html, extraClasses, id) {
     }
 }
 
-helpim.ui.Room.prototype.getPanel = function() {
+helpim.ui.muc.Room.prototype.getPanel = function() {
     return this._panel;
 };
 
-helpim.ui.Room.prototype.formatMessage = function(msg) {
+helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
     return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
         xmpptk.ui.msgFormat(msg['body']);
 };
 
-helpim.ui.Room.prototype.update = function() {
+helpim.ui.muc.Room.prototype.update = function() {
     this._logger.info("update called");
 
     if (!xmpptk.Config['is_one2one']) {
@@ -249,7 +249,7 @@ helpim.ui.Room.prototype.update = function() {
     }
 };
 
-helpim.ui.Room.prototype._subjectChanged = function(roomSubject) {
+helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
     if (xmpptk.Config['is_staff'] && roomSubject != '') {
         this._logger.info('showing subject: '+roomSubject);
         goog.style.showElement(this._subjectPanel, true);
@@ -263,7 +263,7 @@ helpim.ui.Room.prototype._subjectChanged = function(roomSubject) {
     }
 };
 
-helpim.ui.Room.prototype._eventsChanged = function(events) {
+helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
     this._logger.info("an event occured");
     for (var l=events.length; this._eventsAt<l; this._eventsAt++) {
         var event = events[this._eventsAt];
@@ -314,7 +314,7 @@ helpim.ui.Room.prototype._eventsChanged = function(events) {
     }
 };
 
-helpim.ui.Room.prototype._messagesChanged = function(messages) {
+helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
     for (var l=messages.length; this._messagesAt<l;this._messagesAt++) {
         this.appendMessage(this.formatMessage(messages[this._messagesAt]));
         if (messages[this._messagesAt]['from'] != this.subject['nick']) {
@@ -323,7 +323,7 @@ helpim.ui.Room.prototype._messagesChanged = function(messages) {
     }
 };
 
-helpim.ui.Room.prototype._chatStatesChanged = function(chatStates) {
+helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
     goog.object.forEach(
         chatStates,
         function(state, from) {

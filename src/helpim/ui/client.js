@@ -15,6 +15,7 @@ goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
 
 goog.require('helpim.Client');
+goog.require('helpim.ui.muc.Room');
 
 /**
  * @constructor
@@ -186,7 +187,7 @@ helpim.ui.Client.prototype.update = function() {
         this.subject.rooms,
         function(room) {
             if (!this.tabBar.getChild(room.id)) {
-                this._rooms[room.id] = new helpim.ui.Room(room);
+                this._rooms[room.id] = new helpim.ui.muc.Room(room);
 
                 var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
                 tab.setId(room.id);
