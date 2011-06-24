@@ -122,7 +122,7 @@ helpim.ui.Client = function(client) {
                 cond = 'Bad Request';
                 break;
             case 'item-not-found':
-                cond = "Sorry, currently there's no room available. Please return later!";
+                cond = "Sorry, currently there's no chat available. Please return later!";
                 break;
             case 'not-authorized':
                 cond = "Sorry, you're not allowed to access this service";
