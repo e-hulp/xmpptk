@@ -132,7 +132,8 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
             this.events.push({'type': 'occupant_left',
-                              'from': oPres.getFromJID().getResource()});
+                              'from': oPres.getFromJID().getResource(),
+                              'status': oPres.getStatus()});
             this.set('events', this.events);
         }
     } else {
@@ -148,7 +149,8 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                     'real_jid':    item.getAttribute('jid')
                 });
                 this.events.push({'type': 'occupant_joined',
-                                  'from': oPres.getFromJID().getResource()});
+                                  'from': oPres.getFromJID().getResource(),
+                                  'status': oPres.getStatus()});
                 this.set('events', this.events);
 
                 if (from == this.jid) {

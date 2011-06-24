@@ -305,7 +305,11 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                 }
                 break;
             case 'occupant_left':
-                this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has left", 'roomEvent');
+                var msg = xmpptk.ui.htmlEnc(event['from']) + " has left";
+                if (event['status'] != '') {
+                    msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
+                }
+                this.appendMessage(msg, 'roomEvent');
                 break;
             }
         } else {
