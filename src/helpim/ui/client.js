@@ -29,6 +29,10 @@ helpim.ui.Client = function(client) {
     xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
     xmpptk.ui.sound.init(xmpptk.Config['static_url']);
 
+    client.subscribeOnce('disconnected', function() {
+        document.location.replace(xmpptk.Config['logout_redirect']);
+    });
+
     goog.events.listen(
         goog.dom.getElement('soundButton'),
         goog.events.EventType.CLICK,
@@ -51,9 +55,6 @@ helpim.ui.Client = function(client) {
         goog.ui.Component.EventType.ACTION,
         function() {
             // send presence
-            client.subscribeOnce('disconnected', function() {
-                document.location.replace(xmpptk.Config['logout_redirect']);
-            });
             client.logoutCleanExit();
         },
         false,
@@ -94,7 +95,7 @@ helpim.ui.Client = function(client) {
                     room._room_subject_desired = goog.dom.getElement('muc_subject').value;;
                     room.join();
                 } else {
-                    document.location.replace(xmpptk.Config['logout_redirect']);
+                    client.logout();
                 }
             }, false, this);
 
@@ -136,7 +137,7 @@ helpim.ui.Client = function(client) {
             dialog.render(goog.dom.getElement("dialog"));
 
             goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                document.location.replace(xmpptk.Config['logout_redirect']);
+                client.logout();
             });
 
             dialog.setVisible(true);
