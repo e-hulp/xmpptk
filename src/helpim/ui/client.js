@@ -69,7 +69,7 @@ helpim.ui.Client = function(client) {
 
             var dialog = new goog.ui.Dialog();
             dialog.setTitle('Join Chat');
-            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">Nickname: </label><input id="muc_nick"/></div><div><label for="muc_subject">Subject: </label><input id="muc_subject"/></div></form>');
+            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">Nickname: </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">Subject: </label><input id="muc_subject" maxlength="64"/></div></form>');
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
