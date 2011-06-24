@@ -14,7 +14,7 @@ goog.require('xmpptk.ui.View');
 goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
 
-goog.require('helpim.Client');
+goog.require('helpim.muc.Room');
 goog.require('helpim.ui.muc.Room');
 
 /**
