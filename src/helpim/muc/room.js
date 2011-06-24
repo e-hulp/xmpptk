@@ -35,5 +35,5 @@ helpim.muc.Room.prototype.part = function(cb) {
     this._client.unregisterRoom(this);
 
     // send presence
-    if (cb) { cb(this); }
+    this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
 };

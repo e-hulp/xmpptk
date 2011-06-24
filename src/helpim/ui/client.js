@@ -50,16 +50,10 @@ helpim.ui.Client = function(client) {
         goog.ui.Component.EventType.ACTION,
         function() {
             // send presence
-            client.logout(
-                function() {
-                    client.subscribeOnce('disconnected', function() {
-                        document.location.replace(xmpptk.Config['logout_redirect']);
-                    });
-                },
-                function (room) {
-                    client.sendPresence('unavailable', 'Clean Exit', room.jid);
-                }
-            );
+            client.subscribeOnce('disconnected', function() {
+                document.location.replace(xmpptk.Config['logout_redirect']);
+            });
+            client.logoutCleanExit();
         },
         false,
         this);

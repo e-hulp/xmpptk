@@ -128,37 +128,45 @@ helpim.Client.prototype.login = function() {
                                      helpim.Client.NS.HELPIM_ROOMS)});
                         }
                     }
+
+                    var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
+                    goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
+
                 }, this),
                  error_handler: goog.bind(function(errIq) {
                      this._logger.info('error: '+errIq.xml());
                      this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
                                   errIq.getChild('error').firstChild.tagName);
+                     goog.net.cookies.remove('room_token');
+
                  }, this)
                 }
             );
-
-            var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
-            goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
         },
         this
     );
 };
 
-helpim.Client.prototype.logout = function(cb, partCb) {
+helpim.Client.prototype.logoutCleanExit = function() {
+    // cookie can safely be removed as we don't want to return to this room
+    goog.net.cookies.remove('room_token');
+
     goog.object.forEach(
         this.rooms,
         function(room) {
-            room.part(partCb);
+            room.part();
         }
     );
     goog.object.clear(this.rooms);
     this.notify();
-    goog.base(this, 'logout');
 
-    if (cb && typeof cb == 'function') {
-        cb();
-    }
+    this.sendPresence('unavailable', 'Clean Exit');
+
+    // we need to delay disconnecting because otherwise it happens
+    // that tigase looses our last messages
+    setTimeout(goog.bind(this.logout, this), 100);
 };
+
 
 /**
  * @inheritDoc
