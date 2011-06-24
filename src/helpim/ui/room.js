@@ -273,7 +273,7 @@ helpim.ui.Room.prototype._eventsChanged = function(events) {
             switch (event['type']) {
             case 'occupant_joined':
                 if (event['from'] != this.subject['nick']) {
-                    this.appendMessage(event['from'] + " has joined", 'roomEvent');
+                    this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has joined", 'roomEvent');
                     if (!this._focused) {
                         window.focus();
                     }
@@ -300,12 +300,12 @@ helpim.ui.Room.prototype._eventsChanged = function(events) {
                     }
                 } else {
                     if (xmpptk.Config['is_staff']) {
-                        this.appendMessage('Welcome '+this.subject.get('nick')+', now wait for a client to join!', 'roomEvent');
+                        this.appendMessage('Welcome '+xmpptk.ui.htmlEnc(this.subject.get('nick'))+', now wait for a client to join!', 'roomEvent');
                     }
                 }
                 break;
             case 'occupant_left':
-                this.appendMessage(event['from'] + " has left", 'roomEvent');
+                this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has left", 'roomEvent');
                 break;
             }
         } else {
@@ -350,7 +350,7 @@ helpim.ui.Room.prototype._chatStatesChanged = function(chatStates) {
                         goog.dom.setTextContent(el, msg);
                     } else {
                         this.appendMessage(
-                            msg,
+                            xmpptk.ui.htmlEnc(msg),
                             "composingMessage",
                             id);
                     }
