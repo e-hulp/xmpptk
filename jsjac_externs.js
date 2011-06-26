@@ -8,6 +8,7 @@ JSJaCHttpBindingConnection.prototype.connect = function(cfg) {};
 JSJaCHttpBindingConnection.prototype.disconnect = function() {};
 JSJaCHttpBindingConnection.prototype.resume = function() {};
 JSJaCHttpBindingConnection.prototype.send = function(p) {};
+JSJaCHttpBindingConnection.prototype.sendIQ = function(p, handlers, context) {};
 JSJaCHttpBindingConnection.prototype.suspend = function(p) {};
 
 var JSJaCPacket = function() {};
@@ -16,6 +17,7 @@ JSJaCPacket.prototype.getFromJID = function() {};
 JSJaCPacket.prototype.getFrom = function() {};
 JSJaCPacket.prototype.pType = function() {};
 JSJaCPacket.prototype.getChild = function(tag, ns) {};
+JSJaCPacket.prototype.getChildVal = function(tag, ns) {};
 
 var JSJaCJID = function() {};
 JSJaCJID.prototype.getResource = function() {};
@@ -32,6 +34,7 @@ JSJaCPresence.prototype.appendNode = function(str, obj, val) {};
 JSJaCPresence.prototype.getFrom = function() {};
 JSJaCPresence.prototype.getFromJID = function() {};
 JSJaCPresence.prototype.getType = function() {};
+JSJaCPresence.prototype.getStatus = function() {};
 
 var JSJaCMessage = function() {};
 JSJaCMessage.prototype.setTo = function(str) {};
@@ -50,5 +53,6 @@ JSJaCMessage.prototype.setChatState = function(state) {};
 var JSJaCIQ = function() {};
 JSJaCIQ.prototype.setType = function(str) {};
 JSJaCIQ.prototype.setQuery = function(str) {};
+JSJaCIQ.prototype.setIQ = function(to, type, id) {};
 JSJaCIQ.prototype.buildNode = function(str, obj, val) {};
 JSJaCIQ.prototype.appendNode = function(str, obj, val) {};
