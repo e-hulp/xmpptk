@@ -84,31 +84,30 @@ helpim.Client.prototype.login = function() {
             query.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, xmpptk.Config['token']));
             this._con.sendIQ(
                 iq,
-                {result_handler: goog.bind(function(resIq) {
+                {'result_handler': goog.bind(function(resIq) {
                     this._logger.info('result: '+resIq.xml());
                     if (xmpptk.Config['is_staff']) {
                         // just go straight to the room
                         new helpim.muc.Room(
                             this,
-                            {room: resIq.getChildVal('room',
+                            {'room': resIq.getChildVal('room',
                                                  helpim.Client.NS.HELPIM_ROOMS),
-                             service: resIq.getChildVal('service',
+                             'service': resIq.getChildVal('service',
                                                         helpim.Client.NS.HELPIM_ROOMS),
-                             nick: xmpptk.Config['muc_nick']},
+                             'nick': xmpptk.Config['muc_nick']},
                             resIq.getChildVal('password',
                                               helpim.Client.NS.HELPIM_ROOMS)).join();
-
                     } else {
                         var nick = resIq.getChildVal('nick',
                                                      helpim.Client.NS.HELPIM_ROOMS)
                         if (nick && nick!='') {
                             new helpim.muc.Room(
                                 this,
-                                {room: resIq.getChildVal('room',
+                                {'room': resIq.getChildVal('room',
                                                          helpim.Client.NS.HELPIM_ROOMS),
-                                 service: resIq.getChildVal('service',
+                                 'service': resIq.getChildVal('service',
                                                             helpim.Client.NS.HELPIM_ROOMS),
-                                 nick: nick},
+                                 'nick': nick},
                                 resIq.getChildVal('password',
                                                   helpim.Client.NS.HELPIM_ROOMS)).join();
                         } else {
@@ -116,13 +115,13 @@ helpim.Client.prototype.login = function() {
                             // indicate ui to ask for nick and subject
                             this.publish(
                                 helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-                                {room: resIq.getChildVal(
+                                {'room': resIq.getChildVal(
                                     'room',
                                     helpim.Client.NS.HELPIM_ROOMS),
-                                 service: resIq.getChildVal(
+                                 'service': resIq.getChildVal(
                                      'service',
                                      helpim.Client.NS.HELPIM_ROOMS),
-                                 password: resIq.getChildVal(
+                                 'password': resIq.getChildVal(
                                      'password',
                                      helpim.Client.NS.HELPIM_ROOMS)});
                         }
@@ -130,9 +129,8 @@ helpim.Client.prototype.login = function() {
 
                     var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
                     goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
-
                 }, this),
-                 error_handler: goog.bind(function(errIq) {
+                 'error_handler': goog.bind(function(errIq) {
                      this._logger.info('error: '+errIq.xml());
                      this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
                                   errIq.getChild('error').firstChild.tagName);

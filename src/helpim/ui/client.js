@@ -88,10 +88,10 @@ helpim.ui.Client = function(client) {
 
                     var room = new helpim.muc.Room(
                         client,
-                        {room: params.room,
-                         service: params.service,
-                         nick: nick},
-                        params.password);
+                        {'room': params['room'],
+                         'service': params['service'],
+                         'nick': nick},
+                        params['password']);
                     room._room_subject_desired = goog.dom.getElement('muc_subject').value;;
                     room.join();
                 } else {
