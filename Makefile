@@ -1,13 +1,17 @@
 BUILDDIR  = ./htdocs
+SOURCEDIR = ./src
 
 OUTFILE   = $(BUILDDIR)/helpim.js
-DEPSFILE  = $(BUILDDIR)/deps.js
+DEPSFILE  = $(SOURCEDIR)/deps.js
 
 all: clean deps jsjac build
 
 build:
 	@echo "building helpim";
-	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=src/ --namespace="helpim" --output_mode=compiled -f '--compilation_level=ADVANCED_OPTIMIZATIONS' -f '--externs=jsjac_externs.js' -f '--define=goog.DEBUG=false' --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
+	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=$(SOURCEDIR) --namespace="helpim" --output_mode=compiled -f '--compilation_level=ADVANCED_OPTIMIZATIONS' -f '--externs=jsjac_externs.js' -f '--define=goog.DEBUG=false' --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
+	@cp -r src/xmpptk/images htdocs/
+	@cp -r src/xmpptk/sounds htdocs/
+	@cp -r src/helpim/helpim.css htdocs/
 
 jsjac:
 	@echo "building jsjac";
@@ -20,4 +24,4 @@ clean:
 
 deps:
 	@echo "building dependencies";
-	@./lib/closure-library/closure/bin/build/depswriter.py --root_with_prefix="./src ../../" > $(DEPSFILE)
+	@./lib/closure-library/closure/bin/build/depswriter.py --root_with_prefix="$(SOURCEDIR) ../../" > $(DEPSFILE)

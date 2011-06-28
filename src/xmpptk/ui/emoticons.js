@@ -10,7 +10,7 @@ xmpptk.ui.emoticons.Replacement;
 /** @type {object.<xmpptk.ui.emoticons.Replacement>} */
 xmpptk.ui.emoticons.replacements = {};
 
-xmpptk.ui.emoticons.path = "images/emoticons/";
+xmpptk.ui.emoticons.path = "xmpptk/xmpptk/images/emoticons/";
 
 xmpptk.ui.emoticons.init = function(base_url) {
 

@@ -2,4 +2,7 @@
 deps.js
 htdocs/jsjac.js
 htdocs/helpim.js
+htdocs/helpim.css
+htdocs/images/
+htdocs/sounds/
 htdocs/.htaccess
