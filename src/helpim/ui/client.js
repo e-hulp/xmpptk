@@ -20,6 +20,7 @@ goog.require('helpim.ui.muc.Room');
 /**
  * @constructor
  * @param {helpim.Client} client
+ * @extends {xmpptk.ui.View}
  */
 helpim.ui.Client = function(client) {
     xmpptk.ui.View.call(this, client);
