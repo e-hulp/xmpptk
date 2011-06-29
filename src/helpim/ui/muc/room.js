@@ -22,7 +22,7 @@ goog.require('xmpptk.ui.sound');
 helpim.ui.muc.Room = function(room) {
     xmpptk.ui.View.call(this, room);
 
-    this._logger.info("creating view for room with id "+room.id);
+    this._logger.info("Creating view for room with id "+room.id);
 
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
     this._panel.id = xmpptk.ui.fixID(room.id + "_roomPanel");
@@ -33,20 +33,8 @@ helpim.ui.muc.Room = function(room) {
     this._subjectPanel  = goog.dom.getElementByClass('subjectPanel', this._panel);
     this._messagesPanel = goog.dom.getElementByClass('messagesPanel', this._panel);
     this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
-    this._sendTextarea = new goog.ui.Textarea("Type here to send a message");
+    this._sendTextarea = new goog.ui.Textarea();
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
-    this._sendTextarea._firstClick = true;
-
-    goog.events.listen(
-        this._sendTextarea.getContentElement(),
-        goog.events.EventType.CLICK,
-        goog.bind(function(e) {
-            if (this._sendTextarea._firstClick) {
-                this._sendTextarea.setValue('');
-                this._sendTextarea._firstClick = false;
-            }
-        }, this)
-    );
 
     goog.events.listen(
         this._sendTextarea.getContentElement(),
@@ -118,11 +106,6 @@ helpim.ui.muc.Room = function(room) {
                 img,
                 goog.events.EventType.CLICK,
                 function(e) {
-                    if (this._sendTextarea._firstClick) {
-                        this._sendTextarea.setValue('');
-                        this._sendTextarea._firstClick = false;
-                    }
-
                     var emoticon = e.target.title;
 
                     var setSelectionRange = function(input, selectionStart, selectionEnd) {
@@ -274,6 +257,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
             case 'occupant_joined':
                 if (event['from'] != this.subject['nick']) {
                     this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has joined", 'roomEvent');
+                    this._sendTextarea.getContentElement().focus();
                     if (!this._focused) {
                         window.focus();
                     }
