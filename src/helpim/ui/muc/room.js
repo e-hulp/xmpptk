@@ -46,9 +46,11 @@ helpim.ui.muc.Room = function(room) {
                     room.sendMessage(this._sendTextarea.getValue());
                     this._sendTextarea.setValue('');
                     e.preventDefault();
-                } catch(e) { this._logger.severe("failed sending message", e.message); }
+                } catch(err) { this._logger.severe("failed sending message", err.message); }
             } else {
-                room.sendComposing();
+                if (!e.ctrlKey && !e.metaKey) {
+                    room.sendComposing();
+                }
             }
         }, this)
     );
