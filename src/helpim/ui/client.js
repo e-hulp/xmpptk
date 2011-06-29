@@ -124,7 +124,11 @@ helpim.ui.Client = function(client) {
                 cond = 'Bad Request';
                 break;
             case 'item-not-found':
-                document.location.replace(xmpptk.Config['unavailable_redirect']);
+                if (xmpptk.Config['is_staff']) {
+                    document.location.replace(xmpptk.Config['logout_redirect']);
+                } else {
+                    document.location.replace(xmpptk.Config['unavailable_redirect']);
+                }
                 return;
                 break;
             case 'not-authorized':
