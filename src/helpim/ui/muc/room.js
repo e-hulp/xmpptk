@@ -53,6 +53,9 @@ helpim.ui.muc.Room = function(room) {
         }, this)
     );
 
+    // will be enabled once other participant joins
+    this._sendTextarea.setEnabled(false);
+
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
     var numEmoticonsProcessed = 0;
@@ -257,7 +260,11 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
             case 'occupant_joined':
                 if (event['from'] != this.subject['nick']) {
                     this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has joined", 'roomEvent');
+
+                    // we're ready to chat
+                    this._sendTextarea.setEnabled(true);
                     this._sendTextarea.getContentElement().focus();
+
                     if (!this._focused) {
                         window.focus();
                     }
@@ -294,6 +301,9 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
                 }
                 this.appendMessage(msg, 'roomEvent');
+                if (xmpptk.Config['is_one2one']) {
+                    this._sendTextarea.setEnabled(false);
+                }
                 break;
             }
         } else {
