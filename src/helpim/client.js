@@ -13,6 +13,7 @@ goog.require('xmpptk.muc.Client');
 goog.require('helpim.jsjac_ext');
 goog.require('helpim.muc.Room');
 goog.require('helpim.ui.Client');
+goog.require('helpim.ui.ClientRunning');
 
 /**
  * @constructor
@@ -20,6 +21,16 @@ goog.require('helpim.ui.Client');
  */
 helpim.Client = function() {
     this._logger.info("starting up");
+
+    if (goog.net.cookies.containsKey('client_running')) {
+        this._logger.info("aborting");
+        xmpptk.muc.Client.call(this);
+        this._view = new helpim.ui.ClientRunning(this);
+        return;
+    }
+
+    goog.net.cookies.set('client_running', true);
+
     xmpptk.muc.Client.call(this);
 
     this._composingTimeout = xmpptk.getConfig('composing_timeout', helpim.Client.COMPOSING_TIMEOUT);
@@ -142,6 +153,11 @@ helpim.Client.prototype.login = function() {
         },
         this
     );
+};
+
+helpim.Client.prototype.logout = function() {
+    goog.net.cookies.remove('client_running');
+    goog.base(this, 'logout');
 };
 
 helpim.Client.prototype.logoutCleanExit = function() {
