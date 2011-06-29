@@ -167,9 +167,11 @@ helpim.ui.muc.Room = function(room) {
 
     goog.style.showElement(this._subjectPanel, false);
 
-    this._focused = true;
-    window.onblur = goog.bind(function() { this._focused = false; }, this);
-    window.onfocus = goog.bind(function() { this._focused = true; }, this);
+    this._focused = false;
+    window.onblur = goog.bind(function() { this._focused = false; this._logger.info("focus: "+this._focused); }, this);
+    window.onfocus = goog.bind(function() { this._focused = true; this._logger.info("focus: "+this._focused); }, this);
+
+    this._ringing = false;
 
     this._messagesAt = 0;
     this._eventsAt = 0;
@@ -261,34 +263,57 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                 if (event['from'] != this.subject['nick']) {
                     this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has entered the conversation", 'roomEvent');
 
-                    // we're ready to chat
-                    this._sendTextarea.setEnabled(true);
-                    this._sendTextarea.getContentElement().focus();
+                    this._logger.info("FOCUSED at joined: "+this._focused);
+                    if (xmpptk.Config['is_staff']) {
+                        if (!this._focused) {
+                            if (!this._ringing) {
+                                // taken from
+                                // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+                                // combined with
+                                // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+                                var oldTitle = document.title;
+                                var msg = "Ring! Ring!";
+                                var ring = 0;
+                                var timeoutId = setInterval(function() {
+                                    document.title = (document.title == msg)?oldTitle:msg;
+                                    if ((ring % 5) == 0) {
+                                        xmpptk.ui.sound.play('ring');
+                                    }
+                                    ring++;
+                                }, 1000);
 
+                                this._ringing = true;
+                            
+                                var stopRinging = goog.bind(function(handler, fun) {
+                                    if (this._ringing) {
+                                        clearInterval(timeoutId);
+                                        document.title = oldTitle;
+                                        this._ringing = false;
+                                    }
+                                }, this);
+                                document.onmousemove = function() { 
+                                    stopRinging(); 
+                                    document.onmousemove = null;
+                                }
+
+                                var oldonfocus = window.onfocus;
+                                window.onfocus = function() { 
+                                    stopRinging(); 
+                                    oldonfocus();
+                                    window.onfocus = oldonfocus;
+                                }
+                            }
+                        }
+                    } else {
+                        xmpptk.ui.sound.play('ring');
+                    }
                     if (!this._focused) {
                         window.focus();
                     }
-                    if (xmpptk.Config['is_staff']) {
-                        // taken from
-                        // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-                        // combined with
-                        // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-                        var oldTitle = document.title;
-                        var msg = "Ring! Ring!";
-                        var ring = 0;
-                        var timeoutId = setInterval(function() {
-                            document.title = (document.title == msg)?'':msg;
-                            if ((ring % 5) == 0) {
-                                xmpptk.ui.sound.play('ring');
-                            }
-                            ring++;
-                        }, 1000);
-                        document.onmousemove = function() {
-                            clearInterval(timeoutId);
-                            document.title = oldTitle;
-                            document.onmousemove = null;
-                        };
-                    }
+
+                    // we're ready to chat
+                    this._sendTextarea.setEnabled(true);
+                    this._sendTextarea.getContentElement().focus();
                 } else {
                     if (xmpptk.Config['is_staff']) {
                         this.appendMessage('Welcome '+xmpptk.ui.htmlEnc(this.subject.get('nick'))+', now wait for a client to join!', 'roomEvent');
