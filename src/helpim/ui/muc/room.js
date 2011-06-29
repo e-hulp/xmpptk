@@ -259,7 +259,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
             switch (event['type']) {
             case 'occupant_joined':
                 if (event['from'] != this.subject['nick']) {
-                    this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has joined", 'roomEvent');
+                    this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has entered the conversation", 'roomEvent');
 
                     // we're ready to chat
                     this._sendTextarea.setEnabled(true);
@@ -296,9 +296,13 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                 }
                 break;
             case 'occupant_left':
-                var msg = xmpptk.ui.htmlEnc(event['from']) + " has left";
+                var msg = xmpptk.ui.htmlEnc(event['from']) + " has disappeared from the conversation";
                 if (event['status'] != '') {
-                    msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
+                    if (event['status'] == 'Clean Exit') {
+                        msg = xmpptk.ui.htmlEnc(event['from']) + " has ended the conversation";
+                    } else {
+                        msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
+                    }
                 }
                 this.appendMessage(msg, 'roomEvent');
                 if (xmpptk.Config['is_one2one']) {
