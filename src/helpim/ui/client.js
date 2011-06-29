@@ -46,7 +46,7 @@ helpim.ui.Client = function(client) {
         }
     );
  
-    var logoutButton = new goog.ui.Button('logout', 
+    var logoutButton = new goog.ui.Button('Stop Conversation', 
                                             goog.ui.FlatButtonRenderer.getInstance());
     logoutButton.render(goog.dom.getElement('logoutButton'));
     logoutButton.setValue('logout');
