@@ -123,7 +123,8 @@ helpim.ui.Client = function(client) {
                 cond = 'Bad Request';
                 break;
             case 'item-not-found':
-                cond = "Sorry, currently there's no chat available. Please return later!";
+                document.location.replace(xmpptk.Config['unavailable_redirect']);
+                return;
                 break;
             case 'not-authorized':
                 cond = "Sorry, you're not allowed to access this service";
