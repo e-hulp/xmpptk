@@ -46,9 +46,9 @@ helpim.ui.Client = function(client) {
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
         }
     );
- 
-    var logoutButton = new goog.ui.Button('Stop Conversation', 
-                                            goog.ui.FlatButtonRenderer.getInstance());
+
+    var logoutButton = new goog.ui.Button(gettext('Stop Conversation'),
+                                          goog.ui.FlatButtonRenderer.getInstance());
     logoutButton.render(goog.dom.getElement('logoutButton'));
     logoutButton.setValue('logout');
     goog.events.listen(
@@ -65,12 +65,12 @@ helpim.ui.Client = function(client) {
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
     client.subscribeOnce(
-        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',        
+        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
         function(params) {
 
             var dialog = new goog.ui.Dialog();
             dialog.setTitle('Join Chat');
-            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">Nickname: </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">Subject: </label><input id="muc_subject" maxlength="64"/></div></form>');
+            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
@@ -83,7 +83,7 @@ helpim.ui.Client = function(client) {
                     if (!nick || nick == '') {
                         goog.dom.setTextContent(
                             goog.dom.getElement('form_error'),
-                            'Please provide a nickname!');
+                            gettext('Please provide a nickname!'));
                         return false;
                     }
 
@@ -113,7 +113,7 @@ helpim.ui.Client = function(client) {
             // known conditions are:
             // service-unavailable -> bot is down
             // bad-request -> bad xml was sent (hu?)
-            // item-not-found -> no room available 
+            // item-not-found -> no room available
             // not-authorized -> token sent was invalid
 
             switch(cond) {
@@ -132,12 +132,12 @@ helpim.ui.Client = function(client) {
                 return;
                 break;
             case 'not-authorized':
-                cond = "Sorry, you're not allowed to access this service";
+                cond = gettext("Sorry, you're not allowed to access this service");
                 break;
             }
 
             var dialog = new goog.ui.Dialog();
-            dialog.setTitle('An error occured');
+            dialog.setTitle(gettext('An error occured'));
             dialog.setContent(cond);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
             dialog.setHasTitleCloseButton(false);

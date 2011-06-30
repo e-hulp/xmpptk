@@ -81,7 +81,7 @@ helpim.ui.muc.Room = function(room) {
                 goog.style.showElement(emoticonsPanel, false);
                 var plus = goog.dom.createElement('span');
                 plus.className = 'emoticonsExpandBtn';
-                plus.title = 'Click to see even more emoticons';
+                plus.title = gettext('Click to see even more emoticons');
                 goog.dom.appendChild(plus, goog.dom.createTextNode(' more >'));
                 goog.dom.appendChild(oldEmoticonsPanel, plus);
                 plus.shown = false;
@@ -91,12 +91,12 @@ helpim.ui.muc.Room = function(room) {
                     function(e) {
                         this._logger.info('click');
                         if (plus.shown) {
-                            plus.innerHTML = ' more >';
-                            plus.title = 'Click to see even more emoticons';
+                            plus.innerHTML = ' '+gettext('more')+' >';
+                            plus.title = gettext('Click to see even more emoticons');
                             (new goog.fx.dom.FadeOutAndHide(emoticonsPanel, 200)).play();
                         } else {
-                            plus.innerHTML = '< less ';
-                            plus.title = 'Click to collapse emoticons';
+                            plus.innerHTML = '< '+gettext('less')+' ';
+                            plus.title = gettext('Click to collapse emoticons');
                             (new goog.fx.dom.FadeInAndShow(emoticonsPanel, 200)).play();
                         }
                         plus.shown = !plus.shown;
@@ -263,7 +263,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
             switch (event['type']) {
             case 'occupant_joined':
                 if (event['from'] != this.subject['nick']) {
-                    this.appendMessage(xmpptk.ui.htmlEnc(event['from']) + " has entered the conversation", 'roomEvent');
+                    this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
                     if (xmpptk.Config['is_staff']) {
@@ -274,7 +274,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                                 // combined with
                                 // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
                                 var oldTitle = document.title;
-                                var msg = "Ring! Ring!";
+                                var msg = gettext("Ring! Ring!");
                                 var ring = 0;
                                 var timeoutId = setInterval(function() {
                                     document.title = (document.title == msg)?oldTitle:msg;
@@ -318,15 +318,15 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this._sendTextarea.getContentElement().focus();
                 } else {
                     if (xmpptk.Config['is_staff']) {
-                        this.appendMessage('Welcome '+xmpptk.ui.htmlEnc(this.subject.get('nick'))+', now wait for a client to join!', 'roomEvent');
+                        this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
                     }
                 }
                 break;
             case 'occupant_left':
-                var msg = xmpptk.ui.htmlEnc(event['from']) + " has disappeared from the conversation";
+                var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
                 if (event['status'] != '') {
                     if (event['status'] == 'Clean Exit') {
-                        msg = xmpptk.ui.htmlEnc(event['from']) + " has ended the conversation";
+                        msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
                     } else {
                         msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
                     }
@@ -371,10 +371,10 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
                     goog.dom.removeNode(el);
                     break;
                 case 'paused':
-                    goog.dom.setTextContent(el, from+" stopped composing");
+                    goog.dom.setTextContent(el, interpolate(gettext("%s stopped composing"), [from]));
                     break;
                 case 'composing':
-                    var msg = from + " is composing a message";
+                    var msg = interpolate(gettext("%s is composing a message"), [from]);
                     if (el) {
                         goog.dom.setTextContent(el, msg);
                     } else {

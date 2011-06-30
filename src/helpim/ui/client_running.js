@@ -19,8 +19,8 @@ helpim.ui.ClientRunning = function(client) {
     );
 
     var dialog = new goog.ui.Dialog();
-    dialog.setTitle('An error occured');
-    dialog.setContent("Sorry, there's already a conversation active at some other window.");
+    dialog.setTitle(gettext('An error occured'));
+    dialog.setContent(gettext("Sorry, there's already a conversation active at some other window."));
     dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
     dialog.setHasTitleCloseButton(false);
     dialog.render(goog.dom.getElement("dialog"));
