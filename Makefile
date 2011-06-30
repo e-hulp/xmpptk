@@ -11,7 +11,8 @@ build:
 	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=$(SOURCEDIR) --namespace="helpim" --output_mode=compiled -f '--compilation_level=ADVANCED_OPTIMIZATIONS' -f '--externs=jsjac_externs.js' -f '--define=goog.DEBUG=false' --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
 	@cp -r src/xmpptk/images htdocs/
 	@cp -r src/xmpptk/sounds htdocs/
-	@cp -r src/helpim/helpim.css htdocs/
+	@cp -r src/helpim/*.css htdocs/
+	@cp -r src/xmpptk/*.html htdocs/
 
 jsjac:
 	@echo "building jsjac";
