@@ -56,3 +56,7 @@ JSJaCIQ.prototype.setQuery = function(str) {};
 JSJaCIQ.prototype.setIQ = function(to, type, id) {};
 JSJaCIQ.prototype.buildNode = function(str, obj, val) {};
 JSJaCIQ.prototype.appendNode = function(str, obj, val) {};
+
+var gettext = function(msgid) {};
+var ngettext = function(singular, plural, count) {};
+var interpolate = function(msgid, obj, named) {};
