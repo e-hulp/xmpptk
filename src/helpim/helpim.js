@@ -1,5 +1,7 @@
 goog.provide('helpim');
 
+goog.require('goog.object');
+
 goog.require('goog.debug.Logger');
 goog.require('goog.debug.Logger.Level');
 goog.require('goog.debug.LogManager');
