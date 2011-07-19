@@ -88,8 +88,7 @@ xmpptk.Model.prototype.set = function(prop, value, skip_notify) {
     if (!skip_notify) {
         // notify observers registered by observer pattern
         this.notify(prop);
-
-        // notify propery handlers
+        // notify propertyhandlers
         if (goog.isArray(this._propertyHandlers[prop])) {
             goog.array.forEach(
                 this._propertyHandlers[prop],
