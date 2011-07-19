@@ -86,15 +86,8 @@ helpim.ui.Client = function(client) {
                             gettext('Please provide a nickname!'));
                         return false;
                     }
-
-                    var room = new helpim.muc.Room(
-                        client,
-                        {'room': params['room'],
-                         'service': params['service'],
-                         'nick': nick},
-                        params['password']);
-                    room._room_subject_desired = goog.dom.getElement('muc_subject').value;;
-                    room.join();
+                    client.joinRoom(params['room'], params['service'], nick, 
+                                    params['password'], goog.dom.getElement('muc_subject').value);
                 } else {
                     client.logout();
                 }
