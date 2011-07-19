@@ -36,6 +36,13 @@ helpim.ui.muc.Room = function(room) {
     this._sendTextarea = new goog.ui.Textarea();
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
 
+    room.attachPropertyhandler(
+        'admitted',
+        goog.bind(function() {
+            goog.style.showElement(goog.dom.getElement('helpimClient'), true);
+        }, this)
+    );
+
     goog.events.listen(
         this._sendTextarea.getContentElement(),
         goog.events.EventType.KEYPRESS,
@@ -285,7 +292,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                                 }, 1000);
 
                                 this._ringing = true;
-                            
+
                                 var stopRinging = goog.bind(function(handler, fun) {
                                     if (this._ringing) {
                                         clearInterval(timeoutId);
@@ -293,14 +300,14 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                                         this._ringing = false;
                                     }
                                 }, this);
-                                document.onmousemove = function() { 
-                                    stopRinging(); 
+                                document.onmousemove = function() {
+                                    stopRinging();
                                     document.onmousemove = null;
                                 }
 
                                 var oldonfocus = window.onfocus;
-                                window.onfocus = function() { 
-                                    stopRinging(); 
+                                window.onfocus = function() {
+                                    stopRinging();
                                     oldonfocus();
                                     window.onfocus = oldonfocus;
                                 }
