@@ -79,6 +79,33 @@ helpim.Client.NS = {
  */
 helpim.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.Client');
 
+/**
+ * advise client to join a chat room
+ * @param {string} roomId the id of the room
+ * @param {string} service the service hosting the room (e.g. 'conference.jabber.org')
+ * @param {string} nick the desired nick within the room
+ * @param {string?} password optional password if required
+ * @param {string?} subject optional subject to set once room is joined
+ * @return {helpim.muc.Room} the room object
+*/
+helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject) {
+    var room = new helpim.muc.Room(
+        this,
+        {'room': room,
+         'service': service,
+         'nick': nick},
+        password);
+    room.join(function() { 
+        if (subject) {
+            room.setSubject(subject); 
+        }
+    });
+    return room;
+}
+
+/**
+ * @inheritDoc
+ */
 helpim.Client.prototype.login = function() {
     var timer = goog.now();
     goog.base(
@@ -98,29 +125,26 @@ helpim.Client.prototype.login = function() {
                 {'result_handler': goog.bind(function(resIq) {
                     this._logger.info('result: '+resIq.xml());
                     if (xmpptk.Config['is_staff']) {
+                        
                         // just go straight to the room
-                        new helpim.muc.Room(
-                            this,
-                            {'room': resIq.getChildVal('room',
-                                                 helpim.Client.NS.HELPIM_ROOMS),
-                             'service': resIq.getChildVal('service',
+                        this.joinRoom(resIq.getChildVal('room',
                                                         helpim.Client.NS.HELPIM_ROOMS),
-                             'nick': xmpptk.Config['muc_nick']},
-                            resIq.getChildVal('password',
-                                              helpim.Client.NS.HELPIM_ROOMS)).join();
+                                      resIq.getChildVal('service',
+                                                        helpim.Client.NS.HELPIM_ROOMS),
+                                      xmpptk.Config['muc_nick'],
+                                      resIq.getChildVal('password',
+                                                        helpim.Client.NS.HELPIM_ROOMS));
                     } else {
                         var nick = resIq.getChildVal('nick',
                                                      helpim.Client.NS.HELPIM_ROOMS)
                         if (nick && nick!='') {
-                            new helpim.muc.Room(
-                                this,
-                                {'room': resIq.getChildVal('room',
-                                                         helpim.Client.NS.HELPIM_ROOMS),
-                                 'service': resIq.getChildVal('service',
+                            this.joinRoom(resIq.getChildVal('room',
                                                             helpim.Client.NS.HELPIM_ROOMS),
-                                 'nick': nick},
-                                resIq.getChildVal('password',
-                                                  helpim.Client.NS.HELPIM_ROOMS)).join();
+                                          resIq.getChildVal('service',
+                                                            helpim.Client.NS.HELPIM_ROOMS),
+                                          nick,
+                                          resIq.getChildVal('password',
+                                                            helpim.Client.NS.HELPIM_ROOMS));
                         } else {
 
                             // indicate ui to ask for nick and subject
@@ -155,11 +179,17 @@ helpim.Client.prototype.login = function() {
     );
 };
 
+/**
+ * @inheritDoc
+ */
 helpim.Client.prototype.logout = function() {
     goog.net.cookies.remove('client_running');
     goog.base(this, 'logout');
 };
 
+/**
+ * @inheritDoc
+ */
 helpim.Client.prototype.logoutCleanExit = function() {
     // cookie can safely be removed as we don't want to return to this room
     goog.net.cookies.remove('room_token');
@@ -233,11 +263,23 @@ helpim.Client.prototype.sendComposing = function(jid) {
     );
 };
 
+/**
+ * set a callback to call when a composing event times out for a given jid
+ * @private
+ * @param {string} jid the jid the composing event was associated with
+ * @param {function()} callback the function to call when timeout occurs
+ * @param {number} timeout the timeout in msec
+ */
 helpim.Client.prototype._setComposingTimeout = function(jid, callback, timeout) {
     this._clearComposingTimeout(jid);
     this._composingTimeouts[jid] = setTimeout(callback, timeout)
 };
 
+/**
+ * clear a composing timeout
+ * @private
+ * @param {string} jid the jid the timeout was associated with
+ */
 helpim.Client.prototype._clearComposingTimeout = function(jid) {
     if (this._composingTimeouts[jid]) {
         clearTimeout(this._composingTimeouts[jid]);
