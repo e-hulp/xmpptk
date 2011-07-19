@@ -132,6 +132,15 @@ xmpptk.Client.prototype.rosterItemSet = function(item, callback) {
     this._con.sendIQ(iq, {error_handler: callback, result_handler: callback});
 };
 
+/**
+ * send a packet
+ * @param {JSJaCPacket} packet the packet to send over the wire
+ * @return {boolean} whether enqueing packet succeeded
+ */
+xmpptk.Client.prototype.send = function(packet) {
+    return this._con.send(packet);
+}
+
 xmpptk.Client.prototype.sendPresence = function(state, message, jid, extra) {
     var p = new JSJaCPresence();
     p.setTo(jid);
@@ -150,7 +159,7 @@ xmpptk.Client.prototype.sendPresence = function(state, message, jid, extra) {
     if (extra && typeof extra == 'function') {
         extra(p);
     }
-    this._con.send(p);
+    this.send(p);
 };
 
 xmpptk.Client.prototype.sendMessage = function(jid, message) {
@@ -159,7 +168,7 @@ xmpptk.Client.prototype.sendMessage = function(jid, message) {
     m.setType('chat');
     m.setBody(message);
 
-    this._con.send(m);
+    this.send(m);
 };
 
 xmpptk.Client.prototype.sendState = function(state) {
@@ -174,7 +183,7 @@ xmpptk.Client.prototype.sendState = function(state) {
             )
         );
 
-    this._con.send(iq);
+    this.send(iq);
 };
 
 xmpptk.Client.prototype.sendSubscription = function(jid, type, message) {
@@ -184,7 +193,7 @@ xmpptk.Client.prototype.sendSubscription = function(jid, type, message) {
     if (message) {
         p.setStatus(message);
     }
-    this._con.send(p);
+    this.send(p);
 };
 
 xmpptk.Client.prototype.suspend = function() {
@@ -282,7 +291,7 @@ xmpptk.Client.prototype._handleRosterPush = function(resIQ) {
     );
 
     // send 'result' reply
-    this._con.send(
+    this.send(
         new JSJaCIQ().setIQ(
             this._con.domain, 'result', resIQ.getID()
         )
