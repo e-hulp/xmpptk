@@ -84,6 +84,7 @@ xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket) {
 /**
  * actually join the room
  * @param {function(object, string)} callback function to call when actually admitted to the room
+ * @return {xmpptk.muc.Room} this rooms
  */
 xmpptk.muc.Room.prototype.join = function(callback) {
     this._logger.info("joining room "+this.jid+" with password "+this.password);
@@ -105,6 +106,7 @@ xmpptk.muc.Room.prototype.join = function(callback) {
     }
 
     this._client.sendPresence('available', undefined, this.jid, extra);
+    return this;
 };
 
 /**
