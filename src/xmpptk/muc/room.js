@@ -82,6 +82,71 @@ xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket) {
 };
 
 /**
+ * actually join the room
+ * @param {function(object, string)} callback function to call when actually admitted to the room
+ */
+xmpptk.muc.Room.prototype.join = function(callback) {
+    this._logger.info("joining room "+this.jid+" with password "+this.password);
+
+    // register handlers
+    this._client.registerRoom(this);
+
+    // register callback
+    if (callback) {
+        this.attachPropertyhandler('admitted', callback);
+    }
+
+    // send presence to rooms jid
+    if (this.password != '') {
+        var extra = goog.bind(function(p) {
+            return p.appendNode('x', {'xmlns': xmpptk.muc.NS.BASE},
+                                [p.buildNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password)]);
+        }, this);
+    }
+
+    this._client.sendPresence('available', undefined, this.jid, extra);
+};
+
+/**
+ * leave this room
+ */
+xmpptk.muc.Room.prototype.part = function() {
+    // unregister handlers
+    this._client.unregisterRoom(this);
+
+    // send presence
+    this._client.sendPresence('unavailable', undefined, this.jid);
+};
+
+/**
+  * send a message to the room (and thus to all occupants)
+  * @param {string} msg the message to send
+  */
+xmpptk.muc.Room.prototype.sendMessage = function(msg) {
+    this._client.sendMessage(this.id, msg);
+};
+
+/**
+ * sends a composing event to the room (must be supported by conference service)
+ */
+xmpptk.muc.Room.prototype.sendComposing = function() {
+    this._client.sendComposing(this.id);
+};
+
+/**
+ * set subject of this room
+ * @param {string} subject the subject to set
+ */
+xmpptk.muc.Room.prototype.setSubject = function(subject) {
+    this._logger.info("sending subject: "+this._room_subject_desired);
+    var m = new JSJaCMessage();
+    m.setTo(this.id);
+    m.setType('groupchat');
+    m.setSubject(subject);
+    this._client._con.send(m);
+}
+
+/**
  * handles a message packet directed to this room
  * @private
  * @param {JSJaCMessage} oMsg a presence packet
@@ -170,40 +235,4 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 
     this.notify();
     this._logger.info("done handling presence");
-};
-
-/**
- * actually join the room
- */
-xmpptk.muc.Room.prototype.join = function() {
-    this._logger.info("joining room "+this.jid+" with password "+this.password);
-
-    // register handlers
-    this._client.registerRoom(this);
-
-    // send presence to rooms jid
-    if (this.password != '') {
-        var extra = goog.bind(function(p) {
-            return p.appendNode('x', {'xmlns': xmpptk.muc.NS.BASE},
-                                [p.buildNode('password', {'xmlns': xmpptk.muc.NS.BASE}, this.password)]);
-        }, this);
-    }
-
-    this._client.sendPresence('available', undefined, this.jid, extra);
-};
-
-xmpptk.muc.Room.prototype.part = function() {
-    // unregister handlers
-    this._client.unregisterRoom(this);
-
-    // send presence
-    this._client.sendPresence('unavailable', undefined, this.jid);
-};
-
-xmpptk.muc.Room.prototype.sendMessage = function(msg) {
-    this._client.sendMessage(this.id, msg);
-};
-
-xmpptk.muc.Room.prototype.sendComposing = function() {
-    this._client.sendComposing(this.id);
 };
