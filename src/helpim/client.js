@@ -89,18 +89,19 @@ helpim.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.Client');
  * @return {helpim.muc.Room} the room object
 */
 helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject) {
-    var room = new helpim.muc.Room(
+    return new helpim.muc.Room(
         this,
-        {'room': room,
+        {'room': roomId,
          'service': service,
          'nick': nick},
-        password);
-    room.join(function() { 
-        if (subject) {
-            room.setSubject(subject); 
+        password
+    ).join(
+        function() { 
+            if (subject) {
+                room.setSubject(subject); 
+            }
         }
-    });
-    return room;
+    );
 }
 
 /**
