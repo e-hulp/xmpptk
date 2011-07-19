@@ -140,12 +140,12 @@ xmpptk.muc.Room.prototype.sendComposing = function() {
  * @param {string} subject the subject to set
  */
 xmpptk.muc.Room.prototype.setSubject = function(subject) {
-    this._logger.info("sending subject: "+this._room_subject_desired);
+    this._logger.info("sending subject: "+subject);
     var m = new JSJaCMessage();
     m.setTo(this.id);
     m.setType('groupchat');
     m.setSubject(subject);
-    this._client._con.send(m);
+    this._client.send(m);
 }
 
 /**
