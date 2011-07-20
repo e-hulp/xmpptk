@@ -116,67 +116,7 @@ helpim.Client.prototype.login = function() {
         'login',
         function() {
             this._logger.info("logged in successfully in "+(goog.now()-timer)+"ms");
-
-            this._logger.info('bot_jid: '+xmpptk.Config['bot_jid']);
-            // ask bot for a room
-            var iq = new JSJaCIQ();
-            iq.setIQ(xmpptk.Config['bot_jid'], 'get', 'room1');
-            var query = iq.setQuery(helpim.Client.NS.HELPIM_ROOMS);
-            query.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, xmpptk.Config['token']));
-            this._con.sendIQ(
-                iq,
-                {'result_handler': goog.bind(function(resIq) {
-                    this._logger.info('result: '+resIq.xml());
-                    if (xmpptk.Config['is_staff']) {
-                        
-                        // just go straight to the room
-                        this.joinRoom(resIq.getChildVal('room',
-                                                        helpim.Client.NS.HELPIM_ROOMS),
-                                      resIq.getChildVal('service',
-                                                        helpim.Client.NS.HELPIM_ROOMS),
-                                      xmpptk.Config['muc_nick'],
-                                      resIq.getChildVal('password',
-                                                        helpim.Client.NS.HELPIM_ROOMS));
-                    } else {
-                        var nick = resIq.getChildVal('nick',
-                                                     helpim.Client.NS.HELPIM_ROOMS)
-                        if (nick && nick!='') {
-                            this.joinRoom(resIq.getChildVal('room',
-                                                            helpim.Client.NS.HELPIM_ROOMS),
-                                          resIq.getChildVal('service',
-                                                            helpim.Client.NS.HELPIM_ROOMS),
-                                          nick,
-                                          resIq.getChildVal('password',
-                                                            helpim.Client.NS.HELPIM_ROOMS));
-                        } else {
-
-                            // indicate ui to ask for nick and subject
-                            this.publish(
-                                helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-                                {'room': resIq.getChildVal(
-                                    'room',
-                                    helpim.Client.NS.HELPIM_ROOMS),
-                                 'service': resIq.getChildVal(
-                                     'service',
-                                     helpim.Client.NS.HELPIM_ROOMS),
-                                 'password': resIq.getChildVal(
-                                     'password',
-                                     helpim.Client.NS.HELPIM_ROOMS)});
-                        }
-                    }
-
-                    var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
-                    goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
-                }, this),
-                 'error_handler': goog.bind(function(errIq) {
-                     this._logger.info('error: '+errIq.xml());
-                     this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
-                                  errIq.getChild('error').firstChild.tagName);
-                     goog.net.cookies.remove('room_token');
-
-                 }, this)
-                }
-            );
+            this.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token']);
         },
         this
     );
@@ -213,6 +153,77 @@ helpim.Client.prototype.logoutCleanExit = function() {
     setTimeout(goog.bind(this.logout, this), 100);
 };
 
+/**
+ * Request a room from bot
+ * @params {string} jid the service bot's jid - this one will be contacted to ask for a room
+ * @params {string} token the token to validate the request with
+ * @params {string?} nick the nick used for actually joining the room
+ * @params {string?} subject a subject to set when joining the room
+ */
+helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
+    this._logger.info('bot_jid: '+jid);
+    // ask bot for a room
+    var iq = new JSJaCIQ();
+    iq.setTo(jid).setType('get');
+    var query = iq.setQuery(helpim.Client.NS.HELPIM_ROOMS);
+    query.appendChild(iq.buildNode('token', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, token));
+    this._con.sendIQ(
+        iq,
+        {'result_handler': goog.bind(function(resIq) {
+            this._logger.info('result: '+resIq.xml());
+            if (xmpptk.Config['is_staff']) {
+                
+                // just go straight to the room
+                this.joinRoom(resIq.getChildVal('room',
+                                                helpim.Client.NS.HELPIM_ROOMS),
+                              resIq.getChildVal('service',
+                                                helpim.Client.NS.HELPIM_ROOMS),
+                              xmpptk.Config['muc_nick'],
+                              resIq.getChildVal('password',
+                                                helpim.Client.NS.HELPIM_ROOMS));
+            } else {
+                nick = resIq.getChildVal('nick',
+                                         helpim.Client.NS.HELPIM_ROOMS) || nick;
+                if (nick) {
+                    // either nick supplied by bot or by form from cycle before
+                    this.joinRoom(resIq.getChildVal('room',
+                                                    helpim.Client.NS.HELPIM_ROOMS),
+                                  resIq.getChildVal('service',
+                                                    helpim.Client.NS.HELPIM_ROOMS),
+                                  nick,
+                                  resIq.getChildVal('password',
+                                                    helpim.Client.NS.HELPIM_ROOMS),
+                                  subject);
+                } else {
+
+                    // indicate ui to ask for nick and subject
+                    this.publish(
+                        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
+                        {'room': resIq.getChildVal(
+                            'room',
+                            helpim.Client.NS.HELPIM_ROOMS),
+                         'service': resIq.getChildVal(
+                             'service',
+                             helpim.Client.NS.HELPIM_ROOMS),
+                         'password': resIq.getChildVal(
+                             'password',
+                             helpim.Client.NS.HELPIM_ROOMS)});
+                }
+            }
+
+            var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
+            goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
+        }, this),
+         'error_handler': goog.bind(function(errIq) {
+             this._logger.info('error: '+errIq.xml());
+             this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
+                          errIq.getChild('error').firstChild.tagName);
+             goog.net.cookies.remove('room_token');
+
+         }, this)
+        }
+    );
+};
 
 /**
  * @inheritDoc
