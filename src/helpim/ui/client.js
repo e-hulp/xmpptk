@@ -66,8 +66,7 @@ helpim.ui.Client = function(client) {
 
     client.subscribeOnce(
         helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-        function(params) {
-
+        function() {
             var dialog = new goog.ui.Dialog();
             dialog.setTitle(gettext('Join Chat'));
             dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
@@ -86,8 +85,7 @@ helpim.ui.Client = function(client) {
                             gettext('Please provide a nickname!'));
                         return false;
                     }
-                    client.joinRoom(params['room'], params['service'], nick, 
-                                    params['password'], goog.dom.getElement('muc_subject').value);
+                    client.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token'], nick, goog.dom.getElement('muc_subject').value);
                 } else {
                     client.logout();
                 }
