@@ -155,10 +155,10 @@ helpim.Client.prototype.logoutCleanExit = function() {
 
 /**
  * Request a room from bot
- * @params {string} jid the service bot's jid - this one will be contacted to ask for a room
- * @params {string} token the token to validate the request with
- * @params {string?} nick the nick used for actually joining the room
- * @params {string?} subject a subject to set when joining the room
+ * @param {string} jid the service bot's jid - this one will be contacted to ask for a room
+ * @param {string} token the token to validate the request with
+ * @param {string?} nick the nick used for actually joining the room
+ * @param {string?} subject a subject to set when joining the room
  */
 helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
     this._logger.info('bot_jid: '+jid);
