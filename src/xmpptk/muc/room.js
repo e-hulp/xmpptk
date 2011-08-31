@@ -125,7 +125,21 @@ xmpptk.muc.Room.prototype.part = function() {
   * @param {string} msg the message to send
   */
 xmpptk.muc.Room.prototype.sendMessage = function(msg) {
-    this._client.sendMessage(this.id, msg);
+    this._client.sendGroupchatMessage(this.id, msg);
+};
+
+/**
+ * send a private message to a room participant
+ * @param {string} nick the nick of the participant to send message to
+ * @param {string} msg the message to send
+ */
+xmpptk.muc.Room.prototype.sendPrivateMessage = function(nick, msg) {
+    var rcpt = this.roster.getItem(this.id+'/'+nick);
+    if (rcpt) {
+        this._client.sendMessage(rcpt.get('jid'), msg);
+    } else {
+        this._logger.info("recepient with nick "+nick+" not found in roster");
+    }
 };
 
 /**
