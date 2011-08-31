@@ -2,6 +2,10 @@
     float: right;
 }
 
+#blockParticipantButton {
+    float: right;
+}
+
 #panelTemplate {
     display: none;
 }
