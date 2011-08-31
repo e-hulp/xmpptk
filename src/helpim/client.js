@@ -228,7 +228,7 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
 /**
  * @inheritDoc
  */
-helpim.Client.prototype.sendMessage = function(jid, message) {
+helpim.Client.prototype.sendGroupchatMessage = function(jid, message) {
     if (!goog.isString(message) || message == '') {
         this._logger.info("not sending empty message");
         return;
