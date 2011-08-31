@@ -184,7 +184,7 @@ helpim.ui.muc.Room = function(room) {
             goog.ui.Component.EventType.ACTION,
             function() {
                 // send message to bot to block user
-                console.log("bot bot");
+                room.blockParticipant(xmpptk.Config['bot_jid'], room.id+'/'+this._participant);
             },
             false,
             this
@@ -292,6 +292,9 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
+
+                    this._participant = event['from'];
+                    
                     if (xmpptk.Config['is_staff']) {
                         if (!this._focused) {
                             if (!this._ringing) {
