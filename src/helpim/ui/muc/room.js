@@ -184,7 +184,7 @@ helpim.ui.muc.Room = function(room) {
             goog.ui.Component.EventType.ACTION,
             function() {
                 // send message to bot to block user
-                room.blockParticipant(xmpptk.Config['bot_jid'], room.id+'/'+this._participant);
+                room.blockParticipant(this._participant);
             },
             false,
             this
