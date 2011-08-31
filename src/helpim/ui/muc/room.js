@@ -174,6 +174,25 @@ helpim.ui.muc.Room = function(room) {
         goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
     }
 
+    if (xmpptk.Config['is_staff']) {
+        this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
+                                          goog.ui.FlatButtonRenderer.getInstance());
+        this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
+
+        goog.events.listen(
+            this._blockParticipantButton,
+            goog.ui.Component.EventType.ACTION,
+            function() {
+                // send message to bot to block user
+                console.log("bot bot");
+            },
+            false,
+            this
+        );
+
+        this._blockParticipantButton.setEnabled(false);
+    }
+
     goog.style.showElement(this._subjectPanel, false);
 
     this._focused = false;
@@ -323,6 +342,9 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     // we're ready to chat
                     this._sendTextarea.setEnabled(true);
                     this._sendTextarea.getContentElement().focus();
+                    if (xmpptk.Config['is_staff']) {
+                        this._blockParticipantButton.setEnabled(true);
+                    }
                 } else {
                     if (xmpptk.Config['is_staff']) {
                         this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');

@@ -2,10 +2,6 @@
     float: right;
 }
 
-#blockParticipantButton {
-    float: right;
-}
-
 #panelTemplate {
     display: none;
 }
@@ -16,6 +12,10 @@
 
 .emoticonsPanel {
     padding: 10px;
+}
+
+.blockParticipantButton {
+    float: right;
 }
 
 .messagesPanel {
