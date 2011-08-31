@@ -28,7 +28,7 @@ helpim.ui.Client = function(client) {
     this._rooms = {};
 
     xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
-    xmpptk.ui.sound.init(xmpptk.Config['static_url']);
+    xmpptk.ui.sound.init(xmpptk.Config['static_url']+'xmpptk/xmpptk/');
 
     client.subscribeOnce('disconnected', function() {
         document.location.replace(xmpptk.Config['logout_redirect']);
@@ -39,9 +39,9 @@ helpim.ui.Client = function(client) {
         goog.events.EventType.CLICK,
         function(e) {
             if (xmpptk.ui.sound.enabled) {
-                e.target.src = '/static/images/stock_volume-mute.png';
+                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume-mute.png';
             } else {
-                e.target.src = '/static/images/stock_volume.png';
+                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume.png';
             }
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
         }
@@ -171,7 +171,6 @@ helpim.ui.Client = function(client) {
     if (!xmpptk.Config['is_staff'] || xmpptk.Config['mode'] == 'light') {
         goog.style.showElement(goog.dom.getElement('tabBar'), false);
     }
-
 };
 goog.inherits(helpim.ui.Client, xmpptk.ui.View);
 
