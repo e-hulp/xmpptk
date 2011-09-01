@@ -19,12 +19,12 @@ helpim.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.muc.Room
  * must be staff to do so.
  * @param {string} participant the nick of the participant to block
  */
-helpim.muc.Room.prototype.blockParticipant = function(participant) {
+helpim.muc.Room.prototype.blockParticipant = function(participant, success, error) {
     if (!xmpptk.Config['is_staff']) {
         // no need to try cause bot would cancel the request anyway
         return;
     }
-    this._client.blockParticipant(xmpptk.Config['bot_jid'], this.id+'/'+participant)
+    this._client.blockParticipant(xmpptk.Config['bot_jid'], this.id+'/'+participant, success, error)
 }
 
 helpim.muc.Room.prototype.part = function(cb) {

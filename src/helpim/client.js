@@ -85,7 +85,7 @@ helpim.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.Client');
  * @param {string} bot the jid of the bot to talk to
  * @param {string} participant the jid of the participant to block
  */
-helpim.Client.prototype.blockParticipant = function(bot, participant) {
+helpim.Client.prototype.blockParticipant = function(bot, participant, success, error) {
     if (!xmpptk.Config['is_staff']) {
         // no need to try cause bot would cancel the request anyway
         return;
@@ -97,8 +97,8 @@ helpim.Client.prototype.blockParticipant = function(bot, participant) {
         iq.buildNode('participant', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, participant)
     ]);
     this._con.sendIQ(iq, {
-        'result_handler': function() {},
-        'error_handler': function() {}
+        'result_handler': success,
+        'error_handler': error
     });
 }
 
