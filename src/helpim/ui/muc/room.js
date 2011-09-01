@@ -183,8 +183,23 @@ helpim.ui.muc.Room = function(room) {
             this._blockParticipantButton,
             goog.ui.Component.EventType.ACTION,
             function() {
-                // send message to bot to block user
-                room.blockParticipant(this._participant);
+
+            var dialog = new goog.ui.Dialog();
+            dialog.setTitle(gettext('Block Participant'));
+            dialog.setContent('Are you sure you want to block this participant?');
+            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                if (e.key == 'ok') {
+                    // send message to bot to block user
+                    room.blockParticipant(this._participant);
+                } 
+            }, false, this);
+
+            dialog.setVisible(true);
+
             },
             false,
             this
