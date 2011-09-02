@@ -82,25 +82,42 @@ helpim.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.Client');
 /**
  * send iq to bot to advise blocking of participant related to given jid.
  * must be staff to do so.
- * @param {string} bot the jid of the bot to talk to
- * @param {string} participant the jid of the participant to block
+ * @param {string} bot_jid the jid of the bot to talk to
+ * @param {string} participant_jid the jid of the participant to block
  */
-helpim.Client.prototype.blockParticipant = function(bot, participant, success, error) {
+helpim.Client.prototype.blockParticipant = function(bot_jid, participant_jid, success, error) {
     if (!xmpptk.Config['is_staff']) {
         // no need to try cause bot would cancel the request anyway
         return;
     }
     var iq = new JSJaCIQ();
-    iq.setTo(bot);
+    iq.setTo(bot_jid);
     iq.setType('set');
     iq.appendNode('block', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, [
-        iq.buildNode('participant', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, participant)
+        iq.buildNode('participant', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, participant_jid)
     ]);
     this._con.sendIQ(iq, {
         'result_handler': success,
         'error_handler': error
     });
-}
+};
+
+/**
+ * get a conversation id stored with room of bot's jid and save it
+ * with logout_redirect. 
+ * @param {string} bot_jid jid of bot. bot_jid must be a jid of a room not a real jid.
+ */
+helpim.Client.prototype.getConversationId = function(bot_jid) {
+    // retrieve conversation if on behalf of bot and
+    // overwrite logout_redirect
+    var iq = new JSJaCIQ();
+    iq.setTo(bot_jid);
+    iq.setType('get');
+    iq.appendNode('conversationId', {xmlns: helpim.Client.NS.HELPIM_ROOMS});
+    this._con.sendIQ(iq, {'result_handler': function(resIq) {
+        xmpptk.Config['logout_redirect'] = xmpptk.Config['conversation_redirect'] + resIq.getChildVal('conversationId')
+    }});
+};
 
 /**
  * advise client to join a chat room
@@ -120,14 +137,19 @@ helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, sub
         password
     );
     room.join(
-        function() { 
+        goog.bind(function() {
             if (subject) {
-                room.setSubject(subject); 
+                room.setSubject(subject);
             }
-        }
+            if (xmpptk.Config['is_staff'] &&
+                xmpptk.Config['is_one2one'] &&
+                xmpptk.Config['conversation_redirect']) {
+                this.getConversationId(room.id+'/'+xmpptk.Config['bot_nick']);
+            }
+        }, this)
     );
     return room;
-}
+};
 
 /**
  * @inheritDoc
@@ -195,7 +217,7 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
         {'result_handler': goog.bind(function(resIq) {
             this._logger.info('result: '+resIq.xml());
             if (xmpptk.Config['is_staff']) {
-                
+
                 // just go straight to the room
                 this.joinRoom(resIq.getChildVal('room',
                                                 helpim.Client.NS.HELPIM_ROOMS),
@@ -239,7 +261,7 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
         }, this),
          'error_handler': goog.bind(function(errIq) {
              this._logger.info('error: '+errIq.xml());
-             this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ', 
+             this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
                           errIq.getChild('error').firstChild.tagName);
              goog.net.cookies.remove('room_token');
 
