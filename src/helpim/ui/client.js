@@ -55,7 +55,6 @@ helpim.ui.Client = function(client) {
         logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            // send presence
             client.logoutCleanExit();
         },
         false,
