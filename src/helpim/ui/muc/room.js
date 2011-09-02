@@ -184,42 +184,43 @@ helpim.ui.muc.Room = function(room) {
             goog.ui.Component.EventType.ACTION,
             function() {
 
-            var dialog = new goog.ui.Dialog();
-            dialog.setTitle(gettext('Block Participant'));
-            dialog.setContent('Are you sure you want to block this participant?');
-            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-            dialog.setHasTitleCloseButton(false);
-            dialog.render(goog.dom.getElement("dialog"));
+                var dialog = new goog.ui.Dialog();
+                dialog.setTitle(gettext('Block Participant'));
+                dialog.setContent('Are you sure you want to block this participant?');
+                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+                dialog.setHasTitleCloseButton(false);
+                dialog.render(goog.dom.getElement("dialog"));
 
-            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                if (e.key == 'ok') {
-                    // send message to bot to block user
-                    room.blockParticipant(
-                        this._participant,
-                        function() {
-                            var dialog = new goog.ui.Dialog();
-                            dialog.setTitle(gettext('Block participant'));
-                            dialog.setContent('The participant has been blocked successfully');
-                            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                            dialog.setHasTitleCloseButton(false);
-                            dialog.render(goog.dom.getElement("dialog"));
-                            dialog.setVisible(true);
-                        },
-                        function() {
-                            var dialog = new goog.ui.Dialog();
-                            dialog.setTitle(gettext('Error'));
-                            dialog.setContent('There was an error blocking the participant');
-                            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                            dialog.setHasTitleCloseButton(false);
-                            dialog.render(goog.dom.getElement("dialog"));
-                            dialog.setVisible(true);
-                        }
-                    );
-                } 
-            }, false, this);
+                goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                    if (e.key == 'ok') {
+                        // send message to bot to block user
+                        room.blockParticipant(
+                            this._participant,
+                            goog.bind(function() {
+                                var dialog = new goog.ui.Dialog();
+                                dialog.setTitle(gettext('Block participant'));
+                                dialog.setContent('The participant has been blocked successfully');
+                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+                                dialog.setHasTitleCloseButton(false);
+                                dialog.render(goog.dom.getElement("dialog"));
+                                dialog.setVisible(true);
+                                this._blockParticipantButton.setEnabled(false);
+                            }, this),
+                            function() {
+                                var dialog = new goog.ui.Dialog();
+                                dialog.setTitle(gettext('Error'));
+                                dialog.setContent('There was an error blocking the participant');
+                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+                                dialog.setHasTitleCloseButton(false);
+                                dialog.render(goog.dom.getElement("dialog"));
+                                dialog.setVisible(true);
+                            }
+                        );
+                    } 
+                }, false, this);
 
-            dialog.setVisible(true);
-
+                dialog.setVisible(true);
+                
             },
             false,
             this
