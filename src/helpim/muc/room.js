@@ -27,7 +27,10 @@ helpim.muc.Room.prototype.blockParticipant = function(participant, success, erro
     this._client.blockParticipant(this.id+'/'+xmpptk.Config['bot_nick'], this.id+'/'+participant, success, error)
 }
 
-helpim.muc.Room.prototype.part = function(cb) {
+/**
+ * leaves the room
+ */
+helpim.muc.Room.prototype.part = function() {
     // unregister handlers
     this._client.unregisterRoom(this);
 
