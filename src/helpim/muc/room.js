@@ -24,7 +24,7 @@ helpim.muc.Room.prototype.blockParticipant = function(participant, success, erro
         // no need to try cause bot would cancel the request anyway
         return;
     }
-    this._client.blockParticipant(xmpptk.Config['bot_jid'], this.id+'/'+participant, success, error)
+    this._client.blockParticipant(this.id+'/'+xmpptk.Config['bot_nick'], this.id+'/'+participant, success, error)
 }
 
 helpim.muc.Room.prototype.part = function(cb) {
