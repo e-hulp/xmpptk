@@ -217,42 +217,28 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
         {'result_handler': goog.bind(function(resIq) {
             this._logger.info('result: '+resIq.xml());
             if (xmpptk.Config['is_staff']) {
-
                 // just go straight to the room
-                this.joinRoom(resIq.getChildVal('room',
-                                                helpim.Client.NS.HELPIM_ROOMS),
-                              resIq.getChildVal('service',
-                                                helpim.Client.NS.HELPIM_ROOMS),
+                this.joinRoom(resIq.getChildVal('room'),
+                              resIq.getChildVal('service'),
                               xmpptk.Config['muc_nick'],
-                              resIq.getChildVal('password',
-                                                helpim.Client.NS.HELPIM_ROOMS));
+                              resIq.getChildVal('password'));
             } else {
-                nick = resIq.getChildVal('nick',
-                                         helpim.Client.NS.HELPIM_ROOMS) || nick;
+                nick = resIq.getChildVal('nick') || nick;
                 if (nick) {
                     // either nick supplied by bot or by form from cycle before
-                    this.joinRoom(resIq.getChildVal('room',
-                                                    helpim.Client.NS.HELPIM_ROOMS),
-                                  resIq.getChildVal('service',
-                                                    helpim.Client.NS.HELPIM_ROOMS),
+                    this.joinRoom(resIq.getChildVal('room'),
+                                  resIq.getChildVal('service'),
                                   nick,
-                                  resIq.getChildVal('password',
-                                                    helpim.Client.NS.HELPIM_ROOMS),
+                                  resIq.getChildVal('password'),
                                   subject);
                 } else {
 
                     // indicate ui to ask for nick and subject
                     this.publish(
                         helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-                        {'room': resIq.getChildVal(
-                            'room',
-                            helpim.Client.NS.HELPIM_ROOMS),
-                         'service': resIq.getChildVal(
-                             'service',
-                             helpim.Client.NS.HELPIM_ROOMS),
-                         'password': resIq.getChildVal(
-                             'password',
-                             helpim.Client.NS.HELPIM_ROOMS)});
+                        {'room': resIq.getChildVal('room'),
+                         'service': resIq.getChildVal('service'),
+                         'password': resIq.getChildVal('password')});
                 }
             }
 
