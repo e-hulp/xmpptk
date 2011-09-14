@@ -1,6 +1,7 @@
 goog.provide('xmpptk.ui.emoticons');
 
 goog.require('goog.object');
+goog.require('goog.array');
 goog.require('goog.string');
 goog.require('goog.net.XhrIo');
 
