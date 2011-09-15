@@ -380,7 +380,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
 
                     // we're ready to chat
                     this._sendTextarea.setEnabled(true);
-                    this._sendTextarea.getContentElement().focus();
+                    this._sendTextarea.setFocused(true);
                     if (xmpptk.Config['is_staff']) {
                         this._blockParticipantButton.setEnabled(true);
                     }
