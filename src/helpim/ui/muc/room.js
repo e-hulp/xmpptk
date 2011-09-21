@@ -62,9 +62,6 @@ helpim.ui.muc.Room = function(room) {
         }, this)
     );
 
-    // will be enabled once other participant joins
-    this._sendTextarea.setEnabled(false);
-
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
     var numEmoticonsProcessed = 0;
@@ -168,6 +165,9 @@ helpim.ui.muc.Room = function(room) {
     );
 
     if (xmpptk.Config['is_one2one']) {
+		// will be enabled once other participant joins
+		this._sendTextarea.setEnabled(false);
+
         // sir hide-a-lot
         goog.style.showElement(this._rosterPanel, false);
         goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
