@@ -329,9 +329,11 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
 
-                    this._participant = event['from'];
+                    if (xmpptk.Config['is_staff'] && xmpptk.Config['is_one2one']) {
 
-                    if (xmpptk.Config['is_staff']) {
+						// this is for blocking participants which is only available for staff at one2one rooms
+						this._participant = event['from'];
+
                         if (!this._focused) {
                             if (!this._ringing) {
                                 // taken from
@@ -378,14 +380,16 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                         window.focus();
                     }
 
-                    // we're ready to chat
-                    this._sendTextarea.setEnabled(true);
-                    this._sendTextarea.getContentElement().focus();
-                    if (xmpptk.Config['is_staff']) {
-                        this._blockParticipantButton.setEnabled(true);
-                    }
+					if (xmpptk.Config['is_one2one']) {
+						// we're ready to chat
+						this._sendTextarea.setEnabled(true);
+						this._sendTextarea.getContentElement().focus();
+						if (xmpptk.Config['is_staff']) {
+							this._blockParticipantButton.setEnabled(true);
+						}
+					}
                 } else {
-                    if (xmpptk.Config['is_staff']) {
+                    if (xmpptk.Config['is_staff'] && xmpptk.Config['is_one2one']) {
                         this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
                     }
                 }
