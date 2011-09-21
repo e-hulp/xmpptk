@@ -172,62 +172,62 @@ helpim.ui.muc.Room = function(room) {
         goog.style.showElement(this._rosterPanel, false);
         goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
         goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
-    }
 
-    if (xmpptk.Config['is_staff']) {
-        this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
-                                          goog.ui.FlatButtonRenderer.getInstance());
-        this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
+		if (xmpptk.Config['is_staff']) {
+			this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
+															   goog.ui.FlatButtonRenderer.getInstance());
+			this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
 
-        goog.events.listen(
-            this._blockParticipantButton,
-            goog.ui.Component.EventType.ACTION,
-            function() {
+			goog.events.listen(
+				this._blockParticipantButton,
+				goog.ui.Component.EventType.ACTION,
+				function() {
 
-                var dialog = new goog.ui.Dialog();
-                dialog.setTitle(gettext('Block Participant'));
-                dialog.setContent('Are you sure you want to block this participant?');
-                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-                dialog.setHasTitleCloseButton(false);
-                dialog.render(goog.dom.getElement("dialog"));
+					var dialog = new goog.ui.Dialog();
+					dialog.setTitle(gettext('Block Participant'));
+					dialog.setContent('Are you sure you want to block this participant?');
+					dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+					dialog.setHasTitleCloseButton(false);
+					dialog.render(goog.dom.getElement("dialog"));
 
-                goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                    if (e.key == 'ok') {
-                        // send message to bot to block user
-                        room.blockParticipant(
-                            this._participant,
-                            goog.bind(function() {
-                                var dialog = new goog.ui.Dialog();
-                                dialog.setTitle(gettext('Block participant'));
-                                dialog.setContent('The participant has been blocked successfully');
-                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                                dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
-                                dialog.setVisible(true);
-                                this._blockParticipantButton.setEnabled(false);
-                            }, this),
-                            function() {
-                                var dialog = new goog.ui.Dialog();
-                                dialog.setTitle(gettext('Error'));
-                                dialog.setContent('There was an error blocking the participant');
-                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                                dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
-                                dialog.setVisible(true);
-                            }
-                        );
-                    } 
-                }, false, this);
+					goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+						if (e.key == 'ok') {
+							// send message to bot to block user
+							room.blockParticipant(
+								this._participant,
+								goog.bind(function() {
+									var dialog = new goog.ui.Dialog();
+									dialog.setTitle(gettext('Block participant'));
+									dialog.setContent('The participant has been blocked successfully');
+									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+									dialog.setHasTitleCloseButton(false);
+									dialog.render(goog.dom.getElement("dialog"));
+									dialog.setVisible(true);
+									this._blockParticipantButton.setEnabled(false);
+								}, this),
+								function() {
+									var dialog = new goog.ui.Dialog();
+									dialog.setTitle(gettext('Error'));
+									dialog.setContent('There was an error blocking the participant');
+									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+									dialog.setHasTitleCloseButton(false);
+									dialog.render(goog.dom.getElement("dialog"));
+									dialog.setVisible(true);
+								}
+							);
+						}
+					}, false, this);
 
-                dialog.setVisible(true);
-                
-            },
-            false,
-            this
-        );
+					dialog.setVisible(true);
 
-        this._blockParticipantButton.setEnabled(false);
-    }
+				},
+				false,
+				this
+			);
+
+			this._blockParticipantButton.setEnabled(false);
+		}
+	}
 
     goog.style.showElement(this._subjectPanel, false);
 
@@ -330,7 +330,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this._logger.info("FOCUSED at joined: "+this._focused);
 
                     this._participant = event['from'];
-                    
+
                     if (xmpptk.Config['is_staff']) {
                         if (!this._focused) {
                             if (!this._ringing) {
