@@ -286,14 +286,16 @@ helpim.ui.muc.Room.prototype.update = function() {
         goog.object.forEach(
             this.subject.roster.getItems(),
             function(item) {
-                if (item.role == xmpptk.muc.Occupant.Role.NONE) {
+				var nick = (new JSJaCJID(item['jid'])).getResource();
+                if (item.role == xmpptk.muc.Occupant.Role.NONE ||
+					(!xmpptk.Config['debug'] && nick == xmpptk.Config['bot_nick'])) {
                     return;
                 }
                 goog.dom.append(
                     this._rosterPanel,
                     goog.dom.createDom('div',
                                        {'class': 'rosterItem'},
-                                       (new JSJaCJID(item['jid'])).getResource())
+                                       nick)
                 );
             },
             this
