@@ -2,6 +2,7 @@ goog.provide('helpim.ui.Client');
 
 goog.require('goog.dom');
 goog.require('goog.object');
+goog.require('goog.json');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.Button');
 goog.require('goog.ui.FlatButtonRenderer');
@@ -181,16 +182,18 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
+	var count = 0;
     goog.object.forEach(
         this.subject.rooms,
-        function(room) {
-            if (!this.tabBar.getChild(room.id)) {
-                this._rooms[room.id] = new helpim.ui.muc.Room(room);
-
-                var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
-                tab.setId(room.id);
+        function(room, id) {
+            if (!this.tabBar.getChild(id)) {
+                this._rooms[id] = new helpim.ui.muc.Room(room);
+				var title = (count == 0)? gettext('lobby'):""+count;
+                var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+                tab.setId(id);
                 this.tabBar.addChild(tab, true);
                 this.tabBar.setSelectedTab(tab);
+				count++;
             }
         },
         this
