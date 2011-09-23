@@ -164,7 +164,7 @@ helpim.ui.muc.Room = function(room) {
         this
     );
 
-    if (xmpptk.Config['is_one2one']) {
+    if (this.subject.is_one2one) {
 		// will be enabled once other participant joins
 		this._sendTextarea.setEnabled(false);
 
@@ -281,7 +281,7 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 helpim.ui.muc.Room.prototype.update = function() {
     this._logger.info("update called");
 
-    if (!xmpptk.Config['is_one2one']) {
+    if (!this.subject.is_one2one) {
         goog.dom.removeChildren(this._rosterPanel);
         goog.object.forEach(
             this.subject.roster.getItems(),
@@ -330,7 +330,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
-					if (xmpptk.Config['is_one2one']) {
+					if (this.subject.is_one2one) {
 						if (xmpptk.Config['is_staff']) {
 
 							// this is for blocking participants which is only available for staff at one2one rooms
@@ -387,7 +387,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
 						this._sendTextarea.getContentElement().focus();
 					} // end is_one2one
                 } else {
-                    if (xmpptk.Config['is_staff'] && xmpptk.Config['is_one2one']) {
+                    if (xmpptk.Config['is_staff'] && this.subject.is_one2one) {
                         this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
                     }
                 }
@@ -402,7 +402,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     }
                 }
                 this.appendMessage(msg, 'roomEvent');
-                if (xmpptk.Config['is_one2one']) {
+                if (this.subject.is_one2one) {
                     this._sendTextarea.setEnabled(false);
                 }
                 break;
