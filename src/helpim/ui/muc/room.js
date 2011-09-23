@@ -330,66 +330,62 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
-
-                    if (xmpptk.Config['is_staff'] && xmpptk.Config['is_one2one']) {
-
-						// this is for blocking participants which is only available for staff at one2one rooms
-						this._participant = event['from'];
-
-                        if (!this._focused) {
-                            if (!this._ringing) {
-                                // taken from
-                                // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-                                // combined with
-                                // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-                                var oldTitle = document.title;
-                                var msg = gettext("Ring! Ring!");
-                                var ring = 0;
-                                var timeoutId = setInterval(function() {
-                                    document.title = (document.title == msg)?oldTitle:msg;
-                                    if ((ring % 5) == 0) {
-                                        xmpptk.ui.sound.play('ring');
-                                    }
-                                    ring++;
-                                }, 1000);
-
-                                this._ringing = true;
-
-                                var stopRinging = goog.bind(function(handler, fun) {
-                                    if (this._ringing) {
-                                        clearInterval(timeoutId);
-                                        document.title = oldTitle;
-                                        this._ringing = false;
-                                    }
-                                }, this);
-                                document.onmousemove = function() {
-                                    stopRinging();
-                                    document.onmousemove = null;
-                                }
-
-                                var oldonfocus = window.onfocus;
-                                window.onfocus = function() {
-                                    stopRinging();
-                                    oldonfocus();
-                                    window.onfocus = oldonfocus;
-                                }
-                            }
-                        }
-                    } else {
-                        xmpptk.ui.sound.play('ring');
-                    }
-                    if (!this._focused) {
-                        window.focus();
-                    }
-
 					if (xmpptk.Config['is_one2one']) {
+						if (xmpptk.Config['is_staff']) {
+
+							// this is for blocking participants which is only available for staff at one2one rooms
+							this._participant = event['from'];
+
+							if (!this._focused) {
+								if (!this._ringing) {
+									// taken from
+									// http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+									// combined with
+									// http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+									var oldTitle = document.title;
+									var msg = gettext("Ring! Ring!");
+									var ring = 0;
+									var timeoutId = setInterval(function() {
+										document.title = (document.title == msg)?oldTitle:msg;
+										if ((ring % 5) == 0) {
+											xmpptk.ui.sound.play('ring');
+										}
+										ring++;
+									}, 1000);
+
+									this._ringing = true;
+
+									var stopRinging = goog.bind(function(handler, fun) {
+										if (this._ringing) {
+											clearInterval(timeoutId);
+											document.title = oldTitle;
+											this._ringing = false;
+										}
+									}, this);
+									document.onmousemove = function() {
+										stopRinging();
+										document.onmousemove = null;
+									}
+
+									var oldonfocus = window.onfocus;
+									window.onfocus = function() {
+										stopRinging();
+										oldonfocus();
+										window.onfocus = oldonfocus;
+									}
+								}
+							}
+							this._blockParticipantButton.setEnabled(true);
+						} else { // end is_staff
+							xmpptk.ui.sound.play('ring');
+						}
+						if (!this._focused) {
+							window.focus();
+						}
 						// we're ready to chat
 						this._sendTextarea.setEnabled(true);
 						this._sendTextarea.getContentElement().focus();
-						if (xmpptk.Config['is_staff']) {
-							this._blockParticipantButton.setEnabled(true);
-						}
-					}
+					} // end is_one2one
                 } else {
                     if (xmpptk.Config['is_staff'] && xmpptk.Config['is_one2one']) {
                         this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
