@@ -142,7 +142,7 @@ helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, sub
                 room.setSubject(subject);
             }
             if (xmpptk.Config['is_staff'] &&
-                xmpptk.Config['is_one2one'] &&
+                xmpptk.Config['mode'] == 'light' &&
                 xmpptk.Config['conversation_redirect']) {
                 this.getConversationId(room.id+'/'+xmpptk.Config['bot_nick']);
             }
