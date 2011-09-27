@@ -66,6 +66,11 @@
     font-weight: bold;
 }
 
+.ajax-loader {
+	text-align: center;
+	padding: 1em;
+}
+
 .goog-tab-bar {
   border: 0;
   cursor: default;

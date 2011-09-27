@@ -16,6 +16,7 @@ goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
 
 goog.require('helpim.muc.Room');
+goog.require('helpim.ui');
 goog.require('helpim.ui.muc.Room');
 
 /**
@@ -40,9 +41,9 @@ helpim.ui.Client = function(client) {
         goog.events.EventType.CLICK,
         function(e) {
             if (xmpptk.ui.sound.enabled) {
-                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume-mute.png';
+                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume-mute.png');
             } else {
-                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume.png';
+                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume.png');
             }
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
         }
@@ -67,32 +68,15 @@ helpim.ui.Client = function(client) {
     client.subscribeOnce(
         helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
         function() {
+			try {
             var dialog = new goog.ui.Dialog();
-            dialog.setTitle(gettext('Join Chat'));
-            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
-            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+            dialog.setTitle(gettext('Please wait!'));
+            dialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a room for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
             dialog.setHasTitleCloseButton(false);
+			dialog.setButtonSet(null);
             dialog.render(goog.dom.getElement("dialog"));
-
-            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                if (e.key == 'ok') {
-                    // get nick and subject from form submitted
-                    var nick = goog.dom.getElement('muc_nick').value;
-                    this._logger.info(nick);
-                    if (!nick || nick == '') {
-                        goog.dom.setTextContent(
-                            goog.dom.getElement('form_error'),
-                            gettext('Please provide a nickname!'));
-                        return false;
-                    }
-                    client.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token'], nick, goog.dom.getElement('muc_subject').value);
-                } else {
-                    client.logout();
-                }
-            }, false, this);
-
-            dialog.setVisible(true);
-            goog.dom.getElement('muc_nick').focus();
+			dialog.setVisible(true);
+			} catch(e) { console.error(e); }
         },
         this
     );
@@ -101,11 +85,12 @@ helpim.ui.Client = function(client) {
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
 
-            // known conditions are:
-            // service-unavailable -> bot is down
-            // bad-request -> bad xml was sent (hu?)
-            // item-not-found -> no room available
-            // not-authorized -> token sent was invalid
+            /* known conditions are:
+             * - service-unavailable -> bot is down
+             * - bad-request         -> bad xml was sent (hu?)
+             * - item-not-found      -> no room available
+             * - not-authorized      -> token sent was invalid
+			 */
 
             switch(cond) {
             case 'service-unavailable':
