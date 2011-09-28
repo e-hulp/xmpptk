@@ -20,10 +20,14 @@ JSJaCPacket.prototype.getChild = function(tag, ns) {};
 JSJaCPacket.prototype.getChildVal = function(tag, ns) {};
 
 var JSJaCJID = function() {};
+JSJaCJID.prototype.getBareJID = function() {};
 JSJaCJID.prototype.getNode = function() {};
 JSJaCJID.prototype.getDomain = function() {};
 JSJaCJID.prototype.getResource = function() {};
 JSJaCJID.prototype.removeResource = function() {};
+JSJaCJID.prototype.setNode = function(str) {};
+JSJaCJID.prototype.setDomain = function(str) {};
+JSJaCJID.prototype.setResource = function(str) {};
 JSJaCJID.prototype.toString = function() {};
 
 var JSJaCPresence = function() {};
