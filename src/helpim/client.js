@@ -172,6 +172,14 @@ helpim.Client.prototype.login = function() {
 		this._logger.info("got a message: "+msg.xml());
 		var invite = msg.getChild('invite');
 		if (invite) {
+            // check if we can put trust in invitee
+            var invitee = invite.getAttribute('from');
+            invitee = invitee.substring(0, invitee.indexOf('/'));
+            if (invitee != xmpptk.Config['bot_jid']) {
+                this._logger.warning("got invitee other than bot: "+invitee);
+                return;
+            }
+
 			var roomJID = msg.getFromJID();
 			this._logger.info("got an invite to a muc room: "+roomJID.toString());
 
