@@ -33,6 +33,8 @@ helpim.Client = function() {
 
     xmpptk.muc.Client.call(this);
 
+    this.nick = xmpptk.Config['muc_nick'];
+
     this._composingTimeout = xmpptk.getConfig('composing_timeout', helpim.Client.COMPOSING_TIMEOUT);
     this._composingSent = {};
     this._composingTimeouts = {};
@@ -177,11 +179,12 @@ helpim.Client.prototype.login = function() {
 			var service = roomJID.getDomain();
 			var password = msg.getChildVal('password');
 
-			if (xmpptk.Config['muc_nick']) {
-				this.joinRoom(roomId, service, xmpptk.Config['muc_nick'], password);
+			if (this.nick) {
+				this.joinRoom(roomId, service, this.nick, password);
 			} else {
 				// request nick (and subject)
 				this.publish('nick_required', goog.bind(function(nick, subject) {
+                    this.nick = nick;
 					this.joinRoom(roomId, service, nick, password, subject);
 				}, this));
 			}
