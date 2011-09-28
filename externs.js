@@ -20,6 +20,8 @@ JSJaCPacket.prototype.getChild = function(tag, ns) {};
 JSJaCPacket.prototype.getChildVal = function(tag, ns) {};
 
 var JSJaCJID = function() {};
+JSJaCJID.prototype.getNode = function() {};
+JSJaCJID.prototype.getDomain = function() {};
 JSJaCJID.prototype.getResource = function() {};
 JSJaCJID.prototype.removeResource = function() {};
 JSJaCJID.prototype.toString = function() {};

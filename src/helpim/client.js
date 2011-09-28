@@ -165,6 +165,28 @@ helpim.Client.prototype.login = function() {
         },
         this
     );
+
+    this._con.registerHandler('message', 'x', xmpptk.muc.NS.USER, goog.bind(function(msg) {
+		this._logger.info("got a message: "+msg.xml());
+		var invite = msg.getChild('invite');
+		if (invite) {
+			var roomJID = msg.getFromJID();
+			this._logger.info("got an invite to a muc room: "+roomJID.toString());
+
+			var roomId = roomJID.getNode();
+			var service = roomJID.getDomain();
+			var password = msg.getChildVal('password');
+
+			if (xmpptk.Config['muc_nick']) {
+				this.joinRoom(roomId, service, xmpptk.Config['muc_nick'], password);
+			} else {
+				// request nick (and subject)
+				this.publish('nick_required', goog.bind(function(nick, subject) {
+					this.joinRoom(roomId, service, nick, password, subject);
+				}, this));
+			}
+		}
+	} , this));
 };
 
 /**

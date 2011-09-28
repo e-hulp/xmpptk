@@ -66,22 +66,6 @@ helpim.ui.Client = function(client) {
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
     client.subscribeOnce(
-        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-        function() {
-			try {
-            var dialog = new goog.ui.Dialog();
-            dialog.setTitle(gettext('Please wait!'));
-            dialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a room for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
-            dialog.setHasTitleCloseButton(false);
-			dialog.setButtonSet(null);
-            dialog.render(goog.dom.getElement("dialog"));
-			dialog.setVisible(true);
-			} catch(e) { console.error(e); }
-        },
-        this
-    );
-
-    client.subscribeOnce(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
 
@@ -126,6 +110,37 @@ helpim.ui.Client = function(client) {
             dialog.setVisible(true);
         }
     );
+
+	client.subscribe(
+		'nick_required',
+		function(callback) {
+            var dialog = new goog.ui.Dialog();
+            dialog.setTitle(gettext('Join Chat'));
+            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
+            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                if (e.key == 'ok') {
+                    // get nick and subject from form submitted
+                    var nick = goog.dom.getElement('muc_nick').value;
+                    this._logger.info(nick);
+                    if (!nick || nick == '') {
+                        goog.dom.setTextContent(
+                            goog.dom.getElement('form_error'),
+                            gettext('Please provide a nickname!'));
+                        return false;
+                    }
+                    callback(nick, goog.dom.getElement('muc_subject').value);
+                } else {
+                    client.logout();
+                }
+            }, false, this);
+			dialog.setVisible(true);
+		},
+		this
+	);
 
     this._lastRoomSelected = null;
 
