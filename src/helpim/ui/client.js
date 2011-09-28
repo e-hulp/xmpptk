@@ -186,15 +186,31 @@ helpim.ui.Client.prototype.update = function() {
     goog.object.forEach(
         this.subject.rooms,
         function(room, id) {
-            if (!this.tabBar.getChild(id)) {
-                this._rooms[id] = new helpim.ui.muc.Room(room);
-				var title = (count == 0)? gettext('lobby'):""+count;
-                var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
-                tab.setId(id);
-                this.tabBar.addChild(tab, true);
-                this.tabBar.setSelectedTab(tab);
-				count++;
-            }
+            if (xmpptk.Config['is_staff']) {
+				if (!this.tabBar.getChild(id)) {
+					this._rooms[id] = new helpim.ui.muc.Room(room);
+					var title = (count == 0)? gettext('lobby'):""+count;
+					var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+					tab.setId(id);
+					this.tabBar.addChild(tab, true);
+					this.tabBar.setSelectedTab(tab);
+				}
+			} else {
+				if (count == 0) {
+					// show waiting dialog
+					var dialog = new goog.ui.Dialog();
+					dialog.setTitle(gettext('Please wait!'));
+					dialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
+					dialog.setHasTitleCloseButton(false);
+					dialog.setButtonSet(null);
+					dialog.render(goog.dom.getElement("dialog"));
+					dialog.setVisible(true);
+				} else {
+					// show room
+					this._rooms[id] = new helpim.ui.muc.Room(room);
+				}
+			}
+			count++;
         },
         this
     );
