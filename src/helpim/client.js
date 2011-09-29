@@ -273,6 +273,14 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
 };
 
 /**
+ * request a one2one room for you and a client from the waiting room by bot. the bot must be addressed by his room jid in order to make this work.
+ * @param {string} jid jid of the bot to ask
+ */
+helpim.Client.prototype.requestClient = function(jid, success, error, ctxt) {
+
+};
+
+/**
  * @inheritDoc
  */
 helpim.Client.prototype.sendGroupchatMessage = function(jid, message) {

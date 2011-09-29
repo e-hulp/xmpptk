@@ -238,7 +238,14 @@ helpim.ui.muc.Room = function(room) {
 				this._requestClientButton,
 				goog.ui.Component.EventType.ACTION,
 				function() {
-				}
+					this._requestClientButton.setEnabled(false);
+					setTimeout(5000, goog.bind(function() {
+						this._requestClientButton.setEnabled(this.subject.clientsWaiting);
+					}, this));
+					room.requestClient();
+				},
+				false,
+				this
 			);
 			this._requestClientButton.setEnabled(false);
 		}

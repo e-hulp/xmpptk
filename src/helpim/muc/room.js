@@ -11,6 +11,7 @@ helpim.muc.Room = function(client, room_jid, password, is_one2one) {
     xmpptk.muc.Room.call(this, client, room_jid, password);
 	this.is_one2one = is_one2one || false;
 	this.clientsWaiting = false;
+	this._waitingClients = 0;
 };
 goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
@@ -38,6 +39,10 @@ helpim.muc.Room.prototype.part = function() {
 
     // send presence
     this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
+};
+
+helpim.muc.Room.prototype.requestClient = function() {
+	this._client.requestClient(this.id+'/'+xmpptk.Config['bot_nick']);
 };
 
 /**
