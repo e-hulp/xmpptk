@@ -138,6 +138,7 @@ helpim.ui.Client = function(client) {
                 }
             }, false, this);
 			dialog.setVisible(true);
+            goog.dom.getElement('muc_nick').focus();
 		},
 		this
 	);

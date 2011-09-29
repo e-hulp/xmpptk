@@ -227,7 +227,23 @@ helpim.ui.muc.Room = function(room) {
 
 			this._blockParticipantButton.setEnabled(false);
 		}
+	} else {
+		if (xmpptk.Config['is_staff']) {
+			// we're in a lobby
+			this._requestClientButton =  new goog.ui.Button(gettext('Request Client'),
+															goog.ui.FlatButtonRenderer.getInstance());
+			this._requestClientButton.render(goog.dom.getElementByClass('requestClientButton', this._panel));
+
+			goog.events.listen(
+				this._requestClientButton,
+				goog.ui.Component.EventType.ACTION,
+				function() {
+				}
+			);
+			this._requestClientButton.setEnabled(false);
+		}
 	}
+
 
     goog.style.showElement(this._subjectPanel, false);
 
@@ -244,6 +260,7 @@ helpim.ui.muc.Room = function(room) {
     room.attachPropertyhandler('events', this._eventsChanged, this);
     room.attachPropertyhandler('messages', this._messagesChanged, this);
     room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
+	room.attachPropertyhandler('clientsWaiting', this._clientsWaiting, this);
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
@@ -301,6 +318,10 @@ helpim.ui.muc.Room.prototype.update = function() {
             this
         );
     }
+};
+
+helpim.ui.muc.Room.prototype._clientsWaiting = function(clientsWaiting) {
+	this._requestClientButton.setEnabled(clientsWaiting);
 };
 
 helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {

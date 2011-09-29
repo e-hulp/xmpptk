@@ -18,6 +18,10 @@
     float: right;
 }
 
+.requestClientButton {
+    float: right;
+}
+
 .messagesPanel {
     margin-right: 228px;
     overflow: auto;

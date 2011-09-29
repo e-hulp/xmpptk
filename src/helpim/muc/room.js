@@ -10,6 +10,7 @@ goog.require('xmpptk.muc.Room');
 helpim.muc.Room = function(client, room_jid, password, is_one2one) {
     xmpptk.muc.Room.call(this, client, room_jid, password);
 	this.is_one2one = is_one2one || false;
+	this.clientsWaiting = false;
 };
 goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
@@ -37,4 +38,27 @@ helpim.muc.Room.prototype.part = function() {
 
     // send presence
     this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
+};
+
+/**
+ * @inheritDoc
+ */
+helpim.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
+	goog.base(this, '_handleGroupchatPresence', oPres, this);
+	var client = oPres.getChild('client', helpim.Client.NS.HELPIM_ROOMS);
+	if (client) {
+		var status = client.getAttribute('status');
+		if (status && status == 'unavailable') {
+			// client left waiting room
+			this._waitingClients--;
+			if (this._waitingClients == 0) {
+				this.set('clientsWaiting', false);
+			} 
+		} else {
+			this._waitingClients++;
+			if (!this.clientsWaiting) {
+				this.set('clientsWaiting', true);
+			}
+		}
+	}
 };
