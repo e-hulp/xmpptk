@@ -239,9 +239,9 @@ helpim.ui.muc.Room = function(room) {
 				goog.ui.Component.EventType.ACTION,
 				function() {
 					this._requestClientButton.setEnabled(false);
-					setTimeout(5000, goog.bind(function() {
+					setTimeout(goog.bind(function() {
 						this._requestClientButton.setEnabled(this.subject.clientsWaiting);
-					}, this));
+					}, this), 5000);
 					room.requestClient();
 				},
 				false,
