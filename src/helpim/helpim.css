@@ -20,6 +20,7 @@
 
 .requestClientButton {
     float: right;
+    width: 224px;
 }
 
 .messagesPanel {
