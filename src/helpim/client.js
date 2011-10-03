@@ -131,12 +131,15 @@ helpim.Client.prototype.getConversationId = function(bot_jid) {
  * @return {helpim.muc.Room} the room object
 */
 helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject) {
+    var isOne2One = goog.object.getCount(this.rooms);
+
     var room = new helpim.muc.Room(
         this,
         {'room': roomId,
          'service': service,
          'nick': nick},
-        password
+        password,
+        isOne2One
     );
     room.join(
         goog.bind(function() {
