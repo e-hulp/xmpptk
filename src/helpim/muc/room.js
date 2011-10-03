@@ -10,8 +10,6 @@ goog.require('xmpptk.muc.Room');
 helpim.muc.Room = function(client, room_jid, password, is_one2one) {
     xmpptk.muc.Room.call(this, client, room_jid, password);
 	this.is_one2one = is_one2one || false;
-	this.clientsWaiting = false;
-	this._waitingClients = 0;
 };
 goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
