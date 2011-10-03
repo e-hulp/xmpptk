@@ -41,29 +41,6 @@ helpim.muc.Room.prototype.part = function() {
     this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
 };
 
-helpim.muc.Room.prototype.requestClient = function() {
-	this._client.requestClient(this.id+'/'+xmpptk.Config['bot_nick']);
-};
-
-/**
- * @inheritDoc
- */
-helpim.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
-	goog.base(this, '_handleGroupchatPresence', oPres, this);
-	var client = oPres.getChild('client', helpim.Client.NS.HELPIM_ROOMS);
-	if (client) {
-		var status = client.getAttribute('status');
-		if (status && status == 'unavailable') {
-			// client left waiting room
-			this._waitingClients--;
-			if (this._waitingClients == 0) {
-				this.set('clientsWaiting', false);
-			} 
-		} else {
-			this._waitingClients++;
-			if (!this.clientsWaiting) {
-				this.set('clientsWaiting', true);
-			}
-		}
-	}
+helpim.muc.Room.prototype.requestRoom = function() {
+	this._client.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token']);
 };
