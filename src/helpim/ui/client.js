@@ -65,7 +65,7 @@ helpim.ui.Client = function(client) {
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
-    client.subscribeOnce(
+    client.subscribe(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
 
