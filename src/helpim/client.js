@@ -237,7 +237,7 @@ helpim.Client.prototype.logoutCleanExit = function() {
  * @param {string} jid the service bot's jid - this one will be contacted to ask for a room
  * @param {string} token the token to validate the request with
  */
-helpim.Client.prototype.requestRoom = function(jid, token, success, error) {
+helpim.Client.prototype.requestRoom = function(jid, token) {
     this._logger.info('bot_jid: '+jid);
     // ask bot for a room
     var iq = new JSJaCIQ();
