@@ -74,7 +74,7 @@ helpim.ui.Client = function(client) {
              * - bad-request         -> bad xml was sent (hu?)
              * - item-not-found      -> no room available
              * - not-authorized      -> token sent was invalid
-			 */
+             */
 
             switch(cond) {
             case 'service-unavailable':
@@ -111,9 +111,9 @@ helpim.ui.Client = function(client) {
         }
     );
 
-	client.subscribe(
-		'nick_required',
-		function(callback) {
+    client.subscribe(
+        'nick_required',
+        function(callback) {
             var dialog = new goog.ui.Dialog();
             dialog.setTitle(gettext('Join Chat'));
             dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
@@ -137,11 +137,11 @@ helpim.ui.Client = function(client) {
                     client.logout();
                 }
             }, false, this);
-			dialog.setVisible(true);
+            dialog.setVisible(true);
             goog.dom.getElement('muc_nick').focus();
-		},
-		this
-	);
+        },
+        this
+    );
 
     this._lastRoomSelected = null;
 
@@ -183,38 +183,46 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
-	var count = 0;
+    var count = 0;
     goog.object.forEach(
         this.subject.rooms,
         function(room, id) {
             if (xmpptk.Config['is_staff']) {
-				if (!this.tabBar.getChild(id)) {
+                if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
-					this._rooms[id] = new helpim.ui.muc.Room(room);
-					var title = (count == 0)? gettext('lobby'):""+count;
-					var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
-					tab.setId(id);
-					this.tabBar.addChild(tab, true);
-					this.tabBar.setSelectedTab(tab);
-				} else {
+                    this._rooms[id] = new helpim.ui.muc.Room(room);
+                    var title = (count == 0)? gettext('lobby'):""+count;
+                    var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+                    tab.setId(id);
+                    this.tabBar.addChild(tab, true);
+                    this.tabBar.setSelectedTab(tab);
+                } else {
                     this._logger.info("not creating new room for "+id+" as it already exists");
                 }
-			} else {
-				if (count == 0) {
-					// show waiting dialog
-					var dialog = new goog.ui.Dialog();
-					dialog.setTitle(gettext('Please wait!'));
-					dialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
-					dialog.setHasTitleCloseButton(false);
-					dialog.setButtonSet(null);
-					dialog.render(goog.dom.getElement("dialog"));
-					dialog.setVisible(true);
-				} else {
-					// show room
-					this._rooms[id] = new helpim.ui.muc.Room(room);
-				}
-			}
-			count++;
+            } else {
+                if (count == 0) {
+                    if (!this._waitingdialog) {
+                        // show waiting dialog
+                        this._waitingdialog = new goog.ui.Dialog();
+                        this._waitingdialog.setTitle(gettext('Please wait!'));
+                        this._waitingdialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
+                        this._waitingdialog.setHasTitleCloseButton(false);
+                        this._waitingdialog.setButtonSet(null);
+                        this._waitingdialog.render(goog.dom.getElement("dialog"));
+                        this._waitingdialog.setVisible(true);
+                    }
+                } else {
+                    // show room
+                    this._rooms[id] = new helpim.ui.muc.Room(room);
+                    if (this._waitingdialog) {
+                        this._logger.info("hiding waiting dialog");
+                        this._waitingdialog.setVisible(false);
+                    } else {
+                        this._logger.info("nothing to hide");
+                    }
+                }
+            }
+            count++;
         },
         this
     );
