@@ -236,10 +236,8 @@ helpim.Client.prototype.logoutCleanExit = function() {
  * invite to a room once there is one available.
  * @param {string} jid the service bot's jid - this one will be contacted to ask for a room
  * @param {string} token the token to validate the request with
- * @param {string?} nick the nick used for actually joining the room
- * @param {string?} subject a subject to set when joining the room
  */
-helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
+helpim.Client.prototype.requestRoom = function(jid, token, success, error) {
     this._logger.info('bot_jid: '+jid);
     // ask bot for a room
     var iq = new JSJaCIQ();
@@ -270,14 +268,6 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
          }, this)
         }
     );
-};
-
-/**
- * request a one2one room for you and a client from the waiting room by bot. the bot must be addressed by his room jid in order to make this work.
- * @param {string} jid jid of the bot to ask
- */
-helpim.Client.prototype.requestClient = function(jid, success, error, ctxt) {
-
 };
 
 /**
