@@ -69,7 +69,9 @@ helpim.ui.muc.Room = function(room) {
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
         function(replacement, key) {
-            var img = replacement.icon;
+            var img = new Image();
+            img.src = replacement.icon.src;
+
             if (seenEmoticon[img.src]) {
                 return;
             }
@@ -109,6 +111,7 @@ helpim.ui.muc.Room = function(room) {
                     this
                 );
             }
+
             goog.dom.appendChild(emoticonsPanel, img);
 
             goog.events.listen(
