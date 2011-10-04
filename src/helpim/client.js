@@ -33,6 +33,8 @@ helpim.Client = function() {
 
     xmpptk.muc.Client.call(this);
 
+    this.nick = xmpptk.Config['muc_nick'];
+
     this._composingTimeout = xmpptk.getConfig('composing_timeout', helpim.Client.COMPOSING_TIMEOUT);
     this._composingSent = {};
     this._composingTimeouts = {};
@@ -129,12 +131,15 @@ helpim.Client.prototype.getConversationId = function(bot_jid) {
  * @return {helpim.muc.Room} the room object
 */
 helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject) {
+    var isOne2One = goog.object.getCount(this.rooms);
+
     var room = new helpim.muc.Room(
         this,
         {'room': roomId,
          'service': service,
          'nick': nick},
-        password
+        password,
+        isOne2One
     );
     room.join(
         goog.bind(function() {
@@ -142,7 +147,7 @@ helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, sub
                 room.setSubject(subject);
             }
             if (xmpptk.Config['is_staff'] &&
-                xmpptk.Config['is_one2one'] &&
+                xmpptk.Config['mode'] == 'light' &&
                 xmpptk.Config['conversation_redirect']) {
                 this.getConversationId(room.id+'/'+xmpptk.Config['bot_nick']);
             }
@@ -165,6 +170,37 @@ helpim.Client.prototype.login = function() {
         },
         this
     );
+
+    this._con.registerHandler('message', 'x', xmpptk.muc.NS.USER, goog.bind(function(msg) {
+		this._logger.info("got a message: "+msg.xml());
+		var invite = msg.getChild('invite');
+		if (invite) {
+            // check if we can put trust in invitee
+            var invitee = invite.getAttribute('from');
+            invitee = invitee.substring(0, invitee.indexOf('/'));
+            if (invitee != xmpptk.Config['bot_jid']) {
+                this._logger.warning("got invitee other than bot: "+invitee);
+                return;
+            }
+
+			var roomJID = msg.getFromJID();
+			this._logger.info("got an invite to a muc room: "+roomJID.toString());
+
+			var roomId = roomJID.getNode();
+			var service = roomJID.getDomain();
+			var password = msg.getChildVal('password');
+
+			if (this.nick) {
+				this.joinRoom(roomId, service, this.nick, password);
+			} else {
+				// request nick (and subject)
+				this.publish('nick_required', goog.bind(function(nick, subject) {
+                    this.nick = nick;
+					this.joinRoom(roomId, service, nick, password, subject);
+				}, this));
+			}
+		}
+	} , this));
 };
 
 /**
@@ -199,13 +235,12 @@ helpim.Client.prototype.logoutCleanExit = function() {
 };
 
 /**
- * Request a room from bot
+ * Request a room from bot. The bot will check our token and send an
+ * invite to a room once there is one available.
  * @param {string} jid the service bot's jid - this one will be contacted to ask for a room
  * @param {string} token the token to validate the request with
- * @param {string?} nick the nick used for actually joining the room
- * @param {string?} subject a subject to set when joining the room
  */
-helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
+helpim.Client.prototype.requestRoom = function(jid, token) {
     this._logger.info('bot_jid: '+jid);
     // ask bot for a room
     var iq = new JSJaCIQ();
@@ -216,41 +251,23 @@ helpim.Client.prototype.requestRoom = function(jid, token, nick, subject) {
         iq,
         {'result_handler': goog.bind(function(resIq) {
             this._logger.info('result: '+resIq.xml());
-            if (xmpptk.Config['is_staff']) {
-                // just go straight to the room
-                this.joinRoom(resIq.getChildVal('room'),
-                              resIq.getChildVal('service'),
-                              xmpptk.Config['muc_nick'],
-                              resIq.getChildVal('password'));
-            } else {
-                nick = resIq.getChildVal('nick') || nick;
-                if (nick) {
-                    // either nick supplied by bot or by form from cycle before
-                    this.joinRoom(resIq.getChildVal('room'),
-                                  resIq.getChildVal('service'),
-                                  nick,
-                                  resIq.getChildVal('password'),
-                                  subject);
-                } else {
 
-                    // indicate ui to ask for nick and subject
-                    this.publish(
-                        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-                        {'room': resIq.getChildVal('room'),
-                         'service': resIq.getChildVal('service'),
-                         'password': resIq.getChildVal('password')});
-                }
-            }
-
+            // indicate ui that we've successfully requested a room
+            this.publish(helpim.Client.NS.HELPIM_ROOMS+'#resultIQ');
+        
+			// save valid token for reuse
             var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
             goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
         }, this),
          'error_handler': goog.bind(function(errIq) {
              this._logger.info('error: '+errIq.xml());
+
+             // indicate ui that we failed to requested a room
              this.publish(helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
                           errIq.getChild('error').firstChild.tagName);
-             goog.net.cookies.remove('room_token');
 
+			 // make sure we don't have a bad token around
+             goog.net.cookies.remove('room_token');
          }, this)
         }
     );

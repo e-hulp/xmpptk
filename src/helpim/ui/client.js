@@ -2,6 +2,7 @@ goog.provide('helpim.ui.Client');
 
 goog.require('goog.dom');
 goog.require('goog.object');
+goog.require('goog.json');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.Button');
 goog.require('goog.ui.FlatButtonRenderer');
@@ -15,6 +16,7 @@ goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
 
 goog.require('helpim.muc.Room');
+goog.require('helpim.ui');
 goog.require('helpim.ui.muc.Room');
 
 /**
@@ -39,9 +41,9 @@ helpim.ui.Client = function(client) {
         goog.events.EventType.CLICK,
         function(e) {
             if (xmpptk.ui.sound.enabled) {
-                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume-mute.png';
+                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume-mute.png');
             } else {
-                e.target.src = '/static/xmpptk/xmpptk/images/stock_volume.png';
+                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume.png');
             }
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
         }
@@ -63,48 +65,16 @@ helpim.ui.Client = function(client) {
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
 
-    client.subscribeOnce(
-        helpim.Client.NS.HELPIM_ROOMS+'#resultIQ',
-        function() {
-            var dialog = new goog.ui.Dialog();
-            dialog.setTitle(gettext('Join Chat'));
-            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
-            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-            dialog.setHasTitleCloseButton(false);
-            dialog.render(goog.dom.getElement("dialog"));
-
-            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                if (e.key == 'ok') {
-                    // get nick and subject from form submitted
-                    var nick = goog.dom.getElement('muc_nick').value;
-                    this._logger.info(nick);
-                    if (!nick || nick == '') {
-                        goog.dom.setTextContent(
-                            goog.dom.getElement('form_error'),
-                            gettext('Please provide a nickname!'));
-                        return false;
-                    }
-                    client.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token'], nick, goog.dom.getElement('muc_subject').value);
-                } else {
-                    client.logout();
-                }
-            }, false, this);
-
-            dialog.setVisible(true);
-            goog.dom.getElement('muc_nick').focus();
-        },
-        this
-    );
-
-    client.subscribeOnce(
+    client.subscribe(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
 
-            // known conditions are:
-            // service-unavailable -> bot is down
-            // bad-request -> bad xml was sent (hu?)
-            // item-not-found -> no room available
-            // not-authorized -> token sent was invalid
+            /* known conditions are:
+             * - service-unavailable -> bot is down
+             * - bad-request         -> bad xml was sent (hu?)
+             * - item-not-found      -> no room available
+             * - not-authorized      -> token sent was invalid
+             */
 
             switch(cond) {
             case 'service-unavailable':
@@ -139,6 +109,38 @@ helpim.ui.Client = function(client) {
 
             dialog.setVisible(true);
         }
+    );
+
+    client.subscribe(
+        'nick_required',
+        function(callback) {
+            var dialog = new goog.ui.Dialog();
+            dialog.setTitle(gettext('Join Chat'));
+            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
+            dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                if (e.key == 'ok') {
+                    // get nick and subject from form submitted
+                    var nick = goog.dom.getElement('muc_nick').value;
+                    this._logger.info(nick);
+                    if (!nick || nick == '') {
+                        goog.dom.setTextContent(
+                            goog.dom.getElement('form_error'),
+                            gettext('Please provide a nickname!'));
+                        return false;
+                    }
+                    callback(nick, goog.dom.getElement('muc_subject').value);
+                } else {
+                    client.logout();
+                }
+            }, false, this);
+            dialog.setVisible(true);
+            goog.dom.getElement('muc_nick').focus();
+        },
+        this
     );
 
     this._lastRoomSelected = null;
@@ -181,17 +183,47 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
+    var count = 0;
     goog.object.forEach(
         this.subject.rooms,
-        function(room) {
-            if (!this.tabBar.getChild(room.id)) {
-                this._rooms[room.id] = new helpim.ui.muc.Room(room);
-
-                var tab = new goog.ui.Tab(room.id, new goog.ui.RoundedTabRenderer());
-                tab.setId(room.id);
-                this.tabBar.addChild(tab, true);
-                this.tabBar.setSelectedTab(tab);
+        function(room, id) {
+            if (xmpptk.Config['is_staff']) {
+                if (!this.tabBar.getChild(id)) {
+                    this._logger.info("creating new room for "+id);
+                    this._rooms[id] = new helpim.ui.muc.Room(room);
+                    var title = (count == 0)? gettext('lobby'):""+count;
+                    var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+                    this._rooms[id]._tab = tab; // let'em know
+                    tab.setId(id);
+                    this.tabBar.addChild(tab, true);
+                    this.tabBar.setSelectedTab(tab);
+                } else {
+                    this._logger.info("not creating new room for "+id+" as it already exists");
+                }
+            } else {
+                if (count == 0) {
+                    if (!this._waitingdialog) {
+                        // show waiting dialog
+                        this._waitingdialog = new goog.ui.Dialog();
+                        this._waitingdialog.setTitle(gettext('Please wait!'));
+                        this._waitingdialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
+                        this._waitingdialog.setHasTitleCloseButton(false);
+                        this._waitingdialog.setButtonSet(null);
+                        this._waitingdialog.render(goog.dom.getElement("dialog"));
+                        this._waitingdialog.setVisible(true);
+                    }
+                } else {
+                    // show room
+                    this._rooms[id] = new helpim.ui.muc.Room(room);
+                    if (this._waitingdialog) {
+                        this._logger.info("hiding waiting dialog");
+                        this._waitingdialog.setVisible(false);
+                    } else {
+                        this._logger.info("nothing to hide");
+                    }
+                }
             }
+            count++;
         },
         this
     );

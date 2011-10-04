@@ -7,8 +7,9 @@ goog.require('xmpptk.muc.Room');
  * @extends {xmpptk.muc.Room}
  * @inheritDoc
  */
-helpim.muc.Room = function(client, room_jid, password) {
+helpim.muc.Room = function(client, room_jid, password, is_one2one) {
     xmpptk.muc.Room.call(this, client, room_jid, password);
+	this.is_one2one = is_one2one || false;
 };
 goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
@@ -36,4 +37,8 @@ helpim.muc.Room.prototype.part = function() {
 
     // send presence
     this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
+};
+
+helpim.muc.Room.prototype.requestRoom = function() {
+	this._client.requestRoom(xmpptk.Config['bot_jid'], xmpptk.Config['token']);
 };

@@ -62,9 +62,6 @@ helpim.ui.muc.Room = function(room) {
         }, this)
     );
 
-    // will be enabled once other participant joins
-    this._sendTextarea.setEnabled(false);
-
     var emoticonsPanel = goog.dom.getElementByClass('emoticonsPanel', this._panel);
     var seenEmoticon = {};
     var numEmoticonsProcessed = 0;
@@ -72,7 +69,9 @@ helpim.ui.muc.Room = function(room) {
     goog.object.forEach(
         xmpptk.ui.emoticons.replacements,
         function(replacement, key) {
-            var img = replacement.icon;
+            var img = new Image();
+            img.src = replacement.icon.src;
+
             if (seenEmoticon[img.src]) {
                 return;
             }
@@ -112,6 +111,7 @@ helpim.ui.muc.Room = function(room) {
                     this
                 );
             }
+
             goog.dom.appendChild(emoticonsPanel, img);
 
             goog.events.listen(
@@ -167,67 +167,93 @@ helpim.ui.muc.Room = function(room) {
         this
     );
 
-    if (xmpptk.Config['is_one2one']) {
+    if (this.subject.is_one2one) {
+		// will be enabled once other participant joins
+		this._sendTextarea.setEnabled(false);
+
         // sir hide-a-lot
         goog.style.showElement(this._rosterPanel, false);
         goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
         goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
-    }
 
-    if (xmpptk.Config['is_staff']) {
-        this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
-                                          goog.ui.FlatButtonRenderer.getInstance());
-        this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
+		if (xmpptk.Config['is_staff']) {
+			this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
+															   goog.ui.FlatButtonRenderer.getInstance());
+			this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
 
-        goog.events.listen(
-            this._blockParticipantButton,
-            goog.ui.Component.EventType.ACTION,
-            function() {
+			goog.events.listen(
+				this._blockParticipantButton,
+				goog.ui.Component.EventType.ACTION,
+				function() {
 
-                var dialog = new goog.ui.Dialog();
-                dialog.setTitle(gettext('Block Participant'));
-                dialog.setContent('Are you sure you want to block this participant?');
-                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-                dialog.setHasTitleCloseButton(false);
-                dialog.render(goog.dom.getElement("dialog"));
+					var dialog = new goog.ui.Dialog();
+					dialog.setTitle(gettext('Block Participant'));
+					dialog.setContent('Are you sure you want to block this participant?');
+					dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+					dialog.setHasTitleCloseButton(false);
+					dialog.render(goog.dom.getElement("dialog"));
 
-                goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                    if (e.key == 'ok') {
-                        // send message to bot to block user
-                        room.blockParticipant(
-                            this._participant,
-                            goog.bind(function() {
-                                var dialog = new goog.ui.Dialog();
-                                dialog.setTitle(gettext('Block participant'));
-                                dialog.setContent('The participant has been blocked successfully');
-                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                                dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
-                                dialog.setVisible(true);
-                                this._blockParticipantButton.setEnabled(false);
-                            }, this),
-                            function() {
-                                var dialog = new goog.ui.Dialog();
-                                dialog.setTitle(gettext('Error'));
-                                dialog.setContent('There was an error blocking the participant');
-                                dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-                                dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
-                                dialog.setVisible(true);
-                            }
-                        );
-                    } 
-                }, false, this);
+					goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+						if (e.key == 'ok') {
+							// send message to bot to block user
+							room.blockParticipant(
+								this._participant,
+								goog.bind(function() {
+									var dialog = new goog.ui.Dialog();
+									dialog.setTitle(gettext('Block participant'));
+									dialog.setContent('The participant has been blocked successfully');
+									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+									dialog.setHasTitleCloseButton(false);
+									dialog.render(goog.dom.getElement("dialog"));
+									dialog.setVisible(true);
+									this._blockParticipantButton.setEnabled(false);
+								}, this),
+								function() {
+									var dialog = new goog.ui.Dialog();
+									dialog.setTitle(gettext('Error'));
+									dialog.setContent('There was an error blocking the participant');
+									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+									dialog.setHasTitleCloseButton(false);
+									dialog.render(goog.dom.getElement("dialog"));
+									dialog.setVisible(true);
+								}
+							);
+						}
+					}, false, this);
 
-                dialog.setVisible(true);
-                
-            },
-            false,
-            this
-        );
+					dialog.setVisible(true);
 
-        this._blockParticipantButton.setEnabled(false);
-    }
+				},
+				false,
+				this
+			);
+
+			this._blockParticipantButton.setEnabled(false);
+		}
+	} else {
+		if (xmpptk.Config['is_staff']) {
+			// we're in a lobby
+			this._requestClientButton =  new goog.ui.Button(gettext('Request Client'),
+															goog.ui.FlatButtonRenderer.getInstance());
+			this._requestClientButton.render(goog.dom.getElementByClass('requestClientButton', this._panel));
+
+			goog.events.listen(
+				this._requestClientButton,
+				goog.ui.Component.EventType.ACTION,
+				function() {
+					this._requestClientButton.setEnabled(false);
+					setTimeout(goog.bind(function() {
+						this._requestClientButton.setEnabled(true);
+					}, this), 5000);
+					room.requestRoom();
+				},
+				false,
+				this
+			);
+			this._requestClientButton.setEnabled(true);
+		}
+	}
+
 
     goog.style.showElement(this._subjectPanel, false);
 
@@ -281,19 +307,21 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 helpim.ui.muc.Room.prototype.update = function() {
     this._logger.info("update called");
 
-    if (!xmpptk.Config['is_one2one']) {
+    if (!this.subject.is_one2one) {
         goog.dom.removeChildren(this._rosterPanel);
         goog.object.forEach(
             this.subject.roster.getItems(),
             function(item) {
-                if (item.role == xmpptk.muc.Occupant.Role.NONE) {
+				var nick = (new JSJaCJID(item['jid'])).getResource();
+                if (item.role == xmpptk.muc.Occupant.Role.NONE ||
+					(!xmpptk.Config['debug'] && nick == xmpptk.Config['bot_nick'])) {
                     return;
                 }
                 goog.dom.append(
                     this._rosterPanel,
                     goog.dom.createDom('div',
                                        {'class': 'rosterItem'},
-                                       (new JSJaCJID(item['jid'])).getResource())
+                                       nick)
                 );
             },
             this
@@ -328,64 +356,67 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 
                     this._logger.info("FOCUSED at joined: "+this._focused);
+					if (this.subject.is_one2one) {
+						if (xmpptk.Config['is_staff']) {
 
-                    this._participant = event['from'];
-                    
-                    if (xmpptk.Config['is_staff']) {
-                        if (!this._focused) {
-                            if (!this._ringing) {
-                                // taken from
-                                // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-                                // combined with
-                                // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-                                var oldTitle = document.title;
-                                var msg = gettext("Ring! Ring!");
-                                var ring = 0;
-                                var timeoutId = setInterval(function() {
-                                    document.title = (document.title == msg)?oldTitle:msg;
-                                    if ((ring % 5) == 0) {
-                                        xmpptk.ui.sound.play('ring');
-                                    }
-                                    ring++;
-                                }, 1000);
+							// this is for blocking participants which is only available for staff at one2one rooms
+							this._participant = event['from'];
+                            
+                            // set our tab's title to nick of client
+                            this._tab.setCaption(event['from']);
 
-                                this._ringing = true;
+							if (!this._focused) {
+								if (!this._ringing) {
+									// taken from
+									// http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+									// combined with
+									// http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+									var oldTitle = document.title;
+									var msg = gettext("Ring! Ring!");
+									var ring = 0;
+									var timeoutId = setInterval(function() {
+										document.title = (document.title == msg)?oldTitle:msg;
+										if ((ring % 5) == 0) {
+											xmpptk.ui.sound.play('ring');
+										}
+										ring++;
+									}, 1000);
 
-                                var stopRinging = goog.bind(function(handler, fun) {
-                                    if (this._ringing) {
-                                        clearInterval(timeoutId);
-                                        document.title = oldTitle;
-                                        this._ringing = false;
-                                    }
-                                }, this);
-                                document.onmousemove = function() {
-                                    stopRinging();
-                                    document.onmousemove = null;
-                                }
+									this._ringing = true;
 
-                                var oldonfocus = window.onfocus;
-                                window.onfocus = function() {
-                                    stopRinging();
-                                    oldonfocus();
-                                    window.onfocus = oldonfocus;
-                                }
-                            }
-                        }
-                    } else {
-                        xmpptk.ui.sound.play('ring');
-                    }
-                    if (!this._focused) {
-                        window.focus();
-                    }
+									var stopRinging = goog.bind(function(handler, fun) {
+										if (this._ringing) {
+											clearInterval(timeoutId);
+											document.title = oldTitle;
+											this._ringing = false;
+										}
+									}, this);
+									document.onmousemove = function() {
+										stopRinging();
+										document.onmousemove = null;
+									}
 
-                    // we're ready to chat
-                    this._sendTextarea.setEnabled(true);
-                    this._sendTextarea.setFocused(true);
-                    if (xmpptk.Config['is_staff']) {
-                        this._blockParticipantButton.setEnabled(true);
-                    }
+									var oldonfocus = window.onfocus;
+									window.onfocus = function() {
+										stopRinging();
+										oldonfocus();
+										window.onfocus = oldonfocus;
+									}
+								}
+							}
+							this._blockParticipantButton.setEnabled(true);
+						} else { // end is_staff
+							xmpptk.ui.sound.play('ring');
+						}
+						if (!this._focused) {
+							window.focus();
+						}
+						// we're ready to chat
+						this._sendTextarea.setEnabled(true);
+						this._sendTextarea.getContentElement().focus();
+					} // end is_one2one
                 } else {
-                    if (xmpptk.Config['is_staff']) {
+                    if (xmpptk.Config['is_staff'] && this.subject.is_one2one) {
                         this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
                     }
                 }
@@ -400,7 +431,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                     }
                 }
                 this.appendMessage(msg, 'roomEvent');
-                if (xmpptk.Config['is_one2one']) {
+                if (this.subject.is_one2one) {
                     this._sendTextarea.setEnabled(false);
                 }
                 break;
@@ -416,6 +447,9 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
         this.appendMessage(this.formatMessage(messages[this._messagesAt]));
         if (messages[this._messagesAt]['from'] != this.subject['nick']) {
             xmpptk.ui.sound.play('chat_recv');
+            if (this._tab && !this._tab.isSelected()) {
+                this._tab.setHighlighted(true);;
+            }
         }
     }
 };
