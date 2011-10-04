@@ -444,6 +444,9 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
         this.appendMessage(this.formatMessage(messages[this._messagesAt]));
         if (messages[this._messagesAt]['from'] != this.subject['nick']) {
             xmpptk.ui.sound.play('chat_recv');
+            if (this._tab && !this._tab.isSelected()) {
+                this._tab.setHighlighted(true);;
+            }
         }
     }
 };
