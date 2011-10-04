@@ -358,6 +358,9 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
 
 							// this is for blocking participants which is only available for staff at one2one rooms
 							this._participant = event['from'];
+                            
+                            // set our tab's title to nick of client
+                            this._tab.setCaption(event['from']);
 
 							if (!this._focused) {
 								if (!this._ringing) {

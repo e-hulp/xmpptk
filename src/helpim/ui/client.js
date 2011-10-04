@@ -193,6 +193,7 @@ helpim.ui.Client.prototype.update = function() {
                     this._rooms[id] = new helpim.ui.muc.Room(room);
                     var title = (count == 0)? gettext('lobby'):""+count;
                     var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+                    this._rooms[id]._tab = tab; // let'em know
                     tab.setId(id);
                     this.tabBar.addChild(tab, true);
                     this.tabBar.setSelectedTab(tab);
