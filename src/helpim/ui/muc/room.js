@@ -364,6 +364,9 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
                             
                             // set our tab's title to nick of client
                             this._tab.setCaption(event['from']);
+                            if (!this._tab.isSelected()) {
+                                this._tab.setHighlighted(true);
+                            }
 
 							if (!this._focused) {
 								if (!this._ringing) {
@@ -448,7 +451,7 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
         if (messages[this._messagesAt]['from'] != this.subject['nick']) {
             xmpptk.ui.sound.play('chat_recv');
             if (this._tab && !this._tab.isSelected()) {
-                this._tab.setHighlighted(true);;
+                this._tab.setHighlighted(true);
             }
         }
     }
