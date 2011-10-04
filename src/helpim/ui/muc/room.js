@@ -267,7 +267,6 @@ helpim.ui.muc.Room = function(room) {
     room.attachPropertyhandler('events', this._eventsChanged, this);
     room.attachPropertyhandler('messages', this._messagesChanged, this);
     room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
-	room.attachPropertyhandler('clientsWaiting', this._clientsWaiting, this);
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
@@ -325,10 +324,6 @@ helpim.ui.muc.Room.prototype.update = function() {
             this
         );
     }
-};
-
-helpim.ui.muc.Room.prototype._clientsWaiting = function(clientsWaiting) {
-	this._requestClientButton.setEnabled(clientsWaiting);
 };
 
 helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
