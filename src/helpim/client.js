@@ -176,9 +176,9 @@ helpim.Client.prototype.login = function() {
 		var invite = msg.getChild('invite');
 		if (invite) {
             // check if we can put trust in invitee
-            var invitee = invite.getAttribute('from');
-            invitee = invitee.substring(0, invitee.indexOf('/'));
-            if (invitee != xmpptk.Config['bot_jid']) {
+            var invitee = (new JSJaCJID(invite.getAttribute('from'))).removeResource().toString();
+            var bot_jid = (new JSJaCJID(xmpptk.Config['bot_jid'])).removeResource().toString();
+            if (invitee != bot_jid) {
                 this._logger.warning("got invitee other than bot: "+invitee);
                 return;
             }
