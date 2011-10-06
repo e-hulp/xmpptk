@@ -16,8 +16,11 @@ goog.require('xmpptk.ui.emoticons');
 goog.require('xmpptk.ui.sound');
 
 goog.require('helpim.muc.Room');
+
 goog.require('helpim.ui');
 goog.require('helpim.ui.muc.Room');
+goog.require('helpim.ui.Tab');
+goog.require('helpim.ui.RoundedTabRenderer');
 
 /**
  * @constructor
@@ -196,8 +199,16 @@ helpim.ui.Client.prototype.update = function() {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
                     this._rooms[id] = new helpim.ui.muc.Room(room);
-                    var title = (count == 0)? gettext('staff'):gettext("waiting")+" - "+count;
-                    var tab = new goog.ui.Tab(title, new goog.ui.RoundedTabRenderer());
+                    if (count == 0) {
+                        // we're at the lobby
+                        var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
+                    } else {
+                        var title = gettext("waiting")+" - "+count;
+                        var tab = new helpim.ui.Tab(title, new helpim.ui.RoundedTabRenderer());
+                        tab.setOnCloseHandler(function() {
+                            room.part();
+                        });
+                    }
                     this._rooms[id]._tab = tab; // let'em know
                     tab.setId(id);
                     this.tabBar.addChild(tab, true);
