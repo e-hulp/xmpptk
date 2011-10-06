@@ -68,12 +68,13 @@ helpim.ui.Client = function(client) {
     client.subscribe(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
         function(cond) {
-
+            var logout_on_submit = true;
             /* known conditions are:
              * - service-unavailable -> bot is down
              * - bad-request         -> bad xml was sent (hu?)
              * - item-not-found      -> no room available
              * - not-authorized      -> token sent was invalid
+             * - not-allowed         -> requested more rooms as allowed
              */
 
             switch(cond) {
@@ -90,10 +91,12 @@ helpim.ui.Client = function(client) {
                     document.location.replace(xmpptk.Config['unavailable_redirect']);
                 }
                 return;
-                break;
             case 'not-authorized':
                 cond = gettext("Sorry, you're not allowed to access this service");
                 break;
+            case 'not-allowed':
+                cond = gettext("Sorry, you're not allowed to request more chats");
+                logout_on_submit = false;
             }
 
             var dialog = new goog.ui.Dialog();
@@ -103,9 +106,11 @@ helpim.ui.Client = function(client) {
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
 
-            goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                client.logout();
-            });
+            if (logout_on_submit) {
+                goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                    client.logout();
+                });
+            }
 
             dialog.setVisible(true);
         }
