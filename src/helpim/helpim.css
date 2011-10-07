@@ -185,15 +185,16 @@ body{background-color:#ffe;font:normal 10pt Arial,sans-serif;}/**/fieldset{paddi
 
 div.goog-rounded-tab-closeTab {
     float: right;
-    width: 12px;
-    height: 12px;
-    margin-top: -6px;
-    margin-right: -6px;
-    background:yellow;
+    width: 11px;
+    height: 11px;
+    margin-right: 3px;
+    background-image:url('close_box.gif');
     cursor: pointer;
+    position:relative;
+    z-index: 20;
 }
 div.goog-rounded-tab-closeTab:hover {
-    background:red;
+    background-color:white;
 }
 
 /*
