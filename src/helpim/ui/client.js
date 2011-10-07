@@ -203,7 +203,7 @@ helpim.ui.Client.prototype.update = function() {
                         // we're at the lobby
                         var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
                     } else {
-                        var title = gettext("waiting")+" - "+count;
+                        var title = gettext("waiting...");
                         var tab = new helpim.ui.Tab(title, new helpim.ui.RoundedTabRenderer());
                         tab.setOnCloseHandler(function() {
                             room.part();
