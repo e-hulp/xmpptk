@@ -52,12 +52,12 @@ helpim.ui.Client = function(client) {
         }
     );
 
-    var logoutButton = new goog.ui.Button(gettext('Stop Conversation'),
+    this.logoutButton = new goog.ui.Button(gettext('Stop Conversation'),
                                           goog.ui.FlatButtonRenderer.getInstance());
-    logoutButton.render(goog.dom.getElement('logoutButton'));
-    logoutButton.setValue('logout');
+    this.logoutButton.render(goog.dom.getElement('logoutButton'));
+    this.logoutButton.setValue('logout');
     goog.events.listen(
-        logoutButton,
+        this.logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
             client.logoutCleanExit();
@@ -191,6 +191,9 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
+
+	this.logoutButton.setEnabled(goog.object.getCount(this.subject.rooms) <= 1);
+
     var count = 0;
     goog.object.forEach(
         this.subject.rooms,
