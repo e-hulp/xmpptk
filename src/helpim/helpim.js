@@ -28,4 +28,34 @@ helpim.start = function(cfg) {
     goog.object.extend(xmpptk.Config, cfg);
     helpim.Client.getInstance();
 };
+
+helpim.registeredHandlers_ = {};
+
+/**
+ * calls registered handler(s) for an event
+ * @param {string} event the event to call
+ * @param {?object} params optional arguments to pass to handlers for event
+ */
+helpim.call = function(event, params){
+	goog.object.forEach(
+		helpim.registeredHandlers_[event],
+		function(handler) {
+			handler(params);
+		}
+	);
+};
+
+/**
+ * register handler for an event
+ * @param {string} event the event to register handler for
+ * @param {function() {}} handler the handler to register with event
+ */
+helpim.register = function(event, handler) {
+	if (!helpim.registeredHandlers_[event]) {
+		helpim.registeredHandlers_[event] = [];
+	}
+	helpim.registeredHandlers_[event].push(handler);
+};
+
 goog.exportSymbol('helpim.start', helpim.start);
+goog.exportSymbol('helpim.call', helpim.call);

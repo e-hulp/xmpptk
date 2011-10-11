@@ -201,6 +201,8 @@ helpim.Client.prototype.login = function() {
 			}
 		}
 	} , this));
+
+    this._con.registerIQSet('query', helpim.Client.NS.HELPIM_ROOMS, goog.bind(this._handleIQSetRooms, this));
 };
 
 /**
@@ -347,4 +349,20 @@ helpim.Client.prototype._clearComposingTimeout = function(jid) {
         clearTimeout(this._composingTimeouts[jid]);
     }
     this._composingTimeouts[jid] = false;
+};
+
+/**
+ * handle set request for answering a questionnaire
+ */
+helpim.Client.prototype._handleIQSetRooms = function(iq) {
+
+	var url = iq.getChild('questionnaire').getAttribute('url');
+	if (url) {
+		this.publish('questionnaire_requested', {url: url, callback: goog.bind(function(){
+			this._con.send(iq.reply());
+		}, this)});
+	} else {
+		this._con.send(iq.errorReply(ERR_BAD_REQUEST));
+	}
+
 };

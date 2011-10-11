@@ -151,6 +151,26 @@ helpim.ui.Client = function(client) {
         this
     );
 
+	client.subscribe(
+		'questionnaire_requested',
+		function(/** @type {url: string, callback: function() {}} */ params) {
+			this._logger.info("got questionnaire url: "+params.url);
+
+            var dialog = new goog.ui.Dialog();
+            dialog.setTitle(gettext('Questionnaire'));
+            dialog.setContent('<iframe width="410" height="640" src="'+params.url+'"></iframe>');
+            dialog.setButtonSet(false);
+            dialog.setHasTitleCloseButton(false);
+            dialog.render(goog.dom.getElement("dialog"));
+
+			helpim.register('questionnaire_submitted', params.callback);
+
+            dialog.setVisible(true);
+
+		},
+		this
+	);
+
     this._lastRoomSelected = null;
 
     goog.events.listen(
