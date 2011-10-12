@@ -48,7 +48,7 @@ helpim.call = function(event, params){
 /**
  * register handler for an event
  * @param {string} event the event to register handler for
- * @param {function() {}} handler the handler to register with event
+ * @param {function(*)} handler the handler to register with event
  */
 helpim.register = function(event, handler) {
 	if (!helpim.registeredHandlers_[event]) {

@@ -153,7 +153,7 @@ helpim.ui.Client = function(client) {
 
 	client.subscribe(
 		'questionnaire_requested',
-		function(/** @type {url: string, callback: function() {}} */ params) {
+		function(params) {
 			this._logger.info("got questionnaire url: "+params.url);
 
             var dialog = new goog.ui.Dialog();
