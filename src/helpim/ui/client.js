@@ -163,7 +163,10 @@ helpim.ui.Client = function(client) {
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
 
-			helpim.register('questionnaire_submitted', params.callback);
+			helpim.register('questionnaire_submitted', function(params1) {
+				params.callback(params1);
+				setTimeout(function() {dialog.setVisible(false)}, 3000);
+			});
 
             dialog.setVisible(true);
 
