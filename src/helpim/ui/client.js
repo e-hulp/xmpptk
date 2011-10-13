@@ -213,12 +213,17 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
 
-	this.logoutButton.setEnabled(goog.object.getCount(this.subject.rooms) <= 1);
+	if (xmpptk.Config['is_staff']) {
+		this.logoutButton.setEnabled(goog.object.getCount(this.subject.rooms) <= 1);
+	} else {
+		this.logoutButton.setEnabled(true);
+	}
 
     var count = 0;
     goog.object.forEach(
         this.subject.rooms,
         function(room, id) {
+			this._logger.info("got room with id "+id);
             if (xmpptk.Config['is_staff']) {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
