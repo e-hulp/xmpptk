@@ -358,8 +358,12 @@ helpim.Client.prototype._handleIQSetRooms = function(iq) {
 
 	var url = iq.getChild('questionnaire').getAttribute('url');
 	if (url) {
-		this.publish('questionnaire_requested', {url: url, callback: goog.bind(function(){
-			this._con.send(iq.reply());
+		this.publish('questionnaire_requested', {url: url, callback: goog.bind(function(id){
+			this._logger.info("questionnaire submitted with id: "+id);
+			var resIq = iq.reply();
+			var q = resIq.getChild('questionnaire');
+			q.appendChild(resIq.getDoc().createTextNode(id));
+			this._con.send(resIq);
 		}, this)});
 	} else {
 		this._con.send(iq.errorReply(ERR_BAD_REQUEST));
