@@ -12,12 +12,39 @@ JSJaCHttpBindingConnection.prototype.sendIQ = function(p, handlers, context) {};
 JSJaCHttpBindingConnection.prototype.suspend = function(p) {};
 
 var JSJaCPacket = function() {};
-JSJaCPacket.prototype.xml = function() {};
-JSJaCPacket.prototype.getFromJID = function() {};
-JSJaCPacket.prototype.getFrom = function() {};
-JSJaCPacket.prototype.pType = function() {};
+JSJaCPacket.prototype.appendNode = function(str, obj, val) {};
+JSJaCPacket.prototype.buildNode = function(str, obj, val) {};
+JSJaCPacket.prototype.errorReply = function(errrorCondition) {};
 JSJaCPacket.prototype.getChild = function(tag, ns) {};
 JSJaCPacket.prototype.getChildVal = function(tag, ns) {};
+JSJaCPacket.prototype.getDoc = function() {};
+JSJaCPacket.prototype.getFrom = function() {};
+JSJaCPacket.prototype.getFromJID = function() {};
+JSJaCPacket.prototype.getNode = function() {};
+JSJaCPacket.prototype.getType = function() {};
+JSJaCPacket.prototype.pType = function() {};
+JSJaCPacket.prototype.setTo = function(str) {};
+JSJaCPacket.prototype.setType = function(str) {};
+JSJaCPacket.prototype.xml = function() {};
+
+var JSJaCPresence = function() {};
+JSJaCPresence.prototype.getStatus = function() {};
+JSJaCPresence.prototype.setShow = function(str) {};
+JSJaCPresence.prototype.setStatus = function(str) {};
+
+var JSJaCMessage = function() {};
+JSJaCMessage.prototype.getBody = function() {};
+JSJaCMessage.prototype.getChatState = function() {};
+JSJaCMessage.prototype.getSubject = function() {};
+JSJaCMessage.prototype.setBody = function(str) {};
+JSJaCMessage.prototype.setChatState = function(state) {};
+JSJaCMessage.prototype.setSubject = function(str) {};
+
+var JSJaCIQ = function() {};
+JSJaCIQ.prototype.getQuery = function(str) {};
+JSJaCIQ.prototype.reply = function(nodeList) {};
+JSJaCIQ.prototype.setIQ = function(to, type, id) {};
+JSJaCIQ.prototype.setQuery = function(str) {};
 
 var JSJaCJID = function() {};
 JSJaCJID.prototype.getBareJID = function() {};
@@ -29,39 +56,6 @@ JSJaCJID.prototype.setNode = function(str) {};
 JSJaCJID.prototype.setDomain = function(str) {};
 JSJaCJID.prototype.setResource = function(str) {};
 JSJaCJID.prototype.toString = function() {};
-
-var JSJaCPresence = function() {};
-JSJaCPresence.prototype.setTo = function(str) {};
-JSJaCPresence.prototype.setType = function(str) {};
-JSJaCPresence.prototype.setShow = function(str) {};
-JSJaCPresence.prototype.setStatus = function(str) {};
-JSJaCPresence.prototype.buildNode = function(str, obj, val) {};
-JSJaCPresence.prototype.appendNode = function(str, obj, val) {};
-JSJaCPresence.prototype.getFrom = function() {};
-JSJaCPresence.prototype.getFromJID = function() {};
-JSJaCPresence.prototype.getType = function() {};
-JSJaCPresence.prototype.getStatus = function() {};
-
-var JSJaCMessage = function() {};
-JSJaCMessage.prototype.setTo = function(str) {};
-JSJaCMessage.prototype.setType = function(str) {};
-JSJaCMessage.prototype.setSubject = function(str) {};
-JSJaCMessage.prototype.setBody = function(str) {};
-JSJaCMessage.prototype.buildNode = function(str, obj, val) {};
-JSJaCMessage.prototype.appendNode = function(str, obj, val) {};
-JSJaCMessage.prototype.getFromJID = function() {};
-JSJaCMessage.prototype.getBody = function() {};
-JSJaCMessage.prototype.getSubject = function() {};
-JSJaCMessage.prototype.getType = function() {};
-JSJaCMessage.prototype.getChatState = function() {};
-JSJaCMessage.prototype.setChatState = function(state) {};
-
-var JSJaCIQ = function() {};
-JSJaCIQ.prototype.setType = function(str) {};
-JSJaCIQ.prototype.setQuery = function(str) {};
-JSJaCIQ.prototype.setIQ = function(to, type, id) {};
-JSJaCIQ.prototype.buildNode = function(str, obj, val) {};
-JSJaCIQ.prototype.appendNode = function(str, obj, val) {};
 
 var gettext = function(msgid) {};
 var ngettext = function(singular, plural, count) {};
