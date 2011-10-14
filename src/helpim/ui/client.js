@@ -90,8 +90,9 @@ helpim.ui.Client = function(client) {
             case 'item-not-found':
                 if (!xmpptk.Config['is_staff']) {
                     document.location.replace(xmpptk.Config['unavailable_redirect']);
+					return;
                 }
-                return;
+				break;
             case 'not-authorized':
                 cond = gettext("Sorry, you're not allowed to access this service");
                 break;
