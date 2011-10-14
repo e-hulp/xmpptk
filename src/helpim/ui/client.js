@@ -123,7 +123,12 @@ helpim.ui.Client = function(client) {
         function(callback) {
             var dialog = new goog.ui.Dialog();
             dialog.setTitle(gettext('Join Chat'));
-            dialog.setContent('<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div><div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div></form>');
+            var content = '<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div>';
+            if (xmpptk.Config['mode'] == 'light') {
+                content += '<div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div>';
+            }
+            content += '</form>';
+            dialog.setContent(content);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
@@ -139,7 +144,13 @@ helpim.ui.Client = function(client) {
                             gettext('Please provide a nickname!'));
                         return false;
                     }
-                    callback(nick, goog.dom.getElement('muc_subject').value);
+                    var subject = goog.dom.getElement('muc_subject');
+                    if (subject && subject.value && subject.value != '') {
+                        subject = subject.value;
+                    } else {
+                        subject = '';
+                    }
+                    callback(nick, subject);
                 } else {
                     client.logout();
                 }
