@@ -71,6 +71,13 @@ helpim.Client.COMPOSING_TIMEOUT = 10;
 helpim.Client.COOKIE_EXPIRES_FOR_STAFF = 86400;
 
 /**
+ * seconds to wait till really logging out
+ * @type {number}
+ * @const
+ */
+helpim.Client.LOGOUT_DELAYED_TIMEOUT = 3;
+
+/**
  * our well known namespaces
  * @const
  */
@@ -211,26 +218,37 @@ helpim.Client.prototype.login = function() {
 /**
  * @inheritDoc
  * @param {?boolean} cleanExit whether this is a clean-exit logout
+ * @param {?boolean} delayed if true this is a delayed call to really logout now
  */
-helpim.Client.prototype.logout = function(cleanExit) {
+helpim.Client.prototype.logout = function(cleanExit, delayed) {
     goog.net.cookies.remove('client_running');
 
-    goog.object.forEach(
-        this.rooms,
-        function(room) {
-            room.part(cleanExit);
-        }
-    );
-    goog.object.clear(this.rooms);
-    this.notify();
+	if (!delayed) {
+		goog.object.forEach(
+			this.rooms,
+			function(room) {
+				room.part(cleanExit);
+			}
+		);
+		goog.object.clear(this.rooms);
+		this.notify();
+	}
 	if (cleanExit) {
 		// cookie can safely be removed as we don't want to return to any rooms
 		goog.net.cookies.remove('room_token');
-		this.sendPresence('unavailable', 'Clean Exit');
+		if (xmpptk.Config['is_staff'] || delayed) {
+			this.sendPresence('unavailable', 'Clean Exit');
+			goog.base(this, 'logout');
+		} else {
+			this._logoutDelayedTimeout = setTimeout(goog.bind(function() {
+				this.logout(true, true);
+			}, this), helpim.Client.LOGOUT_DELAYED_TIMEOUT*1000);
+		}
 	} else {
 		this.sendPresence('unavailable');
+		goog.base(this, 'logout');
 	}
-    goog.base(this, 'logout');
+
 };
 
 /**
@@ -352,6 +370,9 @@ helpim.Client.prototype._clearComposingTimeout = function(jid) {
  * handle set request for answering a questionnaire
  */
 helpim.Client.prototype._handleIQSetRooms = function(iq) {
+	if (this._logoutDelayedTimeout) {
+		clearTimeout(this._logoutDelayedTimeout);
+	}
 
 	var url = iq.getChild('questionnaire').getAttribute('url');
 	if (url) {

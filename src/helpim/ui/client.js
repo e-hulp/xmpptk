@@ -60,7 +60,7 @@ helpim.ui.Client = function(client) {
         this.logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            client.logout(true);
+			client.logout(true);
         },
         false,
         this);
@@ -175,7 +175,16 @@ helpim.ui.Client = function(client) {
 
 			helpim.register('questionnaire_submitted', function(params1) {
 				params.callback(params1);
-				setTimeout(function() {dialog.setVisible(false)}, 3000);
+				if (client._logoutDelayedTimeout) {
+					dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+					goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+						client.logout(true, true);
+					});
+				} else {
+					setTimeout(function() {
+						dialog.setVisible(false);
+					}, 3000);
+				}
 			});
 
             dialog.setVisible(true);
