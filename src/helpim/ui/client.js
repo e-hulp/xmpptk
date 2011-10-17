@@ -60,7 +60,7 @@ helpim.ui.Client = function(client) {
         this.logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            client.logoutCleanExit();
+            client.logout(true);
         },
         false,
         this);

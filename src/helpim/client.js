@@ -6,6 +6,7 @@ goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 goog.require('goog.net.cookies');
 goog.require('goog.json');
+goog.require('goog.userAgent');
 
 goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
@@ -42,10 +43,12 @@ helpim.Client = function() {
 
     this.login();
 
+	var event = goog.userAgent.WEBKIT?'beforeunload':goog.events.EventType.UNLOAD;
+
     goog.events.listen(
         window,
-        goog.events.EventType.UNLOAD,
-        this.logout,
+        event,
+        goog.bind(function() { this.logout(); }, this),
         false,
         this
     );
@@ -207,33 +210,27 @@ helpim.Client.prototype.login = function() {
 
 /**
  * @inheritDoc
+ * @param {?boolean} cleanExit whether this is a clean-exit logout
  */
-helpim.Client.prototype.logout = function() {
+helpim.Client.prototype.logout = function(cleanExit) {
     goog.net.cookies.remove('client_running');
-    goog.base(this, 'logout');
-};
-
-/**
- * @inheritDoc
- */
-helpim.Client.prototype.logoutCleanExit = function() {
-    // cookie can safely be removed as we don't want to return to this room
-    goog.net.cookies.remove('room_token');
 
     goog.object.forEach(
         this.rooms,
         function(room) {
-            room.part();
+            room.part(cleanExit);
         }
     );
     goog.object.clear(this.rooms);
     this.notify();
-
-    this.sendPresence('unavailable', 'Clean Exit');
-
-    // we need to delay disconnecting because otherwise it happens
-    // that tigase looses our last messages
-    setTimeout(goog.bind(this.logout, this), 100);
+	if (cleanExit) {
+		// cookie can safely be removed as we don't want to return to any rooms
+		goog.net.cookies.remove('room_token');
+		this.sendPresence('unavailable', 'Clean Exit');
+	} else {
+		this.sendPresence('unavailable');
+	}
+    goog.base(this, 'logout');
 };
 
 /**

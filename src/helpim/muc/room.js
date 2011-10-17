@@ -30,13 +30,15 @@ helpim.muc.Room.prototype.blockParticipant = function(participant, success, erro
 
 /**
  * leaves the room
+ * @param {boolean} clean whether this is a clean exit
  */
-helpim.muc.Room.prototype.part = function() {
+helpim.muc.Room.prototype.part = function(clean) {
     // unregister handlers
     this._client.unregisterRoom(this);
 
     // send presence
-    this._client.sendPresence('unavailable', 'Clean Exit', this.jid);
+	var message = clean?'Clean Exit':null;
+    this._client.sendPresence('unavailable', message, this.jid);
 };
 
 helpim.muc.Room.prototype.requestRoom = function() {
