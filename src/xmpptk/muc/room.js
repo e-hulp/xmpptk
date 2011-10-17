@@ -166,9 +166,10 @@ xmpptk.muc.Room.prototype.setSubject = function(subject) {
  * handles a message packet directed to this room
  * @private
  * @param {JSJaCMessage} oMsg a presence packet
+ * @param {boolean} priv whether this is a private message
  * @return {boolean}
  */
-xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
+xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg, priv) {
     this._logger.info("room got a message: "+oMsg.xml());
 
     var roomSubject = oMsg.getSubject();
@@ -193,7 +194,8 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
         this.messages.push(
             {'from': from,
              'body': oMsg.getBody(),
-             'type': oMsg.getType()}
+             'type': oMsg.getType(),
+			 'priv': priv}
         );
         this.set('messages', this.messages);
     }
