@@ -300,8 +300,13 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 };
 
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-    return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
-        xmpptk.ui.msgFormat(msg['body']);
+	if (msg['priv']) {
+		// this is a private message presumably from bot - maybe better check this TODO
+		return xmpptk.ui.msgFormat(msg['body']);
+	} else {
+		return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
+			xmpptk.ui.msgFormat(msg['body']);
+	}
 };
 
 helpim.ui.muc.Room.prototype.update = function() {
