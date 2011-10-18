@@ -35,6 +35,7 @@ helpim.ui.muc.Room = function(room) {
     this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
     this._sendTextarea = new goog.ui.Textarea();
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
+	this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
     room.attachPropertyhandler(
         'admitted',
@@ -44,7 +45,7 @@ helpim.ui.muc.Room = function(room) {
     );
 
     goog.events.listen(
-        this._sendTextarea.getContentElement(),
+        this._sendTextareaElement,
         goog.events.EventType.KEYPRESS,
         goog.bind(function(e) {
             if (e.charCode == 13) { // return key
@@ -134,8 +135,7 @@ helpim.ui.muc.Room = function(room) {
                         }
                     };
 
-                    var input = this._sendTextarea.getContentElement();
-
+                    var input = this._sendTextareaElement;
                     if (input.setSelectionRange) {
                         var selectionStart = input.selectionStart;
                         var selectionEnd = input.selectionEnd;
@@ -150,12 +150,16 @@ helpim.ui.muc.Room = function(room) {
                             setSelectionRange(input, selectionStart + emoticon.length, selectionStart + emoticon.length);
                         }
                     }
-                    else if (input.createTextRange && input.caretPos) {
+                    else if (input.caretPos) {
                         var caretPos = input.caretPos;
                         caretPos.text = (caretPos.text.charAt(caretPos.text.length - 1)==' '?emoticon+' ':emoticon);
                         input.focus();
                     }
                     else {
+						console.log("nope");
+						if (input.value.length && input.value.charAt(input.value.length) != ' ') {
+							input.value += ' ';
+						}
                         input.value += emoticon;
                         input.focus();
                     }
