@@ -156,7 +156,6 @@ helpim.ui.muc.Room = function(room) {
                         input.focus();
                     }
                     else {
-						console.log("nope");
 						if (input.value.length && input.value.charAt(input.value.length) != ' ') {
 							input.value += ' ';
 						}
@@ -425,7 +424,7 @@ helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
 						}
 						// we're ready to chat
 						this._sendTextarea.setEnabled(true);
-						this._sendTextarea.getContentElement().focus();
+						this._sendTextarea.setFocused(true);
 					} // end is_one2one
                 } else {
                     if (xmpptk.Config['is_staff'] && this.subject.is_one2one) {
