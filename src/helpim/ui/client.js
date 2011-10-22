@@ -256,17 +256,28 @@ helpim.ui.Client.prototype.update = function() {
                         var title = gettext("waiting...");
                         var tab = new helpim.ui.Tab(title, new helpim.ui.RoundedTabRenderer());
                         tab.setOnCloseHandler(function() {
-							var dlg = new goog.ui.Dialog();
-							dlg.setTitle(gettext('Confirm'));
-							dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
-							dlg.setHasTitleCloseButton(true);
-							dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-							dlg.render(goog.dom.getElement("dialog"));
-							goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
-								if (e.key == 'ok') {
-									room.part();
-								}});
-							dlg.setVisible(true);
+							// on close we should a confirmation
+							// dialog. but only if there's another
+							// participant in the room except for
+							// ourselves and the bot
+							if (goog.object.some(room.roster.get('items'), function(occupant) {
+								return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
+							})) {
+								var dlg = new goog.ui.Dialog();
+								dlg.setTitle(gettext('Confirm'));
+								dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
+								dlg.setHasTitleCloseButton(true);
+								dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+								dlg.render(goog.dom.getElement("dialog"));
+								goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
+									if (e.key == 'ok') {
+										room.part();
+									}});
+								dlg.setVisible(true);
+							} else {
+								// no need to show a dialog, just part
+								room.part();
+							}
                         });
                     }
                     this._rooms[id]._tab = tab; // let'em know
