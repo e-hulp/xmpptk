@@ -43,12 +43,6 @@ xmpptk.muc.Room = function(client, room_jid, password) {
     /** @type {string} */
     this.subject = '';
 
-    /**
-     * indicates whether we've been admitted to room or not
-     * @type {boolean}
-     */
-    this.admitted = false;
-
     /** @type {array} */
     this.messages = [];
 
@@ -62,6 +56,13 @@ xmpptk.muc.Room = function(client, room_jid, password) {
      * @type {xmpptk.muc.Client}
      * @private */
     this._client = client;
+
+    /**
+     * indicates whether we've been admitted to room or not
+     * @type {boolean}
+	 * @private
+     */
+    this._admitted = false;
 };
 goog.inherits(xmpptk.muc.Room, xmpptk.Model);
 
@@ -94,7 +95,7 @@ xmpptk.muc.Room.prototype.join = function(callback) {
 
     // register callback
     if (callback) {
-        this.attachPropertyhandler('admitted', callback);
+        this.subscribeOnce('admitted', callback);
     }
 
     // send presence to rooms jid
@@ -209,7 +210,14 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
     this._logger.info("room got a presence: "+oPres.xml());
 
     var from = oPres.getFrom();
-    if (oPres.getType() == 'unavailable') {
+
+	if (oPres.isError()) {
+		var error = oPres.getChild('error');
+		if (error.getAttribute('type') == 'cancel' &&
+			error.firstChild.tagName == 'conflict') {
+			this.publish('nick_conflict');
+		}
+	} else if (oPres.getType() == 'unavailable') {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
             this.events.push({'type': 'occupant_left',
@@ -237,10 +245,9 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                 if (from == this.jid) {
                     // it's my own presence, check if we're part of the game now
                     var role = occupant.get('role');
-                    if (!this.admitted) {
-                        if (role != 'none' && role != 'outcast') {
-                            this.set('admitted', true);
-                        }
+                    if (!this._admitted && role != 'none' && role != 'outcast') {
+                        this._admitted = true;
+						this.publish('admitted');
                     }
                 }
             }

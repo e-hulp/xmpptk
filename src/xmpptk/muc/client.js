@@ -28,7 +28,7 @@ xmpptk.muc.Client.prototype.login = function(callback, context) {
 
     // register handlers
     this._con.registerHandler('message', goog.bind(this._handleGroupchatPacket, this));
-    this._con.registerHandler('presence', 'x', xmpptk.muc.NS.USER, goog.bind(this._handleGroupchatPacket, this));
+    this._con.registerHandler('presence', goog.bind(this._handleGroupchatPacket, this));
 };
 
 /**
