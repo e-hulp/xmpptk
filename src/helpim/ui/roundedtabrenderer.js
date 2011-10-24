@@ -29,7 +29,7 @@ helpim.ui.RoundedTabRenderer.prototype.createCaption = function(dom, caption) {
     var baseClass = this.getStructuralCssClass();
     this.closeButton_ = dom.createDom(
         'div',
-        {'title':gettext('clickt to close'),
+        {'title':gettext('click to close'),
          'className': goog.getCssName(baseClass, 'closeTab')}
     );
     goog.events.listen(
