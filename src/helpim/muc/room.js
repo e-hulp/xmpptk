@@ -28,6 +28,16 @@ helpim.muc.Room.prototype.blockParticipant = function(participant, success, erro
     this._client.blockParticipant(this.id+'/'+xmpptk.Config['bot_nick'], this.id+'/'+participant, success, error)
 }
 
+helpim.muc.Room.prototype.join = function(callback) {
+	this.subscribeOnce('nick_conflict', function() {
+		this['nick'] += '_';
+		this.jid = this.id + '/' + this['nick'];
+		this._logger.info("nick conflict! adopting nick to "+this['nick']+"and automatically rejoin room");
+		this.join(callback);
+	}, this);
+	goog.base(this, 'join', callback, this);
+};
+
 /**
  * leaves the room
  * @param {boolean} clean whether this is a clean exit
