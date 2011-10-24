@@ -209,6 +209,7 @@ helpim.Client.prototype.login = function() {
 					this.joinRoom(roomId, service, nick, password, subject);
 				}, this));
 			}
+			return true; // stop propagation
 		}
 	} , this));
 

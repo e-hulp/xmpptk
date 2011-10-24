@@ -303,7 +303,7 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 };
 
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-	if (msg['priv']) {
+	if (msg['type'] != 'groupchat') {
 		// this is a private message presumably from bot - maybe better check this TODO
 		return xmpptk.ui.msgFormat(msg['body']);
 	} else {
