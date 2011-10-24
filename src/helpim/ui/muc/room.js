@@ -317,8 +317,12 @@ helpim.ui.muc.Room.prototype.update = function() {
 
     if (!this.subject.is_one2one) {
         goog.dom.removeChildren(this._rosterPanel);
-        goog.object.forEach(
-            this.subject.roster.getItems(),
+		var items = goog.object.getValues(this.subject.roster.getItems());
+		goog.array.sort(items, function(a, b) {
+			return (a.jid < b.jid)?-1:1;
+		});
+        goog.array.forEach(
+			items,
             function(item) {
 				var nick = (new JSJaCJID(item['jid'])).getResource();
                 if (item.role == xmpptk.muc.Occupant.Role.NONE ||
