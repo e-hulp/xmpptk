@@ -27,8 +27,7 @@ xmpptk.muc.Client.prototype.login = function(callback, context) {
     goog.base(this, 'login', callback, context);
 
     // register handlers
-    this._con.registerHandler('message', '*', '*', 'groupchat', goog.bind(this._handleGroupchatPacket, this));
-    this._con.registerHandler('message', '*', '*', 'chat', goog.bind(this._handleChatPacket, this));
+    this._con.registerHandler('message', goog.bind(this._handleGroupchatPacket, this));
     this._con.registerHandler('presence', 'x', xmpptk.muc.NS.USER, goog.bind(this._handleGroupchatPacket, this));
 };
 
@@ -81,31 +80,14 @@ xmpptk.muc.Client.prototype._handleGroupchatPacket = function(oJSJaCPacket) {
             }
             this._logger.severe("failed to call room's handleGroupchatPacket:"+e.message, e.message);
         }
-    } else {
-        this._logger.info("no room for id "+room_id);
-    }
-
-    return true; // no one else needs to handle this
-};
-
-xmpptk.muc.Client.prototype._handleChatPacket = function(oJSJaCPacket) {
-   var room_id = oJSJaCPacket.getFromJID().removeResource().toString();
-    if (this.rooms[room_id]) {
-        this._logger.info("handing over to room with id "+room_id);
-        try {
-            this.rooms[room_id].handleGroupchatPacket(oJSJaCPacket, true);
-        } catch(e) {
-            if (console && console.error) {
-                console.error(e);
-            }
-            this._logger.severe("failed to call room's handleGroupchatPacket:"+e.message, e.message);
-        }
 		return true;
     } else {
         this._logger.info("no room for id "+room_id);
-		return false;
     }
-}
+
+    return false;
+};
+
 /** @enum {string} */
 xmpptk.muc.NS = {
     BASE: 'http://jabber.org/protocol/muc',
