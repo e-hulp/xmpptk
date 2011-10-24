@@ -24,7 +24,7 @@
 }
 
 .sendPanel {
-    overflow: auto;
+    overflow: hidden;
     height: auto;
 }
 
