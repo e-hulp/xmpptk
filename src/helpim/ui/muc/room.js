@@ -37,7 +37,7 @@ helpim.ui.muc.Room = function(room) {
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
 	this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
-    room.attachPropertyhandler(
+    room.subscribeOnce(
         'admitted',
         goog.bind(function() {
             goog.style.showElement(goog.dom.getElement('helpimClient'), true);
