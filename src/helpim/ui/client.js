@@ -301,13 +301,15 @@ helpim.ui.Client.prototype.update = function() {
                     }
                 } else {
                     // show room
-                    this._rooms[id] = new helpim.ui.muc.Room(room);
-                    if (this._waitingdialog) {
-                        this._logger.info("hiding waiting dialog");
-                        this._waitingdialog.setVisible(false);
-                    } else {
-                        this._logger.info("nothing to hide");
-                    }
+					if (!this._rooms[id]) {
+						this._rooms[id] = new helpim.ui.muc.Room(room);
+						if (this._waitingdialog) {
+							this._logger.info("hiding waiting dialog");
+							this._waitingdialog.setVisible(false);
+						} else {
+							this._logger.info("nothing to hide");
+						}
+					}
                 }
             }
             count++;
