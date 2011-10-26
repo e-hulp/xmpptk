@@ -61,34 +61,7 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 	}
 };
 
-helpim.ui.muc.Room.prototype.update = function() {
-    this._logger.info("update called");
-
-    if (!this.subject.is_one2one) {
-        goog.dom.removeChildren(this._rosterPanel);
-		var items = goog.object.getValues(this.subject.roster.getItems());
-		goog.array.sort(items, function(a, b) {
-			return (a.jid < b.jid)?-1:1;
-		});
-        goog.array.forEach(
-			items,
-            function(item) {
-				var nick = (new JSJaCJID(item['jid'])).getResource();
-                if (item.role == xmpptk.muc.Occupant.Role.NONE ||
-					(!xmpptk.Config['debug'] && nick == xmpptk.Config['bot_nick'])) {
-                    return;
-                }
-                goog.dom.append(
-                    this._rosterPanel,
-                    goog.dom.createDom('div',
-                                       {'class': 'rosterItem'},
-                                       nick)
-                );
-            },
-            this
-        );
-    }
-};
+helpim.ui.muc.Room.prototype.update = function() {};
 
 helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
     goog.object.forEach(
@@ -244,9 +217,10 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
     }
 };
 
-helpim.ui.muc.Room._render = function() {
+helpim.ui.muc.Room.prototype._render = function() {
+	this._logger.info("rendering room view");
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
-    this._panel.id = xmpptk.ui.fixID(room.id + "_roomPanel");
+    this._panel.id = xmpptk.ui.fixID(this.subject.id + "_roomPanel");
 
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
@@ -258,7 +232,7 @@ helpim.ui.muc.Room._render = function() {
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
 	this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
-    room.subscribeOnce(
+    this.subject.subscribeOnce(
         'admitted',
         goog.bind(function() {
             goog.style.showElement(goog.dom.getElement('helpimClient'), true);
@@ -272,13 +246,13 @@ helpim.ui.muc.Room._render = function() {
             if (e.charCode == 13) { // return key
                 try {
                     this._logger.info(this._sendTextarea.getValue());
-                    room.sendMessage(this._sendTextarea.getValue());
+                    this.subject.sendMessage(this._sendTextarea.getValue());
                     this._sendTextarea.setValue('');
                     e.preventDefault();
                 } catch(err) { this._logger.severe("failed sending message", err.message); }
             } else {
                 if (!e.ctrlKey && !e.metaKey) {
-                    room.sendComposing();
+                    this.subject.sendComposing();
                 }
             }
         }, this)
@@ -391,94 +365,6 @@ helpim.ui.muc.Room._render = function() {
         this
     );
 
-    if (this.subject.is_one2one) {
-		// will be enabled once other participant joins
-		this._sendTextarea.setEnabled(false);
-
-        // sir hide-a-lot
-        goog.style.showElement(this._rosterPanel, false);
-        goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
-        goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
-
-		if (xmpptk.Config['is_staff']) {
-			this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
-															   goog.ui.FlatButtonRenderer.getInstance());
-			this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
-
-			goog.events.listen(
-				this._blockParticipantButton,
-				goog.ui.Component.EventType.ACTION,
-				function() {
-
-					var dialog = new goog.ui.Dialog();
-					dialog.setTitle(gettext('Block Participant'));
-					dialog.setContent('Are you sure you want to block this participant?');
-					dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-					dialog.setHasTitleCloseButton(false);
-					dialog.render(goog.dom.getElement("dialog"));
-
-					goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-						if (e.key == 'ok') {
-							// send message to bot to block user
-							room.blockParticipant(
-								this._participant,
-								goog.bind(function() {
-									var dialog = new goog.ui.Dialog();
-									dialog.setTitle(gettext('Block participant'));
-									dialog.setContent('The participant has been blocked successfully');
-									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-									dialog.setHasTitleCloseButton(false);
-									dialog.render(goog.dom.getElement("dialog"));
-									dialog.setVisible(true);
-									this._blockParticipantButton.setEnabled(false);
-								}, this),
-								function() {
-									var dialog = new goog.ui.Dialog();
-									dialog.setTitle(gettext('Error'));
-									dialog.setContent('There was an error blocking the participant');
-									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-									dialog.setHasTitleCloseButton(false);
-									dialog.render(goog.dom.getElement("dialog"));
-									dialog.setVisible(true);
-								}
-							);
-						}
-					}, false, this);
-
-					dialog.setVisible(true);
-
-				},
-				false,
-				this
-			);
-
-			this._blockParticipantButton.setEnabled(false);
-		}
-	} else {
-		if (xmpptk.Config['is_staff']) {
-			// we're in a lobby
-			this._requestClientButton =  new goog.ui.Button(gettext('Request Client'),
-															goog.ui.FlatButtonRenderer.getInstance());
-			this._requestClientButton.render(goog.dom.getElementByClass('requestClientButton', this._panel));
-
-			goog.events.listen(
-				this._requestClientButton,
-				goog.ui.Component.EventType.ACTION,
-				function() {
-					this._requestClientButton.setEnabled(false);
-					setTimeout(goog.bind(function() {
-						this._requestClientButton.setEnabled(true);
-					}, this), 5000);
-					room.requestRoom();
-				},
-				false,
-				this
-			);
-			this._requestClientButton.setEnabled(true);
-		}
-	}
-
-
     goog.style.showElement(this._subjectPanel, false);
 
     this._focused = false;
@@ -490,10 +376,10 @@ helpim.ui.muc.Room._render = function() {
     this._messagesAt = 0;
     this._eventsAt = 0;
 
-    room.attachPropertyhandler('subject', this._subjectChanged, this);
-    room.attachPropertyhandler('events', this._eventsChanged, this);
-    room.attachPropertyhandler('messages', this._messagesChanged, this);
-    room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
+    this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
+    this.subject.attachPropertyhandler('events', this._eventsChanged, this);
+    this.subject.attachPropertyhandler('messages', this._messagesChanged, this);
+    this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
 };
 
 helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
