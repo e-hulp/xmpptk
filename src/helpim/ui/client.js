@@ -18,9 +18,13 @@ goog.require('xmpptk.ui.sound');
 goog.require('helpim.muc.Room');
 
 goog.require('helpim.ui');
-goog.require('helpim.ui.muc.Room');
+
 goog.require('helpim.ui.Tab');
 goog.require('helpim.ui.RoundedTabRenderer');
+
+goog.require('helpim.ui.muc.LobbyRoom');
+goog.require('helpim.ui.muc.One2OneRoom');
+goog.require('helpim.ui.muc.WaitingRoom');
 
 /**
  * @constructor
@@ -248,11 +252,12 @@ helpim.ui.Client.prototype.update = function() {
             if (xmpptk.Config['is_staff']) {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
-                    this._rooms[id] = new helpim.ui.muc.Room(room);
                     if (count == 0) {
                         // we're at the lobby
+						this._rooms[id] = new helpim.ui.muc.LobbyRoom(room);
                         var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
                     } else {
+						this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
                         var title = gettext("waiting...");
                         var tab = new helpim.ui.Tab(title, new helpim.ui.RoundedTabRenderer());
                         tab.setOnCloseHandler(function() {
@@ -288,27 +293,14 @@ helpim.ui.Client.prototype.update = function() {
                     this._logger.info("not creating new room for "+id+" as it already exists");
                 }
             } else {
-                if (count == 0) {
-                    if (!this._waitingdialog) {
-                        // show waiting dialog
-                        this._waitingdialog = new goog.ui.Dialog();
-                        this._waitingdialog.setTitle(gettext('Please wait!'));
-                        this._waitingdialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
-                        this._waitingdialog.setHasTitleCloseButton(false);
-                        this._waitingdialog.setButtonSet(null);
-                        this._waitingdialog.render(goog.dom.getElement("dialog"));
-                        this._waitingdialog.setVisible(true);
-                    }
-                } else {
-                    // show room
-					if (!this._rooms[id]) {
+				if (!this._rooms[id]) {
+					if (count == 0) {
+						this._rooms[id] = new helpim.ui.muc.WaitingRoom(room);
+						this._waitingRoom = this._rooms[id];
+					} else {
 						this._rooms[id] = new helpim.ui.muc.Room(room);
-						if (this._waitingdialog) {
-							this._logger.info("hiding waiting dialog");
-							this._waitingdialog.setVisible(false);
-						} else {
-							this._logger.info("nothing to hide");
-						}
+						// better to leave the room which would hide it automatically
+						this._waitingRoom.hide();
 					}
                 }
             }
