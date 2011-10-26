@@ -298,7 +298,7 @@ helpim.ui.Client.prototype.update = function() {
 						this._rooms[id] = new helpim.ui.muc.WaitingRoom(room);
 						this._waitingRoom = this._rooms[id];
 					} else {
-						this._rooms[id] = new helpim.ui.muc.Room(room);
+						this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
 						// better to leave the room which would hide it automatically
 						this._waitingRoom.hide();
 					}
