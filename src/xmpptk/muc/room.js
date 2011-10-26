@@ -72,13 +72,13 @@ xmpptk.muc.Room.prototype._logger = goog.debug.Logger.getLogger('xmpptk.muc.Room
  * handle a JSJaCPacket directed to this room
  * @param {JSJaCPacket} oPacket a JSJaCPacket to handle
  */
-xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket, priv) {
+xmpptk.muc.Room.prototype.handleGroupchatPacket = function(oPacket) {
     // actually looking for a more elegant solution, but hey, saw the
     // ponies?
     this._logger.info(oPacket.pType());
     switch (oPacket.pType()) {
     case 'presence': return this._handleGroupchatPresence(oPacket);
-    case 'message': return this._handleGroupchatMessage(oPacket, priv);
+    case 'message': return this._handleGroupchatMessage(oPacket);
     }
 };
 
