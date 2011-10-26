@@ -181,10 +181,10 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
     } else {
         var chatState = oMsg.getChatState();
         if (chatState != '') {
+			this._logger.info("got a chatState from "+from+": "+chatState);
             this.chatStates[from] = chatState;
             this.set('chatStates', this.chatStates);
         }
-        this._logger.info("got a chatState from "+from+": "+chatState);
         if (oMsg.getBody() == '') {
             this.notify();
             return;
