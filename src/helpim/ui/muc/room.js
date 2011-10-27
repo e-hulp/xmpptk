@@ -65,8 +65,13 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 		// this is a private message presumably from bot - maybe better check this TODO
 		return xmpptk.ui.msgFormat(msg['body']);
 	} else {
-		return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
-			xmpptk.ui.msgFormat(msg['body']);
+		if (msg.body.match(/^\/me (.*)$/)) {
+			return '* ' + xmpptk.ui.htmlEnc(msg['from'])+ ' ' +
+				xmpptk.ui.msgFormat(RegExp.$1) + ' *';
+		} else {
+			return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
+				xmpptk.ui.msgFormat(msg['body']);
+		}
 	}
 };
 
@@ -125,7 +130,7 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
 };
 
 helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
-    if (event.from != this.subject['nick']) {
+    if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event['from'])) {
         this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
 	}
 };
