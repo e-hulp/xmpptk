@@ -211,6 +211,9 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 
     var from = oPres.getFrom();
 
+	var event = {'from': oPres.getFromJID().getResource(),
+                 'status': oPres.getStatus()};
+
 	if (oPres.isError()) {
 		var error = oPres.getChild('error');
 		if (error.getAttribute('type') == 'cancel' &&
@@ -220,9 +223,9 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 	} else if (oPres.getType() == 'unavailable') {
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
-            this.events.push({'type': 'occupant_left',
-                              'from': oPres.getFromJID().getResource(),
-                              'status': oPres.getStatus()});
+
+			this.publish('occupant_left', event);
+            this.events.push(goog.object.extend(event, {'type': 'occupant_left'});
             this.set('events', this.events);
         }
     } else {
@@ -231,25 +234,28 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
         var x = oPres.getChild('x', xmpptk.muc.NS.USER);
         if (x) {
             var item = x.getElementsByTagName('item').item(0);
+
             if (item) {
-                occupant.set({
-                    'affiliation': item.getAttribute('affiliation'),
-                    'role':        item.getAttribute('role'),
-                    'real_jid':    item.getAttribute('jid')
-                });
-                this.events.push({'type': 'occupant_joined',
-                                  'from': oPres.getFromJID().getResource(),
-                                  'status': oPres.getStatus()});
-                this.set('events', this.events);
+				var role = item.getAttribute('role');
 
                 if (from == this.jid) {
                     // it's my own presence, check if we're part of the game now
-                    var role = occupant.get('role');
-                    if (!this._admitted && role != 'none' && role != 'outcast') {
+                    if (!this._admitted && !goog.array.contains(['none', 'outcast'], role) {
                         this._admitted = true;
 						this.publish('admitted');
                     }
                 }
+
+                occupant.set({
+                    'affiliation': item.getAttribute('affiliation'),
+                    'role':        role,
+                    'real_jid':    item.getAttribute('jid')
+                });
+
+				this.publish('occupant_joined', event)
+				this.events.push(goog.object.extend(event, {'type': 'occupant_joined'});
+                this.set('events', this.events);
+
             }
         } else {
             this._logger.info("no item found for "+xmpptk.muc.NS.USER);
