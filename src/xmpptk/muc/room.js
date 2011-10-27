@@ -225,7 +225,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
             this.roster.removeItem(from);
 
 			this.publish('occupant_left', event);
-            this.events.push(goog.object.extend(event, {'type': 'occupant_left'});
+            this.events.push(goog.object.extend(event, {'type': 'occupant_left'}));
             this.set('events', this.events);
         }
     } else {
