@@ -191,9 +191,9 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
         }
         this.chatStates[from] = '';
         this.set('chatStates', this.chatStates);
-		var msg = {'from': from,
-				   'body': oMsg.getBody(),
-				   'type': oMsg.getType()};
+		var msg = {from: from,
+				   body: oMsg.getBody(),
+				   type: oMsg.getType()};
 		this.publish('message', msg);
         this.messages.push(msg);
         this.set('messages', this.messages);
@@ -211,8 +211,8 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 
     var from = oPres.getFrom();
 
-	var event = {'from': oPres.getFromJID().getResource(),
-                 'status': oPres.getStatus()};
+	var event = {from: oPres.getFromJID().getResource(),
+                 status: oPres.getStatus()};
 
 	if (oPres.isError()) {
 		var error = oPres.getChild('error');
