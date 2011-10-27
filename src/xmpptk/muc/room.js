@@ -191,11 +191,11 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
         }
         this.chatStates[from] = '';
         this.set('chatStates', this.chatStates);
-        this.messages.push(
-            {'from': from,
-             'body': oMsg.getBody(),
-             'type': oMsg.getType()}
-        );
+		var msg = {'from': from,
+				   'body': oMsg.getBody(),
+				   'type': oMsg.getType()};
+		this.publish('message', msg);
+        this.messages.push(msg);
         this.set('messages', this.messages);
     }
     this.notify();
