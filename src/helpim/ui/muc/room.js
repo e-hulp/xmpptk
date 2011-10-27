@@ -157,6 +157,9 @@ helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
  * @param {{from: string, status: string}} event the event recieved
  */
 helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
+    if (goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
+		return;
+	}
     var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
     if (event.status != '') {
         if (event.status == 'Clean Exit') {
