@@ -36,6 +36,16 @@ helpim.ui.muc.WaitingRoom.prototype.formatMessage = function(msg) {
 
 helpim.ui.muc.WaitingRoom.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.WaitingRoom');
 
+/**
+ * @inheritDoc
+ */
+helpim.ui.muc.Room.prototype._occupantJoined = function(event) {};
+
+/**
+ * @inheritDoc
+ */
+helpim.ui.muc.Room.prototype._occupantLeft = function(event) {};
+
 helpim.ui.muc.WaitingRoom.prototype._render = function() {
 	this._logger.info("rendering view");
     // show waiting dialog
