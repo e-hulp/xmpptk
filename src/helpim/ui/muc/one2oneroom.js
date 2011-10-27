@@ -2,6 +2,9 @@ goog.provide('helpim.ui.muc.One2OneRoom');
 
 goog.require('helpim.ui.muc.Room');
 
+/**
+ * @constructor
+ */
 helpim.ui.muc.One2OneRoom = function(room) {
 	helpim.ui.muc.Room.call(this, room);
 };
