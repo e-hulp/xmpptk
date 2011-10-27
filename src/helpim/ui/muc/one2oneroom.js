@@ -25,7 +25,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
 		return;
 	}
 
- 	goog.base(this, '_occpantJoined', event, this);
+ 	goog.base(this, '_occupantJoined', event, this);
 
 	if (xmpptk.Config['is_staff']) {
 
