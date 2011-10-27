@@ -240,7 +240,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 
                 if (from == this.jid) {
                     // it's my own presence, check if we're part of the game now
-                    if (!this._admitted && !goog.array.contains(['none', 'outcast'], role) {
+                    if (!this._admitted && !goog.array.contains(['none', 'outcast'], role)) {
                         this._admitted = true;
 						this.publish('admitted');
                     }
@@ -253,7 +253,7 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
                 });
 
 				this.publish('occupant_joined', event)
-				this.events.push(goog.object.extend(event, {'type': 'occupant_joined'});
+				this.events.push(goog.object.extend(event, {'type': 'occupant_joined'}));
                 this.set('events', this.events);
 
             }
