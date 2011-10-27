@@ -69,22 +69,23 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 
 /**
  * format a message
- * @param {{type: string, body: string}}
+ * @param {{type: string, body: string, from: string}}
  * return {{body: string, className: string}}
+ * @notypecheck
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-	if (msg['type'] != 'groupchat') {
+	if (msg.type != 'groupchat') {
 		// this is a private message presumably from bot - maybe better check this TODO
-		return {body:xmpptk.ui.msgFormat(msg['body']), className: 'private_message'};
+		return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
 	} else {
 		var meMatches = msg.body.match(/^\/me (.*)$/); 
 		if (meMatches) {
-			return {body:'* ' + xmpptk.ui.htmlEnc(msg['from'])+ ' ' +
+			return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
 					xmpptk.ui.msgFormat(meMatches[1]) + ' *',
 					className:'me_message'};
 		} else {
-			return {body:'&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
-					xmpptk.ui.msgFormat(msg['body']),
+			return {body:'&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
+					xmpptk.ui.msgFormat(msg.body),
 					className:'groupchat_message'};
 		}
 	}
@@ -130,6 +131,9 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
 
 helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
 
+/**
+ * @param {{body: string, type:string, from:string}} message the message recieved
+ */
 helpim.ui.muc.Room.prototype._messageReceived = function(message) {
     this.appendMessage(this.formatMessage(message));
     if (message['from'] != this.subject['nick']) {
@@ -140,19 +144,25 @@ helpim.ui.muc.Room.prototype._messageReceived = function(message) {
     }
 };
 
+/**
+ * @param {{from: string, status: string}} event the event recieved
+ */
 helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
-    if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event['from'])) {
-        this.appendMessage({body: interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), className:'roomEvent'});
+    if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
+        this.appendMessage({body: interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event.from)]), className:'roomEvent'});
 	}
 };
 
+/**
+ * @param {{from: string, status: string}} event the event recieved
+ */
 helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
-    var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
-    if (event['status'] != '') {
-        if (event['status'] == 'Clean Exit') {
-            msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
+    var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+    if (event.status != '') {
+        if (event.status == 'Clean Exit') {
+            msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
         } else {
-            msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
+            msg += " ("+xmpptk.ui.htmlEnc(event.status)+")";
         }
     }
     this.appendMessage({body:msg, className:'roomEvent'});

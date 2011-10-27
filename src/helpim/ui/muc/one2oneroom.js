@@ -21,7 +21,7 @@ helpim.ui.muc.One2OneRoom.prototype._logger = goog.debug.Logger.getLogger('helpi
 
 helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
 
-    if (event['from'] == xmpptk.Config['bot_nick']) {
+    if (event.from == xmpptk.Config['bot_nick']) {
 		// not showing events from bot
 		return;
 	}
@@ -30,16 +30,16 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
 
 	if (xmpptk.Config['is_staff']) {
 
-		if (event['from'] == this.subject['nick']) {
+		if (event.from == this.subject['nick']) {
             this.appendMessage({body: interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), className:'roomEvent'});
 			return;
 		}
 
 		// this is for blocking participants which is only available for staff at one2one rooms
-		this._participant = event['from'];
+		this._participant = event.from;
 
         // set our tab's title to nick of client
-        this._tab.setCaption(event['from']);
+        this._tab.setCaption(event.from);
         if (!this._tab.isSelected()) {
             this._tab.setHighlighted(true);
         }
