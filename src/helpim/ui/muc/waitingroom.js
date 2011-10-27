@@ -4,7 +4,6 @@ goog.require('helpim.ui.muc.Room');
 
 helpim.ui.muc.WaitingRoom = function(room) {
 	helpim.ui.muc.Room.call(this, room);
-	this._waitingdialog;
 };
 goog.inherits(helpim.ui.muc.WaitingRoom, helpim.ui.muc.Room);
 
