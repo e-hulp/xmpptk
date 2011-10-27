@@ -24,6 +24,15 @@ helpim.ui.muc.Room = function(room) {
     xmpptk.ui.View.call(this, room);
 
 	this._render();
+
+    this._messagesAt = 0;
+
+    this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
+    this.subject.attachPropertyhandler('messages', this._messagesChanged, this);
+    this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
+
+	this.subject.subscribe('occupant_joined', this._occupantJoined, this);
+	this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
@@ -101,108 +110,6 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
     );
 };
 
-helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
-    this._logger.info("an event occured");
-    for (var l=events.length; this._eventsAt<l; this._eventsAt++) {
-        var event = events[this._eventsAt];
-        this._logger.info("handling event "+event['type']+" for "+event['from']);
-        if (event['from'] != xmpptk.Config['bot_nick']) {
-            var html = '';
-            switch (event['type']) {
-            case 'occupant_joined':
-                if (event['from'] != this.subject['nick']) {
-                    this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
-
-                    this._logger.info("FOCUSED at joined: "+this._focused);
-					if (this.subject.is_one2one) {
-						if (xmpptk.Config['is_staff']) {
-
-							// this is for blocking participants which is only available for staff at one2one rooms
-							this._participant = event['from'];
-                            
-                            // set our tab's title to nick of client
-                            this._tab.setCaption(event['from']);
-                            if (!this._tab.isSelected()) {
-                                this._tab.setHighlighted(true);
-                            }
-
-							if (!this._focused) {
-								if (!this._ringing) {
-									// taken from
-									// http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-									// combined with
-									// http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-									var oldTitle = document.title;
-									var msg = gettext("Ring! Ring!");
-									var ring = 0;
-									var timeoutId = setInterval(function() {
-										document.title = (document.title == msg)?oldTitle:msg;
-										if ((ring % 5) == 0) {
-											xmpptk.ui.sound.play('ring');
-										}
-										ring++;
-									}, 1000);
-
-									this._ringing = true;
-
-									var stopRinging = goog.bind(function(handler, fun) {
-										if (this._ringing) {
-											clearInterval(timeoutId);
-											document.title = oldTitle;
-											this._ringing = false;
-										}
-									}, this);
-									document.onmousemove = function() {
-										stopRinging();
-										document.onmousemove = null;
-									}
-
-									var oldonfocus = window.onfocus;
-									window.onfocus = function() {
-										stopRinging();
-										oldonfocus();
-										window.onfocus = oldonfocus;
-									}
-								}
-							}
-							this._blockParticipantButton.setEnabled(true);
-						} else { // end is_staff
-							xmpptk.ui.sound.play('ring');
-						}
-						if (!this._focused) {
-							window.focus();
-						}
-						// we're ready to chat
-						this._sendTextarea.setEnabled(true);
-						this._sendTextarea.setFocused(true);
-					} // end is_one2one
-                } else {
-                    if (xmpptk.Config['is_staff'] && this.subject.is_one2one) {
-                        this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
-                    }
-                }
-                break;
-            case 'occupant_left':
-                var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
-                if (event['status'] != '') {
-                    if (event['status'] == 'Clean Exit') {
-                        msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
-                    } else {
-                        msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
-                    }
-                }
-                this.appendMessage(msg, 'roomEvent');
-                if (this.subject.is_one2one) {
-                    this._sendTextarea.setEnabled(false);
-                }
-                break;
-            }
-        } else {
-            this._logger.info("not showing events from bot");
-        }
-    }
-};
-
 helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
 
 helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
@@ -215,6 +122,24 @@ helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
             }
         }
     }
+};
+
+helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
+    if (event.from != this.subject['nick']) {
+        this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
+	}
+};
+
+helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
+    var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
+    if (event['status'] != '') {
+        if (event['status'] == 'Clean Exit') {
+            msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
+        } else {
+            msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
+        }
+    }
+    this.appendMessage(msg, 'roomEvent');
 };
 
 helpim.ui.muc.Room.prototype._render = function() {
@@ -366,20 +291,6 @@ helpim.ui.muc.Room.prototype._render = function() {
     );
 
     goog.style.showElement(this._subjectPanel, false);
-
-    this._focused = false;
-    window.onblur = goog.bind(function() { this._focused = false; this._logger.info("focus: "+this._focused); }, this);
-    window.onfocus = goog.bind(function() { this._focused = true; this._logger.info("focus: "+this._focused); }, this);
-
-    this._ringing = false;
-
-    this._messagesAt = 0;
-    this._eventsAt = 0;
-
-    this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
-    this.subject.attachPropertyhandler('events', this._eventsChanged, this);
-    this.subject.attachPropertyhandler('messages', this._messagesChanged, this);
-    this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
 };
 
 helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
