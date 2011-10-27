@@ -76,6 +76,12 @@
     font-weight: bold;
 }
 
+.me_message, .private_message {
+	color: #090;
+	font-style: italic;
+	font-weight: bold;
+}
+	
 .ajax-loader {
 	text-align: center;
 	padding: 1em;

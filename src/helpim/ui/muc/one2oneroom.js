@@ -30,7 +30,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
 	if (xmpptk.Config['is_staff']) {
 
 		if (event['from'] == this.subject['nick']) {
-            this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
+            this.appendMessage({body: interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), className:'roomEvent'});
 			return;
 		}
 

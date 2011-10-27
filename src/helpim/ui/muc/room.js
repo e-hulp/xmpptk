@@ -25,27 +25,26 @@ helpim.ui.muc.Room = function(room) {
 
 	this._render();
 
-    this._messagesAt = 0;
-
     this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
-    this.subject.attachPropertyhandler('messages', this._messagesChanged, this);
     this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
+
+    this.subject.subscribe('message', this._messageReceived, this);
 
 	this.subject.subscribe('occupant_joined', this._occupantJoined, this);
 	this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
-helpim.ui.muc.Room.prototype.appendMessage = function(html, extraClasses, id) {
+helpim.ui.muc.Room.prototype.appendMessage = function(message) {
     var classes = 'roomMessage';
-    if (goog.isString(extraClasses)) {
-        classes += ' ' + extraClasses;
+    if (goog.isString(message.className)) {
+        classes += ' ' + message.className;
     }
     var roomMessage = goog.dom.createDom('div', {'class':classes});
-    if (id) {
-        roomMessage.id = id;
+    if (message.id) {
+        roomMessage.id = message.id;
     }
-    roomMessage.innerHTML = html;
+    roomMessage.innerHTML = message.body;
 
     var scrollBottom = this._messagesPanel.scrollTop+this._messagesPanel.clientHeight>=this._messagesPanel.scrollHeight;
     this._logger.info("scrollBottom: "+scrollBottom);
@@ -63,14 +62,16 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 	if (msg['type'] != 'groupchat') {
 		// this is a private message presumably from bot - maybe better check this TODO
-		return xmpptk.ui.msgFormat(msg['body']);
+		return {body:xmpptk.ui.msgFormat(msg['body']), className: 'private_message'};
 	} else {
 		if (msg.body.match(/^\/me (.*)$/)) {
-			return '* ' + xmpptk.ui.htmlEnc(msg['from'])+ ' ' +
-				xmpptk.ui.msgFormat(RegExp.$1) + ' *';
+			return {body:'* ' + xmpptk.ui.htmlEnc(msg['from'])+ ' ' +
+					xmpptk.ui.msgFormat(RegExp.$1) + ' *',
+					className:'me_message'};
 		} else {
-			return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
-				xmpptk.ui.msgFormat(msg['body']);
+			return {body:'&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
+					xmpptk.ui.msgFormat(msg['body']),
+					className:'groupchat_message'};
 		}
 	}
 };
@@ -81,12 +82,10 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
     goog.object.forEach(
         chatStates,
         function(state, from) {
-            this._logger.info("chat state > "+from +":"+state);
-            this._logger.info(this.subject['nick']);
             if (from == this.subject['nick']) {
-                this._logger.info("skipping my own chat state")
                 return;
             }
+            this._logger.info("chat state from "+from +":"+state);
             var id = xmpptk.ui.fixID(this.subject.id+from+"_composingMessage");
             var el = goog.dom.getElement(id);
             try {
@@ -104,9 +103,9 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
                         goog.dom.setTextContent(el, msg);
                     } else {
                         this.appendMessage(
-                            xmpptk.ui.htmlEnc(msg),
-                            "composingMessage",
-                            id);
+                            {body: xmpptk.ui.htmlEnc(msg),
+                             className: "composingMessage",
+                             id: id});
                     }
                 }
             } catch(e) { this._logger.severe("failed show chat state", e.message); }
@@ -117,21 +116,19 @@ helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
 
 helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
 
-helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
-    for (var l=messages.length; this._messagesAt<l;this._messagesAt++) {
-        this.appendMessage(this.formatMessage(messages[this._messagesAt]));
-        if (messages[this._messagesAt]['from'] != this.subject['nick']) {
-            xmpptk.ui.sound.play('chat_recv');
-            if (this._tab && !this._tab.isSelected()) {
-                this._tab.setHighlighted(true);
-            }
+helpim.ui.muc.Room.prototype._messageReceived = function(message) {
+    this.appendMessage(this.formatMessage(message));
+    if (message['from'] != this.subject['nick']) {
+        xmpptk.ui.sound.play('chat_recv');
+        if (this._tab && !this._tab.isSelected()) {
+            this._tab.setHighlighted(true);
         }
     }
 };
 
 helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
     if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event['from'])) {
-        this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
+        this.appendMessage({body: interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), className:'roomEvent'});
 	}
 };
 
@@ -144,7 +141,7 @@ helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
             msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
         }
     }
-    this.appendMessage(msg, 'roomEvent');
+    this.appendMessage({body:msg, className:'roomEvent'});
 };
 
 helpim.ui.muc.Room.prototype._render = function() {
