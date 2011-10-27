@@ -35,6 +35,14 @@ helpim.ui.muc.Room = function(room) {
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
+/**
+ * Appends message to chat window
+ * @param {Object} message with properties 
+ *   body (string) the message body
+ *   className (string) optional css class to add
+ *   id (string) optional id if message element
+ * @notypecheck
+ */
 helpim.ui.muc.Room.prototype.appendMessage = function(message) {
     var classes = 'roomMessage';
     if (goog.isString(message.className)) {
@@ -59,14 +67,20 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
     return this._panel;
 };
 
+/**
+ * format a message
+ * @param {{type: string, body: string}}
+ * return {{body: string, className: string}}
+ */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 	if (msg['type'] != 'groupchat') {
 		// this is a private message presumably from bot - maybe better check this TODO
 		return {body:xmpptk.ui.msgFormat(msg['body']), className: 'private_message'};
 	} else {
-		if (msg.body.match(/^\/me (.*)$/)) {
+		var meMatches = msg.body.match(/^\/me (.*)$/); 
+		if (meMatches) {
 			return {body:'* ' + xmpptk.ui.htmlEnc(msg['from'])+ ' ' +
-					xmpptk.ui.msgFormat(RegExp.$1) + ' *',
+					xmpptk.ui.msgFormat(meMatches[1]) + ' *',
 					className:'me_message'};
 		} else {
 			return {body:'&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
