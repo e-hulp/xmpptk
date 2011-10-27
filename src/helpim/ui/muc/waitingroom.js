@@ -16,6 +16,23 @@ helpim.ui.muc.WaitingRoom.prototype.hide = function() {
 	};
 };
 
+/**
+ * @inheritDoc
+ */
+helpim.ui.muc.WaitingRoom.prototype.appendMessage = function(message) {
+	if (message) {
+		goog.dom.setTextContent(this._message, message.body);
+	}
+};
+
+/**
+ * @inheritDoc
+ */
+helpim.ui.muc.WaitingRoom.prototype.formatMessage = function(msg) {
+	if (msg.type == 'groupchat') { return; } // not handling groupchat messages here
+	return goog.base(this, 'formatMessage', msg, this);
+};
+
 helpim.ui.muc.WaitingRoom.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.WaitingRoom');
 
 helpim.ui.muc.WaitingRoom.prototype._render = function() {

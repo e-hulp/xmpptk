@@ -4,6 +4,7 @@ goog.require('helpim.ui.muc.Room');
 
 /**
  * @constructor
+ * @extends {helpim.ui.muc.Room}
  */
 helpim.ui.muc.One2OneRoom = function(room) {
 	helpim.ui.muc.Room.call(this, room);
