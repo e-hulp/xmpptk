@@ -7,31 +7,31 @@ goog.require('helpim.ui.muc.Room');
  * @extends {helpim.ui.muc.Room}
  */
 helpim.ui.muc.WaitingRoom = function(room) {
-	helpim.ui.muc.Room.call(this, room);
+    helpim.ui.muc.Room.call(this, room);
 };
 goog.inherits(helpim.ui.muc.WaitingRoom, helpim.ui.muc.Room);
 
 helpim.ui.muc.WaitingRoom.prototype.hide = function() {
-	if (this._waitingdialog) {
-		this._waitingdialog.setVisible(false);
-	};
+    if (this._waitingdialog) {
+        this._waitingdialog.setVisible(false);
+    };
 };
 
 /**
  * @inheritDoc
  */
 helpim.ui.muc.WaitingRoom.prototype.appendMessage = function(message) {
-	if (message) {
-		goog.dom.setTextContent(this._message, message.body);
-	}
+    if (message) {
+        goog.dom.setTextContent(this._message, message.body);
+    }
 };
 
 /**
  * @inheritDoc
  */
 helpim.ui.muc.WaitingRoom.prototype.formatMessage = function(msg) {
-	if (msg.type == 'groupchat') { return; } // not handling groupchat messages here
-	return goog.base(this, 'formatMessage', msg, this);
+    if (msg.type == 'groupchat') { return; } // not handling groupchat messages here
+    return goog.base(this, 'formatMessage', msg, this);
 };
 
 helpim.ui.muc.WaitingRoom.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.WaitingRoom');
@@ -39,15 +39,15 @@ helpim.ui.muc.WaitingRoom.prototype._logger = goog.debug.Logger.getLogger('helpi
 /**
  * @inheritDoc
  */
-helpim.ui.muc.Room.prototype._occupantJoined = function(event) {};
+helpim.ui.muc.WaitingRoom.prototype._occupantJoined = function(event) {};
 
 /**
  * @inheritDoc
  */
-helpim.ui.muc.Room.prototype._occupantLeft = function(event) {};
+helpim.ui.muc.WaitingRoom.prototype._occupantLeft = function(event) {};
 
 helpim.ui.muc.WaitingRoom.prototype._render = function() {
-	this._logger.info("rendering view");
+    this._logger.info("rendering view");
     // show waiting dialog
     this._waitingdialog = new goog.ui.Dialog();
     this._waitingdialog.setTitle(gettext('Please wait!'));
@@ -56,5 +56,5 @@ helpim.ui.muc.WaitingRoom.prototype._render = function() {
     this._waitingdialog.setButtonSet(null);
     this._waitingdialog.render(goog.dom.getElement("dialog"));
     this._waitingdialog.setVisible(true);
-	this._message = goog.dom.getElement('waitingroom_message');
+    this._message = goog.dom.getElement('waitingroom_message');
 };
