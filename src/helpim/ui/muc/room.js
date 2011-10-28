@@ -23,21 +23,21 @@ helpim.ui.muc.Room = function(room) {
     this._logger.info("Creating view for room with id "+room.id);
     xmpptk.ui.View.call(this, room);
 
-	this._render();
+    this._render();
 
     this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
     this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
 
     this.subject.subscribe('message', this._messageReceived, this);
 
-	this.subject.subscribe('occupant_joined', this._occupantJoined, this);
-	this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
+    this.subject.subscribe('occupant_joined', this._occupantJoined, this);
+    this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
 /**
  * Appends message to chat window
- * @param {Object} message with properties 
+ * @param {Object} message with properties
  *   body (string) the message body
  *   className (string) optional css class to add
  *   id (string) optional id if message element
@@ -74,21 +74,21 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-	if (msg.type != 'groupchat') {
-		// this is a private message presumably from bot - maybe better check this TODO
-		return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
-	} else {
-		var meMatches = msg.body.match(/^\/me (.*)$/); 
-		if (meMatches) {
-			return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
-					xmpptk.ui.msgFormat(meMatches[1]) + ' *',
-					className:'me_message'};
-		} else {
-			return {body:'&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
-					xmpptk.ui.msgFormat(msg.body),
-					className:'groupchat_message'};
-		}
-	}
+    if (msg.type != 'groupchat') {
+        // this is a private message presumably from bot - maybe better check this TODO
+        return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
+    } else {
+        var meMatches = msg.body.match(/^\/me (.*)$/);
+        if (meMatches) {
+            return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
+                    xmpptk.ui.msgFormat(meMatches[1]) + ' *',
+                    className:'me_message'};
+        } else {
+            return {body:'&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
+                    xmpptk.ui.msgFormat(msg.body),
+                    className:'groupchat_message'};
+        }
+    }
 };
 
 helpim.ui.muc.Room.prototype.update = function() {};
@@ -150,7 +150,7 @@ helpim.ui.muc.Room.prototype._messageReceived = function(message) {
 helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
     if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
         this.appendMessage({body: interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event.from)]), className:'roomEvent'});
-	}
+    }
 };
 
 /**
@@ -158,8 +158,8 @@ helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
  */
 helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
     if (goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
-		return;
-	}
+        return;
+    }
     var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
     if (event.status != '') {
         if (event.status == 'Clean Exit') {
@@ -172,7 +172,7 @@ helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
 };
 
 helpim.ui.muc.Room.prototype._render = function() {
-	this._logger.info("rendering room view");
+    this._logger.info("rendering room view");
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
     this._panel.id = xmpptk.ui.fixID(this.subject.id + "_roomPanel");
 
@@ -184,7 +184,7 @@ helpim.ui.muc.Room.prototype._render = function() {
     this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
     this._sendTextarea = new goog.ui.Textarea();
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
-	this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
+    this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
     this.subject.subscribeOnce(
         'admitted',
@@ -305,9 +305,9 @@ helpim.ui.muc.Room.prototype._render = function() {
                         input.focus();
                     }
                     else {
-						if (input.value.length && input.value.charAt(input.value.length) != ' ') {
-							input.value += ' ';
-						}
+                        if (input.value.length && input.value.charAt(input.value.length) != ' ') {
+                            input.value += ' ';
+                        }
                         input.value += emoticon;
                         input.focus();
                     }
