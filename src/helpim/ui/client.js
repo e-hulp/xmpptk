@@ -296,8 +296,10 @@ helpim.ui.Client.prototype.update = function() {
                 if (!this._rooms[id]) {
                     if (count == 0) {
                         this._rooms[id] = new helpim.ui.muc.WaitingRoom(room);
+                        this._waitingRoom = this._rooms[id];
                     } else {
                         this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                        this._waitingRoom.hide();
                     }
                 }
             }
