@@ -116,7 +116,7 @@ helpim.Client.prototype.blockParticipant = function(bot_jid, participant_jid, su
 
 /**
  * get a conversation id stored with room of bot's jid and save it
- * with logout_redirect. 
+ * with logout_redirect.
  * @param {string} bot_jid jid of bot. bot_jid must be a jid of a room not a real jid.
  */
 helpim.Client.prototype.getConversationId = function(bot_jid) {
@@ -163,6 +163,17 @@ helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, sub
             }
         }, this)
     );
+
+	if (!xmpptk.Config['is_staff']) {
+		if (!isOne2One) {
+			this._waitingRoom = room;
+		} else {
+			if (this._waitingRoom) {
+				this._waitingRoom.part();
+			}
+		}
+	}
+
     return room;
 };
 
@@ -272,7 +283,7 @@ helpim.Client.prototype.requestRoom = function(jid, token) {
 
             // indicate ui that we've successfully requested a room
             this.publish(helpim.Client.NS.HELPIM_ROOMS+'#resultIQ');
-        
+
 			// save valid token for reuse
             var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
             goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
