@@ -64,13 +64,68 @@ helpim.ui.Client = function(client) {
         this.logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            client.logout(true);
+            var room = this._clientRoom || client.rooms[this.tabBar.getSelectedTab().getId()];
+
+            if (goog.object.some(room.roster.get('items'), 
+                                 function(occupant) {
+                                     return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
+                                 }) && (!xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
+                var dlg = new goog.ui.Dialog();
+                dlg.setTitle(gettext('Confirm'));
+                dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
+                dlg.setHasTitleCloseButton(true);
+                dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+                dlg.render(goog.dom.getElement("dialog"));
+                goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
+                    if (e.key == 'ok') {
+                        if (goog.object.getCount(client.rooms) == 1) {
+                            client.logout(true);
+                        } else {
+                            room.part(true);
+                        }
+                    }});
+                dlg.setVisible(true);
+            } else {
+                // no need to show a dialog, just part
+                if (goog.object.getCount(client.rooms) == 1) {
+                    client.logout(true);
+                } else {
+                    room.part(true);
+                }
+            }
         },
         false,
         this);
+    this.logoutButton.setEnabled(true);
 
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
+
+    this._lastRoomSelected = null;
+
+    goog.events.listen(
+        this.tabBar,
+        goog.ui.Component.EventType.SELECT,
+        goog.bind(function(e) {
+            var tabSelected = e.target;
+            this._logger.info("tab selected for "+tabSelected.getId());
+            var contentElement = goog.dom.getElement('tab_content');
+            if (this._lastRoomSelected) {
+                goog.style.showElement(
+                    this._rooms[this._lastRoomSelected].getPanel(),
+                    false
+                );
+            }
+            goog.style.showElement(
+                this._rooms[tabSelected.getId()].getPanel(),
+                true
+            );
+            this._lastRoomSelected = tabSelected.getId();
+            this.logoutButton.setEnabled(
+                !xmpptk.Config['is_staff'] || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
+            );
+        }, this)
+    );
 
     client.subscribe(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
@@ -197,29 +252,6 @@ helpim.ui.Client = function(client) {
         this
     );
 
-    this._lastRoomSelected = null;
-
-    goog.events.listen(
-        this.tabBar,
-        goog.ui.Component.EventType.SELECT,
-        goog.bind(function(e) {
-            var tabSelected = e.target;
-            this._logger.info("tab selected for "+tabSelected.getId());
-            var contentElement = goog.dom.getElement('tab_content');
-            if (this._lastRoomSelected) {
-                goog.style.showElement(
-                    this._rooms[this._lastRoomSelected].getPanel(),
-                    false
-                );
-            }
-            goog.style.showElement(
-                this._rooms[tabSelected.getId()].getPanel(),
-                true
-            );
-            this._lastRoomSelected = tabSelected.getId();
-        }, this)
-    );
-
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
     goog.style.showElement(goog.dom.getElement('helpimClient'), false);
 
@@ -237,12 +269,6 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
-
-    if (xmpptk.Config['is_staff']) {
-        this.logoutButton.setEnabled(goog.object.getCount(this.subject.rooms) <= 1);
-    } else {
-        this.logoutButton.setEnabled(true);
-    }
 
     var count = 0;
     goog.object.forEach(
@@ -299,6 +325,7 @@ helpim.ui.Client.prototype.update = function() {
                         this._waitingRoom = this._rooms[id];
                     } else {
                         this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                        this._clientRoom = room;
                         this._waitingRoom.hide();
                     }
                 }
