@@ -189,24 +189,6 @@ body{background-color:#ffe;font:normal 10pt Arial,sans-serif;}/**/fieldset{paddi
 .goog-tab-bar-start .goog-rounded-tab-selected .goog-rounded-tab-outer-edge,.goog-tab-bar-start .goog-rounded-tab-selected .goog-rounded-tab-inner-edge,.goog-tab-bar-start .goog-rounded-tab-selected .goog-rounded-tab-caption{border-left:1px solid #036!important;border-right:0!important;}
 .goog-tab-bar-start .goog-rounded-tab-disabled .goog-rounded-tab-outer-edge,.goog-tab-bar-start .goog-rounded-tab-disabled .goog-rounded-tab-inner-edge,.goog-tab-bar-start .goog-rounded-tab-disabled .goog-rounded-tab-caption{border-left:1px solid #ccc!important;border-right:0!important;}
 
-div.goog-rounded-tab-caption {
-	padding-right: 13px;
-}
-
-div.goog-rounded-tab-closeTab {
-    float: right;
-    width: 11px;
-    height: 11px;
-    margin-right: 3px;
-    background-image:url('close_box.gif');
-    cursor: pointer;
-    position:relative;
-    z-index: 20;
-}
-div.goog-rounded-tab-closeTab:hover {
-    background-color:white;
-}
-
 /*
  * Copyright 2009 The Closure Library Authors. All Rights Reserved.
  *
