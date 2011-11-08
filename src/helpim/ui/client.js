@@ -18,9 +18,10 @@ goog.require('xmpptk.ui.sound');
 goog.require('helpim.muc.Room');
 
 goog.require('helpim.ui');
-goog.require('helpim.ui.muc.Room');
-goog.require('helpim.ui.Tab');
-goog.require('helpim.ui.RoundedTabRenderer');
+
+goog.require('helpim.ui.muc.LobbyRoom');
+goog.require('helpim.ui.muc.One2OneRoom');
+goog.require('helpim.ui.muc.WaitingRoom');
 
 /**
  * @constructor
@@ -60,13 +61,68 @@ helpim.ui.Client = function(client) {
         this.logoutButton,
         goog.ui.Component.EventType.ACTION,
         function() {
-            client.logoutCleanExit();
+            var room = this._clientRoom || client.rooms[this.tabBar.getSelectedTab().getId()];
+
+            if (goog.object.some(room.roster.get('items'), 
+                                 function(occupant) {
+                                     return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
+                                 }) && (!xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
+                var dlg = new goog.ui.Dialog();
+                dlg.setTitle(gettext('Confirm'));
+                dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
+                dlg.setHasTitleCloseButton(true);
+                dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+                dlg.render(goog.dom.getElement("dialog"));
+                goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
+                    if (e.key == 'ok') {
+                        if (goog.object.getCount(client.rooms) == 1) {
+                            client.logout(true);
+                        } else {
+                            room.part(true);
+                        }
+                    }});
+                dlg.setVisible(true);
+            } else {
+                // no need to show a dialog, just part
+                if (goog.object.getCount(client.rooms) == 1) {
+                    client.logout(true);
+                } else {
+                    room.part(true);
+                }
+            }
         },
         false,
         this);
+    this.logoutButton.setEnabled(true);
 
     this.tabBar = new goog.ui.TabBar();
     this.tabBar.render(goog.dom.getElement('tabBar'));
+
+    this._lastRoomSelected = null;
+
+    goog.events.listen(
+        this.tabBar,
+        goog.ui.Component.EventType.SELECT,
+        goog.bind(function(e) {
+            var tabSelected = e.target;
+            this._logger.info("tab selected for "+tabSelected.getId());
+            var contentElement = goog.dom.getElement('tab_content');
+            if (this._lastRoomSelected) {
+                goog.style.showElement(
+                    this._rooms[this._lastRoomSelected].getPanel(),
+                    false
+                );
+            }
+            goog.style.showElement(
+                this._rooms[tabSelected.getId()].getPanel(),
+                true
+            );
+            this._lastRoomSelected = tabSelected.getId();
+            this.logoutButton.setEnabled(
+                !xmpptk.Config['is_staff'] || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
+            );
+        }, this)
+    );
 
     client.subscribe(
         helpim.Client.NS.HELPIM_ROOMS+'#errorIQ',
@@ -90,9 +146,9 @@ helpim.ui.Client = function(client) {
             case 'item-not-found':
                 if (!xmpptk.Config['is_staff']) {
                     document.location.replace(xmpptk.Config['unavailable_redirect']);
-					return;
+                    return;
                 }
-				break;
+                break;
             case 'not-authorized':
                 cond = gettext("Sorry, you're not allowed to access this service");
                 break;
@@ -161,50 +217,36 @@ helpim.ui.Client = function(client) {
         this
     );
 
-	client.subscribe(
-		'questionnaire_requested',
-		function(params) {
-			this._logger.info("got questionnaire url: "+params.url);
+    client.subscribe(
+        'questionnaire_requested',
+        function(params) {
+            this._logger.info("got questionnaire url: "+params.url);
 
             var dialog = new goog.ui.Dialog();
             dialog.setTitle(gettext('Questionnaire'));
-            dialog.setContent('<iframe width="410" height="640" src="'+params.url+'"></iframe>');
+            dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
             dialog.setButtonSet(false);
             dialog.setHasTitleCloseButton(false);
             dialog.render(goog.dom.getElement("dialog"));
 
-			helpim.register('questionnaire_submitted', function(params1) {
-				params.callback(params1);
-				setTimeout(function() {dialog.setVisible(false)}, 3000);
-			});
+            helpim.register('questionnaire_submitted', function(params1) {
+                params.callback(params1);
+                if (client._logoutDelayedTimeout) {
+                    dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+                    goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
+                        client.logout(true, true);
+                    });
+                } else {
+                    setTimeout(function() {
+                        dialog.setVisible(false);
+                    }, 3000);
+                }
+            });
 
             dialog.setVisible(true);
 
-		},
-		this
-	);
-
-    this._lastRoomSelected = null;
-
-    goog.events.listen(
-        this.tabBar,
-        goog.ui.Component.EventType.SELECT,
-        goog.bind(function(e) {
-            var tabSelected = e.target;
-            this._logger.info("tab selected for "+tabSelected.getId());
-            var contentElement = goog.dom.getElement('tab_content');
-            if (this._lastRoomSelected) {
-                goog.style.showElement(
-                    this._rooms[this._lastRoomSelected].getPanel(),
-                    false
-                );
-            }
-            goog.style.showElement(
-                this._rooms[tabSelected.getId()].getPanel(),
-                true
-            );
-            this._lastRoomSelected = tabSelected.getId();
-        }, this)
+        },
+        this
     );
 
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
@@ -225,30 +267,21 @@ helpim.ui.Client.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.Clie
 helpim.ui.Client.prototype.update = function() {
     this._logger.info("model updated");
 
-	if (xmpptk.Config['is_staff']) {
-		this.logoutButton.setEnabled(goog.object.getCount(this.subject.rooms) <= 1);
-	} else {
-		this.logoutButton.setEnabled(true);
-	}
-
     var count = 0;
     goog.object.forEach(
         this.subject.rooms,
         function(room, id) {
-			this._logger.info("got room with id "+id);
+            this._logger.info("got room with id "+id);
             if (xmpptk.Config['is_staff']) {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
-                    this._rooms[id] = new helpim.ui.muc.Room(room);
                     if (count == 0) {
                         // we're at the lobby
+                        this._rooms[id] = new helpim.ui.muc.LobbyRoom(room);
                         var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
                     } else {
-                        var title = gettext("waiting...");
-                        var tab = new helpim.ui.Tab(title, new helpim.ui.RoundedTabRenderer());
-                        tab.setOnCloseHandler(function() {
-                            room.part();
-                        });
+                        this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                        var tab = new goog.ui.Tab(gettext("waiting..."), new goog.ui.RoundedTabRenderer());
                     }
                     this._rooms[id]._tab = tab; // let'em know
                     tab.setId(id);
@@ -258,25 +291,14 @@ helpim.ui.Client.prototype.update = function() {
                     this._logger.info("not creating new room for "+id+" as it already exists");
                 }
             } else {
-                if (count == 0) {
-                    if (!this._waitingdialog) {
-                        // show waiting dialog
-                        this._waitingdialog = new goog.ui.Dialog();
-                        this._waitingdialog.setTitle(gettext('Please wait!'));
-                        this._waitingdialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
-                        this._waitingdialog.setHasTitleCloseButton(false);
-                        this._waitingdialog.setButtonSet(null);
-                        this._waitingdialog.render(goog.dom.getElement("dialog"));
-                        this._waitingdialog.setVisible(true);
-                    }
-                } else {
-                    // show room
-                    this._rooms[id] = new helpim.ui.muc.Room(room);
-                    if (this._waitingdialog) {
-                        this._logger.info("hiding waiting dialog");
-                        this._waitingdialog.setVisible(false);
+                if (!this._rooms[id]) {
+                    if (count == 0) {
+                        this._rooms[id] = new helpim.ui.muc.WaitingRoom(room);
+                        this._waitingRoom = this._rooms[id];
                     } else {
-                        this._logger.info("nothing to hide");
+                        this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                        this._clientRoom = room;
+                        this._waitingRoom.hide();
                     }
                 }
             }

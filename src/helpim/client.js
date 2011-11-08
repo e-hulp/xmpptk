@@ -6,6 +6,7 @@ goog.require('goog.events.EventType');
 goog.require('goog.debug.Logger');
 goog.require('goog.net.cookies');
 goog.require('goog.json');
+goog.require('goog.userAgent');
 
 goog.require('xmpptk.Config');
 goog.require('xmpptk.muc.Client');
@@ -42,10 +43,12 @@ helpim.Client = function() {
 
     this.login();
 
+	var event = goog.userAgent.WEBKIT?'beforeunload':goog.events.EventType.UNLOAD;
+
     goog.events.listen(
         window,
-        goog.events.EventType.UNLOAD,
-        this.logout,
+        event,
+        goog.bind(function() { this.logout(); }, this),
         false,
         this
     );
@@ -66,6 +69,13 @@ helpim.Client.COMPOSING_TIMEOUT = 10;
  * @const
  */
 helpim.Client.COOKIE_EXPIRES_FOR_STAFF = 86400;
+
+/**
+ * seconds to wait till really logging out
+ * @type {number}
+ * @const
+ */
+helpim.Client.LOGOUT_DELAYED_TIMEOUT = 3;
 
 /**
  * our well known namespaces
@@ -106,7 +116,7 @@ helpim.Client.prototype.blockParticipant = function(bot_jid, participant_jid, su
 
 /**
  * get a conversation id stored with room of bot's jid and save it
- * with logout_redirect. 
+ * with logout_redirect.
  * @param {string} bot_jid jid of bot. bot_jid must be a jid of a room not a real jid.
  */
 helpim.Client.prototype.getConversationId = function(bot_jid) {
@@ -153,6 +163,17 @@ helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, sub
             }
         }, this)
     );
+
+	if (!xmpptk.Config['is_staff']) {
+		if (!isOne2One) {
+			this._waitingRoom = room;
+		} else {
+			if (this._waitingRoom) {
+				this._waitingRoom.part();
+			}
+		}
+	}
+
     return room;
 };
 
@@ -199,6 +220,7 @@ helpim.Client.prototype.login = function() {
 					this.joinRoom(roomId, service, nick, password, subject);
 				}, this));
 			}
+			return true; // stop propagation
 		}
 	} , this));
 
@@ -207,33 +229,38 @@ helpim.Client.prototype.login = function() {
 
 /**
  * @inheritDoc
+ * @param {?boolean} cleanExit whether this is a clean-exit logout
+ * @param {?boolean} delayed if true this is a delayed call to really logout now
  */
-helpim.Client.prototype.logout = function() {
+helpim.Client.prototype.logout = function(cleanExit, delayed) {
     goog.net.cookies.remove('client_running');
-    goog.base(this, 'logout');
-};
 
-/**
- * @inheritDoc
- */
-helpim.Client.prototype.logoutCleanExit = function() {
-    // cookie can safely be removed as we don't want to return to this room
-    goog.net.cookies.remove('room_token');
+	if (!delayed) {
+		goog.object.forEach(
+			this.rooms,
+			function(room) {
+				room.part(cleanExit);
+			}
+		);
+		goog.object.clear(this.rooms);
+		this.notify();
+	}
+	if (cleanExit) {
+		// cookie can safely be removed as we don't want to return to any rooms
+		goog.net.cookies.remove('room_token');
+		if (xmpptk.Config['is_staff'] || delayed) {
+			this.sendPresence('unavailable', 'Clean Exit');
+			goog.base(this, 'logout');
+		} else {
+			this._logoutDelayedTimeout = setTimeout(goog.bind(function() {
+				this.logout(true, true);
+			}, this), helpim.Client.LOGOUT_DELAYED_TIMEOUT*1000);
+		}
+	} else {
+		this.sendPresence('unavailable');
+		goog.base(this, 'logout');
+	}
 
-    goog.object.forEach(
-        this.rooms,
-        function(room) {
-            room.part();
-        }
-    );
-    goog.object.clear(this.rooms);
-    this.notify();
-
-    this.sendPresence('unavailable', 'Clean Exit');
-
-    // we need to delay disconnecting because otherwise it happens
-    // that tigase looses our last messages
-    setTimeout(goog.bind(this.logout, this), 100);
 };
 
 /**
@@ -256,7 +283,7 @@ helpim.Client.prototype.requestRoom = function(jid, token) {
 
             // indicate ui that we've successfully requested a room
             this.publish(helpim.Client.NS.HELPIM_ROOMS+'#resultIQ');
-        
+
 			// save valid token for reuse
             var expires = xmpptk.Config['is_staff']? helpim.Client.COOKIE_EXPIRES_FOR_STAFF:-1;
             goog.net.cookies.set('room_token', xmpptk.Config['token'], expires);
@@ -355,6 +382,9 @@ helpim.Client.prototype._clearComposingTimeout = function(jid) {
  * handle set request for answering a questionnaire
  */
 helpim.Client.prototype._handleIQSetRooms = function(iq) {
+	if (this._logoutDelayedTimeout) {
+		clearTimeout(this._logoutDelayedTimeout);
+	}
 
 	var url = iq.getChild('questionnaire').getAttribute('url');
 	if (url) {

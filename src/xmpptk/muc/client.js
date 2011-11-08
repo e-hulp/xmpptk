@@ -27,8 +27,8 @@ xmpptk.muc.Client.prototype.login = function(callback, context) {
     goog.base(this, 'login', callback, context);
 
     // register handlers
-    this._con.registerHandler('message', '*', '*', 'groupchat', goog.bind(this._handleGroupchatPacket, this));
-    this._con.registerHandler('presence', 'x', xmpptk.muc.NS.USER, goog.bind(this._handleGroupchatPacket, this));
+    this._con.registerHandler('message', goog.bind(this._handleGroupchatPacket, this));
+    this._con.registerHandler('presence', goog.bind(this._handleGroupchatPacket, this));
 };
 
 /**
@@ -80,11 +80,12 @@ xmpptk.muc.Client.prototype._handleGroupchatPacket = function(oJSJaCPacket) {
             }
             this._logger.severe("failed to call room's handleGroupchatPacket:"+e.message, e.message);
         }
+		return true;
     } else {
         this._logger.info("no room for id "+room_id);
     }
 
-    return true; // no one else needs to handle this
+    return false;
 };
 
 /** @enum {string} */

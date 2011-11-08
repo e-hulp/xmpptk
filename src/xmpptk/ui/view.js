@@ -22,28 +22,28 @@ xmpptk.ui.MAX_WORD_LENGTH = 28;
 xmpptk.ui.cropLongWords = function(msg, length, forceBreak) {
     var ret = [];
     goog.array.forEach(
-    msg.split(" "),
-    function(word) {
-      if (word.length > length) {
-	var tokens = [];
-	while (word.length >= length) {
-	  tokens.push(word.slice(0, length));
-	  word = word.slice(length);
-	}
-        if (word) {
-          tokens.push(word);
-        }
-
-        if ( forceBreak == true ) {
-        	word = tokens.join('<br />');
-        } else {
-        	word = tokens.join('<wbr />');
-        }
-
-      }
-      ret.push(word);
-    });
-  return ret.join(" ");
+		msg.split(" "),
+		function(word) {
+			if (word.length > length) {
+				var tokens = [];
+				while (word.length >= length) {
+					tokens.push(word.slice(0, length));
+					word = word.slice(length);
+				}
+				if (word) {
+					tokens.push(word);
+				}
+				
+				if ( forceBreak == true ) {
+        			word = tokens.join('<br />');
+				} else {
+        			word = tokens.join('<wbr />');
+				}
+				
+			}
+			ret.push(word);
+		});
+	return ret.join(" ");
 };
 
 xmpptk.ui.fixID = function(str) {
@@ -96,7 +96,7 @@ xmpptk.ui.msgFormat = function(msg) {
     }
 
     msg = xmpptk.ui.htmlEnc(msg);
-    msg = xmpptk.ui.cropLongWords(msg, xmpptk.ui.MAX_WORD_LENGTH);
+//    msg = xmpptk.ui.cropLongWords(msg, xmpptk.ui.MAX_WORD_LENGTH);
 
     goog.object.forEach(
         xmpptk.ui.emoticons.sortedReplacements,

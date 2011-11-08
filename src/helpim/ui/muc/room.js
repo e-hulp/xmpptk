@@ -20,12 +20,161 @@ goog.require('xmpptk.ui.sound');
  * @extends {xmpptk.ui.View}
  */
 helpim.ui.muc.Room = function(room) {
+    this._logger.info("Creating view for room with id "+room.id);
     xmpptk.ui.View.call(this, room);
 
-    this._logger.info("Creating view for room with id "+room.id);
+    this._render();
 
+    this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
+    this.subject.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
+
+    this.subject.subscribe('message', this._messageReceived, this);
+
+    this.subject.subscribe('occupant_joined', this._occupantJoined, this);
+    this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
+};
+goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
+
+/**
+ * Appends message to chat window
+ * @param {Object} message with properties
+ *   body (string) the message body
+ *   className (string) optional css class to add
+ *   id (string) optional id if message element
+ * @notypecheck
+ */
+helpim.ui.muc.Room.prototype.appendMessage = function(message) {
+    var classes = 'roomMessage';
+    if (goog.isString(message.className)) {
+        classes += ' ' + message.className;
+    }
+    var roomMessage = goog.dom.createDom('div', {'class':classes});
+    if (message.id) {
+        roomMessage.id = message.id;
+    }
+    roomMessage.innerHTML = message.body;
+
+    var scrollBottom = this._messagesPanel.scrollTop+this._messagesPanel.clientHeight>=this._messagesPanel.scrollHeight;
+    this._logger.info("scrollBottom: "+scrollBottom);
+
+    goog.dom.appendChild(this._messagesPanel, roomMessage);
+    if (scrollBottom) {
+        this._messagesPanel.scrollTop = this._messagesPanel.scrollHeight;
+    }
+}
+
+helpim.ui.muc.Room.prototype.getPanel = function() {
+    return this._panel;
+};
+
+/**
+ * format a message
+ * @param {{type: string, body: string, from: string}}
+ * return {{body: string, className: string}}
+ * @notypecheck
+ */
+helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
+    if (msg.type != 'groupchat') {
+        // this is a private message presumably from bot - maybe better check this TODO
+        return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
+    } else {
+        var meMatches = msg.body.match(/^\/me (.*)$/);
+        if (meMatches) {
+            return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
+                    xmpptk.ui.msgFormat(meMatches[1]) + ' *',
+                    className:'me_message'};
+        } else {
+            return {body:'&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
+                    xmpptk.ui.msgFormat(msg.body),
+                    className:'groupchat_message'};
+        }
+    }
+};
+
+helpim.ui.muc.Room.prototype.update = function() {};
+
+helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
+    goog.object.forEach(
+        chatStates,
+        function(state, from) {
+            if (from == this.subject['nick']) {
+                return;
+            }
+            this._logger.info("chat state from "+from +":"+state);
+            var id = xmpptk.ui.fixID(this.subject.id+from+"_composingMessage");
+            var el = goog.dom.getElement(id);
+            try {
+                switch (state) {
+                case '':
+                case 'active':
+                    goog.dom.removeNode(el);
+                    break;
+                case 'paused':
+                    goog.dom.setTextContent(el, interpolate(gettext("%s stopped composing"), [from]));
+                    break;
+                case 'composing':
+                    var msg = interpolate(gettext("%s is composing a message"), [from]);
+                    if (el) {
+                        goog.dom.setTextContent(el, msg);
+                    } else {
+                        this.appendMessage(
+                            {body: xmpptk.ui.htmlEnc(msg),
+                             className: "composingMessage",
+                             id: id});
+                    }
+                }
+            } catch(e) { this._logger.severe("failed show chat state", e.message); }
+        },
+        this
+    );
+};
+
+helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
+
+/**
+ * @param {{body: string, type:string, from:string}} message the message recieved
+ */
+helpim.ui.muc.Room.prototype._messageReceived = function(message) {
+    this.appendMessage(this.formatMessage(message));
+    if (message['from'] != this.subject['nick']) {
+        xmpptk.ui.sound.play('chat_recv');
+        if (this._tab && !this._tab.isSelected()) {
+            this._tab.setHighlighted(true);
+        }
+    }
+};
+
+/**
+ * @param {{from: string, status: string}} event the event recieved
+ */
+helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
+    if (!goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
+        this.appendMessage({body: interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event.from)]), className:'roomEvent'});
+    }
+};
+
+/**
+ * @param {{from: string, status: string}} event the event recieved
+ */
+helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
+    if (goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
+        return;
+    }
+    var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+    if (event.status != '') {
+        if (event.status == 'Clean Exit') {
+            msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+        } else {
+            msg += " ("+xmpptk.ui.htmlEnc(event.status)+")";
+        }
+    }
+    this.appendMessage({body:msg, className:'roomEvent'});
+};
+
+helpim.ui.muc.Room.prototype._render = function() {
+    this._logger.info("rendering room view");
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
-    this._panel.id = xmpptk.ui.fixID(room.id + "_roomPanel");
+    this._panel.id = xmpptk.ui.fixID(this.subject.id + "_roomPanel");
 
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
@@ -35,8 +184,9 @@ helpim.ui.muc.Room = function(room) {
     this._rosterPanel = goog.dom.getElementByClass('rosterPanel', this._panel);
     this._sendTextarea = new goog.ui.Textarea();
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
+    this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
-    room.attachPropertyhandler(
+    this.subject.subscribeOnce(
         'admitted',
         goog.bind(function() {
             goog.style.showElement(goog.dom.getElement('helpimClient'), true);
@@ -44,19 +194,19 @@ helpim.ui.muc.Room = function(room) {
     );
 
     goog.events.listen(
-        this._sendTextarea.getContentElement(),
+        this._sendTextareaElement,
         goog.events.EventType.KEYPRESS,
         goog.bind(function(e) {
             if (e.charCode == 13) { // return key
                 try {
                     this._logger.info(this._sendTextarea.getValue());
-                    room.sendMessage(this._sendTextarea.getValue());
+                    this.subject.sendMessage(this._sendTextarea.getValue());
                     this._sendTextarea.setValue('');
                     e.preventDefault();
                 } catch(err) { this._logger.severe("failed sending message", err.message); }
             } else {
                 if (!e.ctrlKey && !e.metaKey) {
-                    room.sendComposing();
+                    this.subject.sendComposing();
                 }
             }
         }, this)
@@ -134,8 +284,7 @@ helpim.ui.muc.Room = function(room) {
                         }
                     };
 
-                    var input = this._sendTextarea.getContentElement();
-
+                    var input = this._sendTextareaElement;
                     if (input.setSelectionRange) {
                         var selectionStart = input.selectionStart;
                         var selectionEnd = input.selectionEnd;
@@ -150,12 +299,15 @@ helpim.ui.muc.Room = function(room) {
                             setSelectionRange(input, selectionStart + emoticon.length, selectionStart + emoticon.length);
                         }
                     }
-                    else if (input.createTextRange && input.caretPos) {
+                    else if (input.caretPos) {
                         var caretPos = input.caretPos;
                         caretPos.text = (caretPos.text.charAt(caretPos.text.length - 1)==' '?emoticon+' ':emoticon);
                         input.focus();
                     }
                     else {
+                        if (input.value.length && input.value.charAt(input.value.length) != ' ') {
+                            input.value += ' ';
+                        }
                         input.value += emoticon;
                         input.focus();
                     }
@@ -167,166 +319,7 @@ helpim.ui.muc.Room = function(room) {
         this
     );
 
-    if (this.subject.is_one2one) {
-		// will be enabled once other participant joins
-		this._sendTextarea.setEnabled(false);
-
-        // sir hide-a-lot
-        goog.style.showElement(this._rosterPanel, false);
-        goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
-        goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
-
-		if (xmpptk.Config['is_staff']) {
-			this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
-															   goog.ui.FlatButtonRenderer.getInstance());
-			this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
-
-			goog.events.listen(
-				this._blockParticipantButton,
-				goog.ui.Component.EventType.ACTION,
-				function() {
-
-					var dialog = new goog.ui.Dialog();
-					dialog.setTitle(gettext('Block Participant'));
-					dialog.setContent('Are you sure you want to block this participant?');
-					dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-					dialog.setHasTitleCloseButton(false);
-					dialog.render(goog.dom.getElement("dialog"));
-
-					goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-						if (e.key == 'ok') {
-							// send message to bot to block user
-							room.blockParticipant(
-								this._participant,
-								goog.bind(function() {
-									var dialog = new goog.ui.Dialog();
-									dialog.setTitle(gettext('Block participant'));
-									dialog.setContent('The participant has been blocked successfully');
-									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-									dialog.setHasTitleCloseButton(false);
-									dialog.render(goog.dom.getElement("dialog"));
-									dialog.setVisible(true);
-									this._blockParticipantButton.setEnabled(false);
-								}, this),
-								function() {
-									var dialog = new goog.ui.Dialog();
-									dialog.setTitle(gettext('Error'));
-									dialog.setContent('There was an error blocking the participant');
-									dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
-									dialog.setHasTitleCloseButton(false);
-									dialog.render(goog.dom.getElement("dialog"));
-									dialog.setVisible(true);
-								}
-							);
-						}
-					}, false, this);
-
-					dialog.setVisible(true);
-
-				},
-				false,
-				this
-			);
-
-			this._blockParticipantButton.setEnabled(false);
-		}
-	} else {
-		if (xmpptk.Config['is_staff']) {
-			// we're in a lobby
-			this._requestClientButton =  new goog.ui.Button(gettext('Request Client'),
-															goog.ui.FlatButtonRenderer.getInstance());
-			this._requestClientButton.render(goog.dom.getElementByClass('requestClientButton', this._panel));
-
-			goog.events.listen(
-				this._requestClientButton,
-				goog.ui.Component.EventType.ACTION,
-				function() {
-					this._requestClientButton.setEnabled(false);
-					setTimeout(goog.bind(function() {
-						this._requestClientButton.setEnabled(true);
-					}, this), 5000);
-					room.requestRoom();
-				},
-				false,
-				this
-			);
-			this._requestClientButton.setEnabled(true);
-		}
-	}
-
-
     goog.style.showElement(this._subjectPanel, false);
-
-    this._focused = false;
-    window.onblur = goog.bind(function() { this._focused = false; this._logger.info("focus: "+this._focused); }, this);
-    window.onfocus = goog.bind(function() { this._focused = true; this._logger.info("focus: "+this._focused); }, this);
-
-    this._ringing = false;
-
-    this._messagesAt = 0;
-    this._eventsAt = 0;
-
-    room.attachPropertyhandler('subject', this._subjectChanged, this);
-    room.attachPropertyhandler('events', this._eventsChanged, this);
-    room.attachPropertyhandler('messages', this._messagesChanged, this);
-    room.attachPropertyhandler('chatStates', this._chatStatesChanged, this);
-};
-goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
-
-helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.Room');
-
-helpim.ui.muc.Room.prototype.appendMessage = function(html, extraClasses, id) {
-    var classes = 'roomMessage';
-    if (goog.isString(extraClasses)) {
-        classes += ' ' + extraClasses;
-    }
-    var roomMessage = goog.dom.createDom('div', {'class':classes});
-    if (id) {
-        roomMessage.id = id;
-    }
-    roomMessage.innerHTML = html;
-
-    var scrollBottom = this._messagesPanel.scrollTop+this._messagesPanel.clientHeight>=this._messagesPanel.scrollHeight;
-    this._logger.info("scrollBottom: "+scrollBottom);
-
-    goog.dom.appendChild(this._messagesPanel, roomMessage);
-    if (scrollBottom) {
-        this._messagesPanel.scrollTop = this._messagesPanel.scrollHeight;
-    }
-}
-
-helpim.ui.muc.Room.prototype.getPanel = function() {
-    return this._panel;
-};
-
-helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-    return '&lt;'+xmpptk.ui.htmlEnc(msg['from'])+'&gt; '+
-        xmpptk.ui.msgFormat(msg['body']);
-};
-
-helpim.ui.muc.Room.prototype.update = function() {
-    this._logger.info("update called");
-
-    if (!this.subject.is_one2one) {
-        goog.dom.removeChildren(this._rosterPanel);
-        goog.object.forEach(
-            this.subject.roster.getItems(),
-            function(item) {
-				var nick = (new JSJaCJID(item['jid'])).getResource();
-                if (item.role == xmpptk.muc.Occupant.Role.NONE ||
-					(!xmpptk.Config['debug'] && nick == xmpptk.Config['bot_nick'])) {
-                    return;
-                }
-                goog.dom.append(
-                    this._rosterPanel,
-                    goog.dom.createDom('div',
-                                       {'class': 'rosterItem'},
-                                       nick)
-                );
-            },
-            this
-        );
-    }
 };
 
 helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
@@ -341,156 +334,4 @@ helpim.ui.muc.Room.prototype._subjectChanged = function(roomSubject) {
         this._logger.info('hiding subject');
         goog.style.showElement(this._subjectPanel, false);
     }
-};
-
-helpim.ui.muc.Room.prototype._eventsChanged = function(events) {
-    this._logger.info("an event occured");
-    for (var l=events.length; this._eventsAt<l; this._eventsAt++) {
-        var event = events[this._eventsAt];
-        this._logger.info("handling event "+event['type']+" for "+event['from']);
-        if (event['from'] != xmpptk.Config['bot_nick']) {
-            var html = '';
-            switch (event['type']) {
-            case 'occupant_joined':
-                if (event['from'] != this.subject['nick']) {
-                    this.appendMessage(interpolate(gettext("%s has entered the conversation"), [xmpptk.ui.htmlEnc(event['from'])]), 'roomEvent');
-
-                    this._logger.info("FOCUSED at joined: "+this._focused);
-					if (this.subject.is_one2one) {
-						if (xmpptk.Config['is_staff']) {
-
-							// this is for blocking participants which is only available for staff at one2one rooms
-							this._participant = event['from'];
-                            
-                            // set our tab's title to nick of client
-                            this._tab.setCaption(event['from']);
-                            if (!this._tab.isSelected()) {
-                                this._tab.setHighlighted(true);
-                            }
-
-							if (!this._focused) {
-								if (!this._ringing) {
-									// taken from
-									// http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-									// combined with
-									// http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-									var oldTitle = document.title;
-									var msg = gettext("Ring! Ring!");
-									var ring = 0;
-									var timeoutId = setInterval(function() {
-										document.title = (document.title == msg)?oldTitle:msg;
-										if ((ring % 5) == 0) {
-											xmpptk.ui.sound.play('ring');
-										}
-										ring++;
-									}, 1000);
-
-									this._ringing = true;
-
-									var stopRinging = goog.bind(function(handler, fun) {
-										if (this._ringing) {
-											clearInterval(timeoutId);
-											document.title = oldTitle;
-											this._ringing = false;
-										}
-									}, this);
-									document.onmousemove = function() {
-										stopRinging();
-										document.onmousemove = null;
-									}
-
-									var oldonfocus = window.onfocus;
-									window.onfocus = function() {
-										stopRinging();
-										oldonfocus();
-										window.onfocus = oldonfocus;
-									}
-								}
-							}
-							this._blockParticipantButton.setEnabled(true);
-						} else { // end is_staff
-							xmpptk.ui.sound.play('ring');
-						}
-						if (!this._focused) {
-							window.focus();
-						}
-						// we're ready to chat
-						this._sendTextarea.setEnabled(true);
-						this._sendTextarea.getContentElement().focus();
-					} // end is_one2one
-                } else {
-                    if (xmpptk.Config['is_staff'] && this.subject.is_one2one) {
-                        this.appendMessage(interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), 'roomEvent');
-                    }
-                }
-                break;
-            case 'occupant_left':
-                var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
-                if (event['status'] != '') {
-                    if (event['status'] == 'Clean Exit') {
-                        msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event['from'])]);
-                    } else {
-                        msg += " ("+xmpptk.ui.htmlEnc(event['status'])+")";
-                    }
-                }
-                this.appendMessage(msg, 'roomEvent');
-                if (this.subject.is_one2one) {
-                    this._sendTextarea.setEnabled(false);
-                }
-                break;
-            }
-        } else {
-            this._logger.info("not showing events from bot");
-        }
-    }
-};
-
-helpim.ui.muc.Room.prototype._messagesChanged = function(messages) {
-    for (var l=messages.length; this._messagesAt<l;this._messagesAt++) {
-        this.appendMessage(this.formatMessage(messages[this._messagesAt]));
-        if (messages[this._messagesAt]['from'] != this.subject['nick']) {
-            xmpptk.ui.sound.play('chat_recv');
-            if (this._tab && !this._tab.isSelected()) {
-                this._tab.setHighlighted(true);
-            }
-        }
-    }
-};
-
-helpim.ui.muc.Room.prototype._chatStatesChanged = function(chatStates) {
-    goog.object.forEach(
-        chatStates,
-        function(state, from) {
-            this._logger.info("chat state > "+from +":"+state);
-            this._logger.info(this.subject['nick']);
-            if (from == this.subject['nick']) {
-                this._logger.info("skipping my own chat state")
-                return;
-            }
-            var id = xmpptk.ui.fixID(this.subject.id+from+"_composingMessage");
-            var el = goog.dom.getElement(id);
-            try {
-                switch (state) {
-                case '':
-                case 'active':
-                    goog.dom.removeNode(el);
-                    break;
-                case 'paused':
-                    goog.dom.setTextContent(el, interpolate(gettext("%s stopped composing"), [from]));
-                    break;
-                case 'composing':
-                    var msg = interpolate(gettext("%s is composing a message"), [from]);
-                    if (el) {
-                        goog.dom.setTextContent(el, msg);
-                    } else {
-                        this.appendMessage(
-                            xmpptk.ui.htmlEnc(msg),
-                            "composingMessage",
-                            id);
-                    }
-                }
-            } catch(e) { this._logger.severe("failed show chat state", e.message); }
-        },
-        this
-    );
 };

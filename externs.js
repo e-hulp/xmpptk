@@ -22,6 +22,7 @@ JSJaCPacket.prototype.getFrom = function() {};
 JSJaCPacket.prototype.getFromJID = function() {};
 JSJaCPacket.prototype.getNode = function() {};
 JSJaCPacket.prototype.getType = function() {};
+JSJaCPacket.prototype.isError = function() {};
 JSJaCPacket.prototype.pType = function() {};
 JSJaCPacket.prototype.setTo = function(str) {};
 JSJaCPacket.prototype.setType = function(str) {};
