@@ -16,7 +16,7 @@ build:
 
 jsjac:
 	@echo "building jsjac";
-	@make -C lib/jsjac;
+	@make -C lib/jsjac clean utils build crunch;
 	@cp lib/jsjac/jsjac.js $(BUILDDIR)
 
 clean:
