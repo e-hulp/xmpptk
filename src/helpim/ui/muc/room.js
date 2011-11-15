@@ -137,7 +137,11 @@ helpim.ui.muc.Room.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.mu
 helpim.ui.muc.Room.prototype._messageReceived = function(message) {
     this.appendMessage(this.formatMessage(message));
     if (message['from'] != this.subject['nick']) {
-        xmpptk.ui.sound.play('chat_recv');
+        if (xmpptk.Config['is_staff']) {
+            xmpptk.ui.sound.play('chat_recv');
+        } else {
+            xmpptk.ui.sound.play('ping_client');
+        }
         if (this._tab && !this._tab.isSelected()) {
             this._tab.setHighlighted(true);
         }
