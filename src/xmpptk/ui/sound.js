@@ -9,7 +9,9 @@ xmpptk.ui.sound.FILES = {
     'offline': "offline.swf",
     'startup': "startup.swf",
     'connected': "connected.swf",
-    'ring': "ring.swf"
+    'ring': "ring.swf",
+    'ping_client': 'ping_client.swf',
+    'ring_client': 'ring_client.swf'
 };
 
 /** @type {string} */
