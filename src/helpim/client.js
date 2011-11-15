@@ -34,7 +34,10 @@ helpim.Client = function() {
 
     xmpptk.muc.Client.call(this);
 
-    this.nick = xmpptk.Config['muc_nick'];
+    if (xmpptk.Config['is_staff']) {
+        this.nick = xmpptk.Config['muc_nick'];
+        this.lobby_nick = xmpptk.Config['lobby_nick'] || this.nick;
+    }
 
     this._composingTimeout = xmpptk.getConfig('composing_timeout', helpim.Client.COMPOSING_TIMEOUT);
     this._composingSent = {};
@@ -138,11 +141,10 @@ helpim.Client.prototype.getConversationId = function(bot_jid) {
  * @param {string} nick the desired nick within the room
  * @param {string?} password optional password if required
  * @param {string?} subject optional subject to set once room is joined
+ * @param {boolean?} isOne2One optional whether this is a one2One chat room
  * @return {helpim.muc.Room} the room object
 */
-helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject) {
-    var isOne2One = goog.object.getCount(this.rooms);
-
+helpim.Client.prototype.joinRoom = function(roomId, service, nick, password, subject, isOne2One) {
     var room = new helpim.muc.Room(
         this,
         {'room': roomId,
@@ -211,13 +213,16 @@ helpim.Client.prototype.login = function() {
 			var service = roomJID.getDomain();
 			var password = msg.getChildVal('password');
 
+            var isOne2One = goog.object.getCount(this.rooms) > 0;
+            this._logger.info("isOne2One chat? "+isOne2One);
 			if (this.nick) {
-				this.joinRoom(roomId, service, this.nick, password);
+                var nick =  (xmpptk.Config['is_staff'] && !isOne2One)? this.lobby_nick : this.nick;
+				this.joinRoom(roomId, service, nick, password, null, isOne2One);
 			} else {
 				// request nick (and subject)
 				this.publish('nick_required', goog.bind(function(nick, subject) {
                     this.nick = nick;
-					this.joinRoom(roomId, service, nick, password, subject);
+					this.joinRoom(roomId, service, nick, password, subject, isOne2One);
 				}, this));
 			}
 			return true; // stop propagation

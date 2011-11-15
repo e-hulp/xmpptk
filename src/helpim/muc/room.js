@@ -6,10 +6,11 @@ goog.require('xmpptk.muc.Room');
  * @constructor
  * @extends {xmpptk.muc.Room}
  * @inheritDoc
+ * @param {boolean?} isOne2One whether this is a one2one room
  */
-helpim.muc.Room = function(client, room_jid, password, is_one2one) {
-    xmpptk.muc.Room.call(this, client, room_jid, password);
-	this.is_one2one = is_one2one || false;
+helpim.muc.Room = function(client, roomJid, password, isOne2One) {
+    xmpptk.muc.Room.call(this, client, roomJid, password);
+	this.is_one2one = isOne2One || false;
 };
 goog.inherits(helpim.muc.Room, xmpptk.muc.Room);
 
