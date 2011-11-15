@@ -85,7 +85,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
         }
         this._blockParticipantButton.setEnabled(true);
     } else { // end is_staff
-        xmpptk.ui.sound.play('client_ring');
+        xmpptk.ui.sound.play('ring_client');
     }
     if (!this._focused) {
         window.focus();
