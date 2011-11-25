@@ -2,7 +2,7 @@ BUILDDIR  = ./htdocs
 SOURCEDIR = ./src
 
 OUTFILE   = $(BUILDDIR)/helpim.js
-DEPSFILE  = $(SOURCEDIR)/deps.js
+DEPSFILE  = $(BUILDDIR)/deps.js
 
 all: clean deps jsjac build
 
