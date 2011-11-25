@@ -44,7 +44,7 @@ helpim.ui.Client = function(client) {
         this._logger.info(e.code);
         var dlg = new goog.ui.Dialog();
         dlg.setTitle(gettext('Error'));
-        dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'</div>');
+        dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'<p>'+helpim.ui.errorToString(e)+'</p></div>');
         dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
         dlg.setHasTitleCloseButton(false);
         dlg.render(goog.dom.getElement("dialog"));
