@@ -90,6 +90,12 @@ xmpptk.Client.prototype.login = function(callback, context) {
                                                   this._con.status() == 'session-terminate-conflict');
                               },this));
 
+    this._con.registerHandler('onerror',
+                              JSJaC.bind(function(e) {
+                                  this._logger.info("an error occured");
+                                  this.publish('error', {code: e.getAttribute('code'), type: e.getAttribute('type'), condition: e.firstChild.nodeName});
+                              }, this));
+
     this._con.registerHandler('presence',
                               JSJaC.bind(this._handlePresence, this));
 

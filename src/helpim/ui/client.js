@@ -40,6 +40,21 @@ helpim.ui.Client = function(client) {
         document.location.replace(xmpptk.Config['logout_redirect']);
     });
 
+    client.subscribe('error', function(e) {
+        this._logger.info(e.code);
+        var dlg = new goog.ui.Dialog();
+        dlg.setTitle(gettext('Error'));
+        dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'</div>');
+        dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
+        dlg.setHasTitleCloseButton(false);
+        dlg.render(goog.dom.getElement("dialog"));
+        
+        goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
+            document.location.replace(xmpptk.Config['logout_redirect']);
+        });
+        dlg.setVisible(true);
+    }, this);
+
     goog.events.listen(
         goog.dom.getElement('soundButton'),
         goog.events.EventType.CLICK,
