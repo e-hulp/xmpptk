@@ -34,7 +34,7 @@ helpim.ui.Client = function(client) {
     this._rooms = {};
 
     xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
-    xmpptk.ui.sound.init(xmpptk.Config['static_url']+'xmpptk/xmpptk/');
+    xmpptk.ui.sound.init(xmpptk.Config['static_url']+'xmpptk/');
 
     client.subscribeOnce('disconnected', function() {
         document.location.replace(xmpptk.Config['logout_redirect']);
