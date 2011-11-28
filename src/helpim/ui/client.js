@@ -42,6 +42,10 @@ helpim.ui.Client = function(client) {
 
     client.subscribe('error', function(e) {
         this._logger.info(e.code);
+        if (!this.subject.isConnected()) {
+            // no need to show any error - it's probably about disconnecting
+            return;
+        }
         var dlg = new goog.ui.Dialog();
         dlg.setTitle(gettext('Error'));
         dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'<p><small>'+helpim.ui.errorToString(e)+'</small></p></div>');
