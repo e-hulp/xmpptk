@@ -6,6 +6,9 @@ DEPSFILE  = $(BUILDDIR)/deps.js
 
 all: clean deps jsjac build
 
+install:
+	@echo "done."
+
 build:
 	@echo "building helpim";
 	@./lib/closure-library/closure/bin/build/closurebuilder.py --root=lib/closure-library/ --root=$(SOURCEDIR) --namespace="helpim" --output_mode=compiled -f '--compilation_level=ADVANCED_OPTIMIZATIONS' -f '--externs=externs.js' -f '--define=goog.DEBUG=false' --compiler_jar=utils/compiler/compiler.jar > $(OUTFILE)
