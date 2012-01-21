@@ -291,6 +291,13 @@ helpim.ui.Client.prototype.update = function() {
         this.subject.rooms,
         function(room, id) {
             this._logger.info("got room with id "+id);
+            if (xmpptk.Config['mode'] == 'light') {
+                if (!this._rooms[id]) {
+                    this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                }
+                // nothing left to do in light mode - we don't know tabs or any other rooms
+                return;
+            }
             if (xmpptk.Config['is_staff']) {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
@@ -325,10 +332,14 @@ helpim.ui.Client.prototype.update = function() {
         },
         this
     );
+
+    // remove tabs for rooms that have been left
     this.tabBar.forEachChild(
         function(tab) {
             var id = tab.getId();
+            // check if id of tab (which is bound to a room) is still in list of rooms
             if (!goog.object.some(this.subject.rooms, function(room) { return id == room.id; })) {
+                // not on list (this.subject.rooms)
                 this.tabBar.removeChild(tab, true);
             }
         },
