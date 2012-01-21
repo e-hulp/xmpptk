@@ -26,22 +26,24 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
         return;
     }
 
-     goog.base(this, '_occupantJoined', event, this);
+    goog.base(this, '_occupantJoined', event, this);
+
+    if (event.from == this.subject['nick'] && goog.object.getCount(this.subject.roster.get('items')) < 3) {
+        // we joined ourself - checking for this condition makes sure we're about to initialize
+        // for a working one2oneRoom there must be the bot, yourself plus another participant
+        this.appendMessage({body: interpolate(gettext('Welcome %s, now wait for a participant to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), className:'roomEvent'});
+        return;
+    }
 
     if (xmpptk.Config['is_staff']) {
 
-        if (event.from == this.subject['nick']) {
-            this.appendMessage({body: interpolate(gettext('Welcome %s, now wait for a client to join!'), [xmpptk.ui.htmlEnc(this.subject.get('nick'))]), className:'roomEvent'});
-            return;
-        }
-
-        // this is for blocking participants which is only available for staff at one2one rooms
-        this._participant = event.from;
-
-        // set our tab's title to nick of client
-        this._tab.setCaption(event.from);
-        if (!this._tab.isSelected()) {
-            this._tab.setHighlighted(true);
+        if (xmpptk.Config['mode'] != 'light') {
+            // no tabbar for light mode!
+            // set our tab's title to nick of client
+            this._tab.setCaption(event.from);
+            if (!this._tab.isSelected()) {
+                this._tab.setHighlighted(true);
+            }
         }
 
         if (!this._focused) {
@@ -83,7 +85,13 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
                 }
             }
         }
-        this._blockParticipantButton.setEnabled(true);
+
+        if (!xmpptk.Config['disable_blocking']) {
+            // this is for blocking participants which is only available for staff at one2one rooms
+            this._participant = event.from;
+            
+            this._blockParticipantButton.setEnabled(true);
+        }
     } else { // end is_staff
         xmpptk.ui.sound.play('ring_client');
     }
@@ -112,7 +120,7 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
     goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
     goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
 
-    if (xmpptk.Config['is_staff']) {
+    if (xmpptk.Config['is_staff'] && !xmpptk.Config['disable_blocking']) {
         this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
                                                            goog.ui.FlatButtonRenderer.getInstance());
         this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
