@@ -34,8 +34,8 @@ helpim.Client = function() {
 
     xmpptk.muc.Client.call(this);
 
+    this.nick = xmpptk.Config['muc_nick'];
     if (xmpptk.Config['is_staff']) {
-        this.nick = xmpptk.Config['muc_nick'];
         this.lobby_nick = xmpptk.Config['lobby_nick'] || this.nick;
     }
 
