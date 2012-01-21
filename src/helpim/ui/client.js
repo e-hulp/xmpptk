@@ -85,7 +85,7 @@ helpim.ui.Client = function(client) {
             if (goog.object.some(room.roster.get('items'), 
                                  function(occupant) {
                                      return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
-                                 }) && (!xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
+                                 }) && (xmpptk.Config['mode'] == 'light' || !xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
                 var dlg = new goog.ui.Dialog();
                 dlg.setTitle(gettext('Confirm'));
                 dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
@@ -294,6 +294,7 @@ helpim.ui.Client.prototype.update = function() {
             if (xmpptk.Config['mode'] == 'light') {
                 if (!this._rooms[id]) {
                     this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
+                    this._clientRoom = room;
                 }
                 // nothing left to do in light mode - we don't know tabs or any other rooms
                 return;
