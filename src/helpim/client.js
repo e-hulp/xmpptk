@@ -253,7 +253,7 @@ helpim.Client.prototype.logout = function(cleanExit, delayed) {
 	if (cleanExit) {
 		// cookie can safely be removed as we don't want to return to any rooms
 		goog.net.cookies.remove('room_token');
-		if (xmpptk.Config['is_staff'] || delayed) {
+		if ((xmpptk.Config['mode'] != 'light' && xmpptk.Config['is_staff']) || delayed) {
 			this.sendPresence('unavailable', 'Clean Exit');
 			goog.base(this, 'logout');
 		} else {
