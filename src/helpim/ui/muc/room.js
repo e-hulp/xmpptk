@@ -63,6 +63,18 @@ helpim.ui.muc.Room.prototype.appendMessage = function(message) {
     }
 }
 
+/**
+ * determine the css class for coloring a nickname
+ * @param {string} nick the nick name to lookup a color for
+ * @return {string} the name of the color to be used
+ */
+helpim.ui.muc.Room.prototype.getNickColor = function(nick) {
+    return helpim.ui.getNickColor(nick);
+};
+
+/**
+ * return the panel element
+ */
 helpim.ui.muc.Room.prototype.getPanel = function() {
     return this._panel;
 };
@@ -70,22 +82,28 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 /**
  * format a message
  * @param {{type: string, body: string, from: string}}
- * return {{body: string, className: string}}
+ * @return {{body: string, className: string}}
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
+    console.log(msg);
     if (msg.type != 'groupchat') {
         // this is a private message presumably from bot - maybe better check this TODO
         return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
     } else {
+        if (msg.delay) {
+            var ts = Date.jab2date(msg.delay);
+            ts = '@'+ts.toLocaleTimeString();
+        } else {
+            var ts = '@'+(new Date().toLocaleTimeString());
+        }
         var meMatches = msg.body.match(/^\/me (.*)$/);
         if (meMatches) {
             return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
                     xmpptk.ui.msgFormat(meMatches[1]) + ' *',
                     className:'me_message'};
         } else {
-            return {body:'&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt; '+
-                    xmpptk.ui.msgFormat(msg.body),
+            return {body:'<span title="'+ts+'" style="color:'+this.getNickColor(msg.from)+';">&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt;</span> '+ xmpptk.ui.msgFormat(msg.body),
                     className:'groupchat_message'};
         }
     }

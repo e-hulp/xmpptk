@@ -18,6 +18,16 @@ helpim.ui.muc.One2OneRoom = function(room) {
 };
 goog.inherits(helpim.ui.muc.One2OneRoom, helpim.ui.muc.Room);
 
+/**
+ * returns color based on role (whether message from me or the other
+ * participant
+ * @param {string} nick the nick of the sender of the message
+ *@return {string} the color to be used
+ */
+helpim.ui.muc.One2OneRoom.prototype.getNickColor = function(nick) {
+    return (nick == this.subject.nick)?'blue':'red';
+};
+
 helpim.ui.muc.One2OneRoom.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.One2OneRoom');
 
 helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
@@ -90,7 +100,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
         if (!xmpptk.Config['disable_blocking']) {
             // this is for blocking participants which is only available for staff at one2one rooms
             this._participant = event.from;
-            
+
             this._blockParticipantButton.setEnabled(true);
         }
     } else { // end is_staff
