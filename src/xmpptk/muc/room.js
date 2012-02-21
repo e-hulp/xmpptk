@@ -193,7 +193,7 @@ xmpptk.muc.Room.prototype._handleGroupchatMessage = function(oMsg) {
         this.set('chatStates', this.chatStates);
 		var msg = {from: from,
 				   body: oMsg.getBody(),
-				   type: oMsg.getType(),
+				   type: oMsg.getType()
                   };
         var delay = oMsg.getChild('delay', 'urn:xmpp:delay');
         if (delay) {
