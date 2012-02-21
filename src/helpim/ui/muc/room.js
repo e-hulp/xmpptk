@@ -86,7 +86,6 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
-    console.log(msg);
     if (msg.type != 'groupchat') {
         // this is a private message presumably from bot - maybe better check this TODO
         return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
