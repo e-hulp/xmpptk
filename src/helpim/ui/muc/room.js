@@ -208,6 +208,17 @@ helpim.ui.muc.Room.prototype._render = function() {
     this._sendTextarea.decorate(goog.dom.getElementByClass('sendTextarea', this._panel));
     this._sendTextareaElement = goog.dom.getElementByClass('sendTextarea', this._panel);
 
+    this._sendTextarea.setValue(gettext('Please click here to send a message!'));
+    goog.events.listenOnce(
+        this._sendTextarea.getElement(),
+        goog.events.EventType.CLICK,
+        function(e) {
+            this._sendTextarea.setValue('');
+        },
+        true,
+        this
+    );
+
     this.subject.subscribeOnce(
         'admitted',
         goog.bind(function() {
