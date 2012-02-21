@@ -9,7 +9,6 @@ goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.TabBar');
 goog.require('goog.ui.Tab');
 goog.require('goog.ui.RoundedTabRenderer');
-goog.require('goog.ui.Dialog');
 
 goog.require('xmpptk.ui.View');
 goog.require('xmpptk.ui.emoticons');
@@ -18,6 +17,8 @@ goog.require('xmpptk.ui.sound');
 goog.require('helpim.muc.Room');
 
 goog.require('helpim.ui');
+
+goog.require('helpim.ui.Dialog');
 
 goog.require('helpim.ui.muc.LobbyRoom');
 goog.require('helpim.ui.muc.One2OneRoom');
@@ -46,7 +47,7 @@ helpim.ui.Client = function(client) {
             // no need to show any error - it's probably about disconnecting
             return;
         }
-        var dlg = new goog.ui.Dialog();
+        var dlg = new helpim.ui.Dialog('modal-dialog modal-dialog-error');
         dlg.setTitle(gettext('Error'));
         dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'<p><small>'+helpim.ui.errorToString(e)+'</small></p></div>');
         dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
@@ -86,7 +87,7 @@ helpim.ui.Client = function(client) {
                                  function(occupant) {
                                      return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
                                  }) && (xmpptk.Config['mode'] == 'light' || !xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
-                var dlg = new goog.ui.Dialog();
+                var dlg = new helpim.ui.Dialog();
                 dlg.setTitle(gettext('Confirm'));
                 dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
                 dlg.setHasTitleCloseButton(true);
@@ -176,7 +177,7 @@ helpim.ui.Client = function(client) {
                 logout_on_submit = false;
             }
 
-            var dialog = new goog.ui.Dialog();
+            var dialog = new goog.ui.Dialog('modal-dialog modal-dialog-error');
             dialog.setTitle(gettext('An error occured'));
             dialog.setContent(cond);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
@@ -241,7 +242,7 @@ helpim.ui.Client = function(client) {
         function(params) {
             this._logger.info("got questionnaire url: "+params.url);
 
-            var dialog = new goog.ui.Dialog();
+            var dialog = new goog.ui.Dialog('modal-dialog modal-dialog-questionnaire');
             dialog.setTitle(gettext('Questionnaire'));
             dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
             dialog.setButtonSet(false);

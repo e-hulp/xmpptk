@@ -2,8 +2,9 @@ goog.provide('helpim.ui.ClientRunning');
 
 goog.require('goog.dom');
 goog.require('goog.style');
-goog.require('goog.ui.Dialog');
 goog.require('xmpptk.ui.View');
+
+goog.require('helpim.ui.Dialog');
 
 /**
  * @constructor
@@ -18,7 +19,7 @@ helpim.ui.ClientRunning = function(client) {
         false
     );
 
-    var dialog = new goog.ui.Dialog();
+    var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-error');
     dialog.setTitle(gettext('An error occured'));
     dialog.setContent(gettext("Sorry, there's already a conversation active at some other window."));
     dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
