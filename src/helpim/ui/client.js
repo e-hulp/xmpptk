@@ -177,7 +177,7 @@ helpim.ui.Client = function(client) {
                 logout_on_submit = false;
             }
 
-            var dialog = new goog.ui.Dialog('modal-dialog modal-dialog-error');
+            var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-error');
             dialog.setTitle(gettext('An error occured'));
             dialog.setContent(cond);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
@@ -197,7 +197,7 @@ helpim.ui.Client = function(client) {
     client.subscribe(
         'nick_required',
         function(callback) {
-            var dialog = new goog.ui.Dialog();
+            var dialog = new helpim.ui.Dialog();
             dialog.setTitle(gettext('Join Chat'));
             var content = '<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div>';
             if (xmpptk.Config['mode'] == 'light') {
@@ -242,7 +242,7 @@ helpim.ui.Client = function(client) {
         function(params) {
             this._logger.info("got questionnaire url: "+params.url);
 
-            var dialog = new goog.ui.Dialog('modal-dialog modal-dialog-questionnaire');
+            var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-questionnaire');
             dialog.setTitle(gettext('Questionnaire'));
             dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
             dialog.setButtonSet(false);

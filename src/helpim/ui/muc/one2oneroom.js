@@ -154,7 +154,7 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
                                 this._blockParticipantButton.setEnabled(false);
                             }, this),
                             function() {
-                                var dialog = new goog.ui.Dialog('modal-dialog modal-dialog-error');
+                                var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-error');
                                 dialog.setTitle(gettext('Error'));
                                 dialog.setContent('There was an error blocking the participant');
                                 dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
