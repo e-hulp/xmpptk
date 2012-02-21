@@ -81,7 +81,7 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
 
 /**
  * format a message
- * @param {{type: string, body: string, from: string}}
+ * @param {{type: string, body: string, from: string}} msg the message to be formated
  * @return {{body: string, className: string}}
  * @notypecheck
  */

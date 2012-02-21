@@ -4,6 +4,7 @@ goog.require('goog.ui.Dialog');
 
 /**
  * @inheritDoc
+ * @constructor
  * @extends {goog.ui.Dialog}
  * Just like goog.ui.Dialog but accecpts multiple classnames for
  * opt_class separated by blanks. The first one is being passed as
