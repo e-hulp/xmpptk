@@ -1,5 +1,6 @@
 goog.provide('helpim.ui.muc.One2OneRoom');
 
+goog.require('helpim.ui.Dialog');
 goog.require('helpim.ui.muc.Room');
 
 /**
