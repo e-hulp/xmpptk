@@ -22,10 +22,11 @@ goog.inherits(helpim.ui.muc.One2OneRoom, helpim.ui.muc.Room);
  * returns color based on role (whether message from me or the other
  * participant
  * @param {string} nick the nick of the sender of the message
- *@return {string} the color to be used
+ * @return {string} the color to be used
  */
 helpim.ui.muc.One2OneRoom.prototype.getNickColor = function(nick) {
-    return (nick == this.subject.nick)?'blue':'red';
+    return ((xmpptk.Config['is_staff'] && nick == this.subject.get('nick')) ||
+            (!xmpptk.Config['is_staff'] && nick != this.subject.get('nick')))?'nickColorStaff':'nickColorClient';
 };
 
 helpim.ui.muc.One2OneRoom.prototype._logger = goog.debug.Logger.getLogger('helpim.ui.muc.One2OneRoom');

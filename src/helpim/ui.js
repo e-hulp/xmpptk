@@ -8,29 +8,15 @@ helpim.ui.getStatic = function(filename) {
 	return xmpptk.Config['static_url']+filename;
 };
 
-helpim.ui.NICK_COLORS = [
-    'grey',
-    'black',
-    'red',
-    'maroon',
-    'yellow',
-    'olive',
-    'lime',
-    'green',
-    'aqua',
-    'teal',
-    'blue',
-    'navy',
-    'fuchsia',
-    'purple'];
+helpim.ui.NICK_COLORS_CSSCLASSPREFIX = 'nickColor';
+helpim.ui.NICK_COLORS_LENGTH = 12;
 
 /**
  * calculates a color used for given nick
  */
 helpim.ui.getNickColor = function(nick) {
-    return helpim.ui.NICK_COLORS[
-        nick.split("").reduce(function(acc, c) { return acc + c.charCodeAt(); }, 0) % (helpim.ui.NICK_COLORS.length-1)
-    ];
+    return helpim.ui.NICK_COLORS_CSSCLASSPREFIX + 
+        nick.split("").reduce(function(acc, c) { return acc + c.charCodeAt(); }, 0) % (helpim.ui.NICK_COLORS_LENGTH-1);
 }
 
 /**

@@ -102,7 +102,7 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
                     xmpptk.ui.msgFormat(meMatches[1]) + ' *',
                     className:'me_message'};
         } else {
-            return {body:'<span title="'+ts+'" style="color:'+this.getNickColor(msg.from)+';">&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt;</span> '+ xmpptk.ui.msgFormat(msg.body),
+            return {body:'<span title="'+ts+'" class="'+this.getNickColor(msg.from)+'">&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt;</span> '+ xmpptk.ui.msgFormat(msg.body),
                     className:'groupchat_message'};
         }
     }
