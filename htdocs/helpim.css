@@ -329,3 +329,46 @@ body{background-color:#ffe;font:normal 10pt Arial,sans-serif;}/**/fieldset{paddi
 .goog-buttonset-default {
   font-weight: bold;
 }
+
+.nickColorStaff {
+    color: blue;
+}
+.nickColorClient {
+    color: red;
+}
+.nickColor0 {
+    color: grey;
+}
+.nickColor1 {
+    color: red;
+}
+.nickColor2 {
+    color: maroon;
+}
+.nickColor3 {
+    color: olive;
+}
+.nickColor4 {
+    color: lime;
+}
+.nickColor5 {
+    color: green;
+}
+.nickColor6 {
+    color: aqua;
+}
+.nickColor7 {
+    color: teal;
+}
+.nickColor8 {
+    color: blue;
+}
+.nickColor9 {
+    color: navy;
+}
+.nickColor10 {
+    color: fuchsia;
+}
+.nickColor11 {
+    color: purple;
+}
