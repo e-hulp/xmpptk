@@ -147,7 +147,6 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
                 dialog.setContent('Are you sure you want to block this participant?');
                 dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
                 dialog.setHasTitleCloseButton(false);
-                dialog.render(goog.dom.getElement("dialog"));
 
                 goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
                     if (e.key == 'ok') {
@@ -160,7 +159,6 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
                                 dialog.setContent('The participant has been blocked successfully');
                                 dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
                                 dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
                                 dialog.setVisible(true);
                                 this._blockParticipantButton.setEnabled(false);
                             }, this),
@@ -170,7 +168,6 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
                                 dialog.setContent('There was an error blocking the participant');
                                 dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
                                 dialog.setHasTitleCloseButton(false);
-                                dialog.render(goog.dom.getElement("dialog"));
                                 dialog.setVisible(true);
                             }
                         );

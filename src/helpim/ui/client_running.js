@@ -24,7 +24,6 @@ helpim.ui.ClientRunning = function(client) {
     dialog.setContent(gettext("Sorry, there's already a conversation active at some other window."));
     dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
     dialog.setHasTitleCloseButton(false);
-    dialog.render(goog.dom.getElement("dialog"));
 
     goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
         document.location.replace(xmpptk.Config['logout_redirect']);

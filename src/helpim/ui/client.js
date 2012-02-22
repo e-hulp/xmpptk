@@ -52,7 +52,6 @@ helpim.ui.Client = function(client) {
         dlg.setContent('<div class="goog_dialog">'+gettext("An error occured")+'<p><small>'+helpim.ui.errorToString(e)+'</small></p></div>');
         dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
         dlg.setHasTitleCloseButton(false);
-        dlg.render(goog.dom.getElement("dialog"));
         
         goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
             document.location.replace(xmpptk.Config['logout_redirect']);
@@ -92,7 +91,6 @@ helpim.ui.Client = function(client) {
                 dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
                 dlg.setHasTitleCloseButton(true);
                 dlg.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-                dlg.render(goog.dom.getElement("dialog"));
                 goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
                     if (e.key == 'ok') {
                         if (goog.object.getCount(client.rooms) == 1) {
@@ -182,7 +180,6 @@ helpim.ui.Client = function(client) {
             dialog.setContent(cond);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
             dialog.setHasTitleCloseButton(false);
-            dialog.render(goog.dom.getElement("dialog"));
 
             if (logout_on_submit) {
                 goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
@@ -207,7 +204,6 @@ helpim.ui.Client = function(client) {
             dialog.setContent(content);
             dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
             dialog.setHasTitleCloseButton(false);
-            dialog.render(goog.dom.getElement("dialog"));
 
             goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
                 if (e.key == 'ok') {
@@ -247,7 +243,6 @@ helpim.ui.Client = function(client) {
             dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
             dialog.setButtonSet(false);
             dialog.setHasTitleCloseButton(false);
-            dialog.render(goog.dom.getElement("dialog"));
 
             helpim.register('questionnaire_submitted', function(params1) {
                 params.callback(params1);

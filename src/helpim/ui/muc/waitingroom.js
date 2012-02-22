@@ -54,7 +54,6 @@ helpim.ui.muc.WaitingRoom.prototype._render = function() {
     this._waitingdialog.setContent('<div class="goog_dialog">'+gettext("Please wait while we're acquiring a conversation for you! This can take some time.")+'</div><div id="waitingroom_message"></div><div class="ajax-loader"><img src="'+helpim.ui.getStatic('/helpim/ajax-loader.gif')+'"/></div>');
     this._waitingdialog.setHasTitleCloseButton(false);
     this._waitingdialog.setButtonSet(null);
-    this._waitingdialog.render(goog.dom.getElement("dialog"));
     this._waitingdialog.setVisible(true);
     this._message = goog.dom.getElement('waitingroom_message');
 };
