@@ -58,6 +58,8 @@ JSJaCJID.prototype.setDomain = function(str) {};
 JSJaCJID.prototype.setResource = function(str) {};
 JSJaCJID.prototype.toString = function() {};
 
+Date.jab2date = function(str) {};
+
 var gettext = function(msgid) {};
 var ngettext = function(singular, plural, count) {};
 var interpolate = function(msgid, obj, named) {};
