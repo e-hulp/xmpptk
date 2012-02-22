@@ -45,6 +45,7 @@ goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
  *   body (string) the message body
  *   className (string) optional css class to add
  *   id (string) optional id of message element
+ *   urls (array) an array of urls to display
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.appendMessage = function(message) {
@@ -52,11 +53,25 @@ helpim.ui.muc.Room.prototype.appendMessage = function(message) {
     if (goog.isString(message.className)) {
         classes += ' ' + message.className;
     }
+    this._logger.info(classes);
     var roomMessage = goog.dom.createDom('div', {'class':classes});
     if (message.id) {
         roomMessage.id = message.id;
     }
+    // using innerHTML here as body already contains formatted html
+    // stuff (like clickable links)
     roomMessage.innerHTML = message.body;
+
+    this._logger.info(message.urls);
+    if (message.className.indexOf('bot_message') != -1 && message.urls) {
+        goog.array.forEach(
+            message.urls,
+            function(url) {
+                goog.dom.appendChild(roomMessage, goog.dom.createElement('div'));
+                var iframe = goog.dom.createDom('iframe', {'class': classes, 'src': url});
+                goog.dom.appendChild(roomMessage, iframe);
+            });
+    }
 
     var scrollBottom = this._messagesPanel.scrollTop+this._messagesPanel.clientHeight>=this._messagesPanel.scrollHeight;
     this._logger.info("scrollBottom: "+scrollBottom);
@@ -91,8 +106,15 @@ helpim.ui.muc.Room.prototype.getPanel = function() {
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
     if (msg.type != 'groupchat') {
-        // this is a private message presumably from bot - maybe better check this TODO
-        return {body:xmpptk.ui.msgFormat(msg.body), className: 'private_message'};
+        // this is a private message
+        var className = 'private_message';
+        this._logger.info(msg.from);
+        this._logger.info(xmpptk.Config['bot_nick']);
+        if (msg.from == xmpptk.Config['bot_nick']) {
+            className += ' bot_message';
+            var urls = msg.body.match(/(http[s]?:\/\/\S+)/g);
+        }
+        return {body: xmpptk.ui.msgFormat(msg.body), className: className, urls: urls};
     } else {
         if (msg.delay) {
             var ts = Date.jab2date(msg.delay);
