@@ -44,7 +44,7 @@ goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
  * @param {Object} message with properties
  *   body (string) the message body
  *   className (string) optional css class to add
- *   id (string) optional id if message element
+ *   id (string) optional id of message element
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.appendMessage = function(message) {
