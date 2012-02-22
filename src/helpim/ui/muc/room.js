@@ -23,6 +23,10 @@ helpim.ui.muc.Room = function(room) {
     this._logger.info("Creating view for room with id "+room.id);
     xmpptk.ui.View.call(this, room);
 
+    this._focused = false;
+    window.onblur = goog.bind(function() { this._focused = false; }, this);
+    window.onfocus = goog.bind(function() { this._focused = true; }, this);
+
     this._render();
 
     this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
@@ -106,6 +110,15 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
                     className:'groupchat_message'};
         }
     }
+};
+
+/**
+ * visually show the room 
+ * @param {boolean} show whether to show or hide the room
+ */
+helpim.ui.muc.Room.prototype.show = function(show) {
+    goog.style.showElement(this.getPanel(), show);
+    this._focused = show?true:false;
 };
 
 helpim.ui.muc.Room.prototype.update = function() {};

@@ -10,10 +10,6 @@ goog.require('helpim.ui.muc.Room');
 helpim.ui.muc.One2OneRoom = function(room) {
     helpim.ui.muc.Room.call(this, room);
 
-    this._focused = false;
-    window.onblur = goog.bind(function() { this._focused = false; }, this);
-    window.onfocus = goog.bind(function() { this._focused = true; }, this);
-
     this._ringing = false;
 };
 goog.inherits(helpim.ui.muc.One2OneRoom, helpim.ui.muc.Room);

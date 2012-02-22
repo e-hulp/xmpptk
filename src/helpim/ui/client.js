@@ -126,15 +126,9 @@ helpim.ui.Client = function(client) {
             this._logger.info("tab selected for "+tabSelected.getId());
             var contentElement = goog.dom.getElement('tab_content');
             if (this._lastRoomSelected) {
-                goog.style.showElement(
-                    this._rooms[this._lastRoomSelected].getPanel(),
-                    false
-                );
+                this._rooms[this._lastRoomSelected].show(false);
             }
-            goog.style.showElement(
-                this._rooms[tabSelected.getId()].getPanel(),
-                true
-            );
+            this._rooms[tabSelected.getId()].show(true);
             this._lastRoomSelected = tabSelected.getId();
             this.logoutButton.setEnabled(
                 !xmpptk.Config['is_staff'] || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
