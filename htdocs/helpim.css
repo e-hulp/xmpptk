@@ -372,3 +372,9 @@ body{background-color:#ffe;font:normal 10pt Arial,sans-serif;}/**/fieldset{paddi
 .nickColor11 {
     color: purple;
 }
+
+iframe.bot_message {
+    border: 1px solid black;
+    width: 100%;
+    margin: 8px 0;
+}
