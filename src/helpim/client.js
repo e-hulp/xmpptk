@@ -46,12 +46,13 @@ helpim.Client = function() {
 
     this.login();
 
-	var event = goog.userAgent.WEBKIT?'beforeunload':goog.events.EventType.UNLOAD;
-
     goog.events.listen(
         window,
-        event,
-        goog.bind(function() { this.logout(); }, this),
+        ['beforeunload', 'unload'],
+        function() { this.logout(); }, 
+    // seems like this could be done more elegantly but if just
+    // passing the function reference we get passed unwanted
+    // parameters to it
         false,
         this
     );
@@ -237,35 +238,26 @@ helpim.Client.prototype.login = function() {
  * @param {?boolean} cleanExit whether this is a clean-exit logout
  * @param {?boolean} delayed if true this is a delayed call to really logout now
  */
-helpim.Client.prototype.logout = function(cleanExit, delayed) {
+helpim.Client.prototype.logout = function(cleanExit) {
     goog.net.cookies.remove('client_running');
 
-	if (!delayed) {
-		goog.object.forEach(
-			this.rooms,
-			function(room) {
-				room.part(cleanExit);
-			}
-		);
-		goog.object.clear(this.rooms);
-		this.notify();
-	}
+	goog.object.forEach(
+		this.rooms,
+		function(room) {
+			room.part(cleanExit);
+		}
+	);
+	goog.object.clear(this.rooms);
+	this.notify();
 	if (cleanExit) {
 		// cookie can safely be removed as we don't want to return to any rooms
 		goog.net.cookies.remove('room_token');
-		if ((xmpptk.Config['mode'] != 'light' && xmpptk.Config['is_staff']) || delayed) {
-			this.sendPresence('unavailable', 'Clean Exit');
-			goog.base(this, 'logout');
-		} else {
-			this._logoutDelayedTimeout = setTimeout(goog.bind(function() {
-				this.logout(true, true);
-			}, this), helpim.Client.LOGOUT_DELAYED_TIMEOUT*1000);
-		}
+		this.sendPresence('unavailable', 'Clean Exit');
+		goog.base(this, 'logout');
 	} else {
 		this.sendPresence('unavailable');
 		goog.base(this, 'logout');
 	}
-
 };
 
 /**
