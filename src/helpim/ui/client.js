@@ -294,13 +294,12 @@ helpim.ui.Client.prototype.update = function() {
                     this._logger.info("creating new room for "+id);
                     if (count == 0) {
                         // we're at the lobby
-                        this._rooms[id] = new helpim.ui.muc.LobbyRoom(room);
                         var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
+                        this._rooms[id] = new helpim.ui.muc.LobbyRoom(room, tab);
                     } else {
-                        this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
                         var tab = new goog.ui.Tab(gettext("waiting..."), new goog.ui.RoundedTabRenderer());
+                        this._rooms[id] = new helpim.ui.muc.One2OneRoom(room, tab);
                     }
-                    this._rooms[id]._tab = tab; // let'em know
                     tab.setId(id);
                     this.tabBar.addChild(tab, true);
                     this.tabBar.setSelectedTab(tab);

@@ -7,8 +7,8 @@ goog.require('helpim.ui.muc.Room');
  * @constructor
  * @extends {helpim.ui.muc.Room}
  */
-helpim.ui.muc.One2OneRoom = function(room) {
-    helpim.ui.muc.Room.call(this, room);
+helpim.ui.muc.One2OneRoom = function(room, tab) {
+    helpim.ui.muc.Room.call(this, room, tab);
 
     this._ringing = false;
 };
@@ -44,60 +44,63 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
     }
 
     if (xmpptk.Config['is_staff']) {
+        if (!this._ringing) {
+            // taken from
+            // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
+            // combined with
+            // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
+            var oldTitle = document.title;
+            var msg = gettext("Ring! Ring!");
+            var ring = 0;
+            var timeoutId = setInterval(function() {
+                document.title = (document.title == msg)?oldTitle:msg;
+                if ((ring % 5) == 0) {
+                    xmpptk.ui.sound.play('ring');
+                }
+                ring++;
+            }, 1000);
 
-        if (xmpptk.Config['mode'] != 'light') {
-            // no tabbar for light mode!
-            // set our tab's title to nick of client
-            this._tab.setCaption(event.from);
-            if (!this._tab.isSelected()) {
-                this._tab.setHighlighted(true);
+            this._ringing = true;
+            
+            var stopRinging = goog.bind(function() {
+                if (this._ringing) {
+                    clearInterval(timeoutId);
+                    document.title = oldTitle;
+                    this._ringing = false;
+                }
+            }, this);
+
+            if (this._tab) {
+                // no tabbar for light mode!
+                // set our tab's title to nick of client
+                this._tab.setCaption(event.from);
+                if (!this._tab.isSelected()) {
+                    this._tab.setHighlighted(true);
+                }
+            
+                if (!this.isSelected()) {
+                    goog.events.listenOnce(
+                        this._tab,
+                        goog.ui.Component.EventType.SELECT,
+                        stopRinging);
+                } else {
+                    goog.events.listenOnce(
+                        document,
+                        goog.events.EventType.MOUSEMOVE,
+                        stopRinging);
+                }
+            } else {
+                // no tab!
+                goog.events.listenOnce(
+                    document,
+                    goog.events.EventType.MOUSEMOVE,
+                    stopRinging);
             }
         }
-
-        if (!this._focused) {
-            if (!this._ringing) {
-                // taken from
-                // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
-                // combined with
-                // http://stackoverflow.com/questions/4257936/window-onmousemove-in-ie-and-firefox
-                var oldTitle = document.title;
-                var msg = gettext("Ring! Ring!");
-                var ring = 0;
-                var timeoutId = setInterval(function() {
-                    document.title = (document.title == msg)?oldTitle:msg;
-                    if ((ring % 5) == 0) {
-                        xmpptk.ui.sound.play('ring');
-                    }
-                    ring++;
-                }, 1000);
-
-                this._ringing = true;
-
-                var stopRinging = goog.bind(function(handler, fun) {
-                    if (this._ringing) {
-                        clearInterval(timeoutId);
-                        document.title = oldTitle;
-                        this._ringing = false;
-                    }
-                }, this);
-                document.onmousemove = function() {
-                    stopRinging();
-                    document.onmousemove = null;
-                }
-
-                var oldonfocus = window.onfocus;
-                window.onfocus = function() {
-                    stopRinging();
-                    oldonfocus();
-                    window.onfocus = oldonfocus;
-                }
-            }
-        }
-
         if (!xmpptk.Config['disable_blocking']) {
             // this is for blocking participants which is only available for staff at one2one rooms
             this._participant = event.from;
-
+            
             this._blockParticipantButton.setEnabled(true);
         }
     } else { // end is_staff

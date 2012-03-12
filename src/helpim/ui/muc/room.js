@@ -19,14 +19,15 @@ goog.require('xmpptk.ui.sound');
  * @constructor
  * @extends {xmpptk.ui.View}
  */
-helpim.ui.muc.Room = function(room) {
+helpim.ui.muc.Room = function(room, tab) {
     this._logger.info("Creating view for room with id "+room.id);
     xmpptk.ui.View.call(this, room);
 
-    this._focused = false;
-    window.onblur = goog.bind(function() { this._focused = false; }, this);
-    window.onfocus = goog.bind(function() { this._focused = true; }, this);
+    if (tab) {
+        this._logger.info("got tab with id " + tab.getId());
+    }     
 
+    this._tab = tab;
     this._render();
 
     this.subject.attachPropertyhandler('subject', this._subjectChanged, this);
@@ -83,22 +84,6 @@ helpim.ui.muc.Room.prototype.appendMessage = function(message) {
 }
 
 /**
- * determine the css class for coloring a nickname
- * @param {string} nick the nick name to lookup a color for
- * @return {string} the name of the color to be used
- */
-helpim.ui.muc.Room.prototype.getNickColor = function(nick) {
-    return helpim.ui.getNickColor(nick);
-};
-
-/**
- * return the panel element
- */
-helpim.ui.muc.Room.prototype.getPanel = function() {
-    return this._panel;
-};
-
-/**
  * format a message
  * @param {{type: string, body: string, from: string}} msg the message to be formated
  * @return {{body: string, className: string}}
@@ -135,12 +120,36 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
 };
 
 /**
- * visually show the room 
+ * determine the css class for coloring a nickname
+ * @param {string} nick the nick name to lookup a color for
+ * @return {string} the name of the color to be used
+ */
+helpim.ui.muc.Room.prototype.getNickColor = function(nick) {
+    return helpim.ui.getNickColor(nick);
+};
+
+/**
+ * return the panel element
+ */
+helpim.ui.muc.Room.prototype.getPanel = function() {
+    return this._panel;
+};
+
+/**
+ * determine whether room is selected
+ * @return {boolean} whether we are selected
+ */
+helpim.ui.muc.Room.prototype.isSelected = function() {
+    // if we don't have tab's we assume we're focused
+    return this._tab? this._tab.isSelected() : true;
+};
+
+/**
+ * visually show the room
  * @param {boolean} show whether to show or hide the room
  */
 helpim.ui.muc.Room.prototype.show = function(show) {
     goog.style.showElement(this.getPanel(), show);
-    this._focused = show?true:false;
 };
 
 helpim.ui.muc.Room.prototype.update = function() {};

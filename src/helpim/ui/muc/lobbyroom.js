@@ -6,8 +6,8 @@ goog.require('helpim.ui.muc.Room');
  * @constructor
  * @extends {helpim.ui.muc.Room}
  */
-helpim.ui.muc.LobbyRoom = function(room) {
-	helpim.ui.muc.Room.call(this, room);
+helpim.ui.muc.LobbyRoom = function(room, tab) {
+	helpim.ui.muc.Room.call(this, room, tab);
 };
 goog.inherits(helpim.ui.muc.LobbyRoom, helpim.ui.muc.Room);
 
