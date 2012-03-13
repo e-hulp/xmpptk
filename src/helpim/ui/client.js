@@ -232,6 +232,8 @@ helpim.ui.Client = function(client) {
         function(params) {
             this._logger.info("got questionnaire url: "+params.url);
 
+            client.publish('hide_dialog');
+
             var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-questionnaire');
             dialog.setTitle(gettext('Questionnaire'));
             dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
