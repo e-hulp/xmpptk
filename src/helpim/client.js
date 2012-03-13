@@ -46,12 +46,10 @@ helpim.Client = function() {
 
     this.login();
 
-	var event = goog.userAgent.WEBKIT?'beforeunload':goog.events.EventType.UNLOAD;
-
     goog.events.listen(
         window,
-        event,
-        goog.bind(function() { this.logout(); }, this),
+        ['beforeunload', 'unload'],
+        function() { this.logout(false, false); },
         false,
         this
     );
