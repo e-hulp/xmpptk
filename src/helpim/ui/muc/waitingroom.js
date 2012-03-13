@@ -61,6 +61,13 @@ helpim.ui.muc.WaitingRoom.prototype._render = function() {
         'hide_dialog',
         function() {
             this._waitingdialog.setVisible(false);
+            this.subject._client.subscribeOnce(
+                'show_dialog',
+                function() {
+                    this._waitingdialog.setVisible(true);
+                },
+                this
+            );
         },
         this
     );

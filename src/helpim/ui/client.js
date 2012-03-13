@@ -245,18 +245,17 @@ helpim.ui.Client = function(client) {
                 if (client._logoutDelayedTimeout) {
                     dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOk());
                     goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT, function(e) {
-                        client.publish('show_dialog');
                         client.logout(true, true);
                     });
                 } else {
                     setTimeout(function() {
+                        client.publish('show_dialog');
                         dialog.setVisible(false);
                     }, 3000);
                 }
             });
 
             dialog.setVisible(true);
-
         },
         this
     );
