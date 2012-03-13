@@ -56,19 +56,4 @@ helpim.ui.muc.WaitingRoom.prototype._render = function() {
     this._waitingdialog.setButtonSet(null);
     this._waitingdialog.setVisible(true);
     this._message = goog.dom.getElement('waitingroom_message');
-
-    this.subject._client.subscribe(
-        'hide_dialog',
-        function() {
-            this._waitingdialog.setVisible(false);
-            this.subject._client.subscribeOnce(
-                'show_dialog',
-                function() {
-                    this._waitingdialog.setVisible(true);
-                },
-                this
-            );
-        },
-        this
-    );
 };
