@@ -90,29 +90,35 @@ helpim.ui.muc.Room.prototype.appendMessage = function(message) {
  * @notypecheck
  */
 helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
+    this._logger.fine("formatting message");
     if (msg.type != 'groupchat') {
+        this._logger.fine("got a private message");
         // this is a private message
         var className = 'private_message';
-        this._logger.info(msg.from);
-        this._logger.info(xmpptk.Config['bot_nick']);
         if (msg.from == xmpptk.Config['bot_nick']) {
+            this._logger.fine("found a private message from bot with jid "+xmmptk.Config['bot_nick']);
             className += ' bot_message';
             var urls = msg.body.match(/(http[s]?:\/\/\S+)/g);
         }
         return {body: xmpptk.ui.msgFormat(msg.body), className: className, urls: urls};
     } else {
         if (msg.delay) {
+            this._logger.fine("message got a delay of "+msg.delay);
             var ts = Date.jab2date(msg.delay);
             ts = '@'+ts.toLocaleTimeString();
         } else {
+            this._logger.fine("no delay found");
             var ts = '@'+(new Date().toLocaleTimeString());
         }
+        this._logger.fine("using timestamp of "+ts);
         var meMatches = msg.body.match(/^\/me (.*)$/);
         if (meMatches) {
+            this._logger.fine("formatting as /me message from "+msg.from);
             return {body:'* ' + xmpptk.ui.htmlEnc(msg.from)+ ' ' +
                     xmpptk.ui.msgFormat(meMatches[1]) + ' *',
                     className:'me_message'};
         } else {
+            this._logger.fine("no /me messsage");
             return {body:'<span title="'+ts+'" class="'+this.getNickColor(msg.from)+'">&lt;'+xmpptk.ui.htmlEnc(msg.from)+'&gt;</span> '+ xmpptk.ui.msgFormat(msg.body),
                     className:'groupchat_message'};
         }
@@ -125,7 +131,9 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
  * @return {string} the name of the color to be used
  */
 helpim.ui.muc.Room.prototype.getNickColor = function(nick) {
-    return helpim.ui.getNickColor(nick);
+    var color = helpim.ui.getNickColor(nick);
+    this._logger.info("got color: "+color);
+    return color;
 };
 
 /**
