@@ -96,7 +96,7 @@ helpim.ui.muc.Room.prototype.formatMessage = function(msg) {
         // this is a private message
         var className = 'private_message';
         if (msg.from == xmpptk.Config['bot_nick']) {
-            this._logger.fine("found a private message from bot with jid "+xmmptk.Config['bot_nick']);
+            this._logger.fine("found a private message from bot with jid "+xmpptk.Config['bot_nick']);
             className += ' bot_message';
             var urls = msg.body.match(/(http[s]?:\/\/\S+)/g);
         }
