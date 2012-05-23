@@ -59,3 +59,17 @@ helpim.register = function(event, handler) {
 
 goog.exportSymbol('helpim.start', helpim.start);
 goog.exportSymbol('helpim.call', helpim.call);
+
+/**
+ * fill in what we need but isn't there
+ */
+if (typeof (Array.prototype.reduce) == 'undefined') {
+    Array.prototype.reduce = function(fun, acc) {
+        for (var i=0, l=this.length; i<l; i++) {
+            if (this.hasOwnProperty(i)) { 
+                acc += fun(acc, this[i]);
+            }
+        }
+        return acc;
+    };
+};
