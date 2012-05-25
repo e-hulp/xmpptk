@@ -234,7 +234,7 @@ helpim.ui.Client = function(client) {
 
             var dialog = new helpim.ui.Dialog('modal-dialog modal-dialog-questionnaire');
             dialog.setTitle(gettext('Questionnaire'));
-            dialog.setContent('<iframe width="410" height="640" src="'+params.url+'" style="border: 0px;"></iframe>');
+            dialog.setContent('<iframe width="100%" height="100%" src="'+params.url+'" style="border: 0px;"></iframe>');
             dialog.setButtonSet(false);
             dialog.setHasTitleCloseButton(false);
 
