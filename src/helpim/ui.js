@@ -15,8 +15,9 @@ helpim.ui.NICK_COLORS_LENGTH = 12;
  * calculates a color used for given nick
  */
 helpim.ui.getNickColor = function(nick) {
+    alert("getNickColor");
     return helpim.ui.NICK_COLORS_CSSCLASSPREFIX + 
-        nick.split("").reduce(function(acc, c) { return acc + c.charCodeAt(); }, 0) % (helpim.ui.NICK_COLORS_LENGTH-1);
+        goog.array.reduce(nick.split(""), function(acc, c) { return acc + c.charCodeAt(); }, 0) % (helpim.ui.NICK_COLORS_LENGTH-1);
 }
 
 /**
