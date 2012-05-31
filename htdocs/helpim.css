@@ -378,3 +378,12 @@ iframe.bot_message {
     width: 100%;
     margin: 8px 0;
 }
+
+.modal-dialog-content {
+  height: 80%;
+}
+
+.modal-dialog-questionnaire {
+  height: 95%;
+  width: 70%;
+}
