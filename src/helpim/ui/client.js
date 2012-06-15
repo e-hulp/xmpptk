@@ -64,9 +64,9 @@ helpim.ui.Client = function(client) {
         goog.events.EventType.CLICK,
         function(e) {
             if (xmpptk.ui.sound.enabled) {
-                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume-mute.png');
+                e.target.src = helpim.ui.getStatic('/xmpptk/images/stock_volume-mute.png');
             } else {
-                e.target.src = helpim.ui.getStatic('/xmpptk/xmpptk/images/stock_volume.png');
+                e.target.src = helpim.ui.getStatic('/xmpptk/images/stock_volume.png');
             }
             xmpptk.ui.sound.enabled = !xmpptk.ui.sound.enabled;
         }
