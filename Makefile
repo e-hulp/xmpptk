@@ -3,6 +3,7 @@ SOURCEDIR = ./src
 
 OUTFILE   = $(BUILDDIR)/helpim.js
 DEPSFILE  = $(BUILDDIR)/deps.js
+JSJACFILE = $(BUILDDIR)/jsjac.js
 
 all: clean deps jsjac build
 
@@ -16,11 +17,12 @@ build:
 jsjac:
 	@echo "building jsjac";
 	@make -C lib/jsjac clean utils build crunch;
-	@cp lib/jsjac/jsjac.js $(BUILDDIR)
+	@cp lib/jsjac/jsjac.js $(JSJACFILE)
 
 clean:
 	@rm -f $(OUTFILE) 2> /dev/null
 	@rm -f $(DEPSFILE) 2> /dev/null
+	@rm -f $(JSJACFILE) 2> /dev/null
 
 deps:
 	@echo "building dependencies";
