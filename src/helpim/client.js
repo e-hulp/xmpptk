@@ -106,8 +106,8 @@ helpim.Client.prototype.blockParticipant = function(bot_jid, participant_jid, su
     var iq = new JSJaCIQ();
     iq.setTo(bot_jid);
     iq.setType('set');
-    iq.appendNode('block', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, [
-        iq.buildNode('participant', {xmlns: helpim.Client.NS.HELPIM_ROOMS}, participant_jid)
+    iq.appendNode('block', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, [
+        iq.buildNode('participant', {'xmlns': helpim.Client.NS.HELPIM_ROOMS}, participant_jid)
     ]);
     this._con.sendIQ(iq, {
         'result_handler': success,
