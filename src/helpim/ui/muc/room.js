@@ -230,15 +230,23 @@ helpim.ui.muc.Room.prototype._occupantJoined = function(event) {
  * @param {{from: string, status: string}} event the event recieved
  */
 helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
-    if (goog.array.contains([this.subject['nick'], xmpptk.Config['bot_nick']], event.from)) {
-        return;
-    }
-    var msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
-    if (event.status != '') {
-        if (event.status == 'Clean Exit') {
-            msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+    var msg = '';
+    if (event.kicked) {
+        if (this.subject['nick'] == event.from) {
+            msg = gettext("You have been kicked");
         } else {
-            msg += " ("+xmpptk.ui.htmlEnc(event.status)+")";
+            msg = interpolate(gettext("%s has been kicked"), [xmpptk.ui.htmlEnc(event.from)]);
+        }
+        if (event.reason)
+            msg += " ("+xmpptk.ui.htmlEnc(event.reason)+")";
+    } else {
+        msg = interpolate(gettext("%s has disappeared from the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+        if (event.status !== '') {
+            if (event.status == 'Clean Exit') {
+                msg = interpolate(gettext("%s has ended the conversation"), [xmpptk.ui.htmlEnc(event.from)]);
+            } else {
+                msg += " ("+xmpptk.ui.htmlEnc(event.status)+")";
+            }
         }
     }
     this.appendMessage({body:msg, className:'roomEvent'});
@@ -247,7 +255,7 @@ helpim.ui.muc.Room.prototype._occupantLeft = function(event) {
 helpim.ui.muc.Room.prototype._render = function() {
     this._logger.info("rendering room view");
     this._panel = goog.dom.getElement('panelTemplate').cloneNode(true);
-    this._panel.id = xmpptk.ui.fixID(this.subject.id + "_roomPanel");
+    this._panel.id = xmpptk.ui.fixID(this.subject.id + "_roomPanel"); 
 
     var contentPanel = goog.dom.getElement('tab_content');
     goog.dom.appendChild(contentPanel, this._panel);
