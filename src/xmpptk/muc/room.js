@@ -226,13 +226,22 @@ xmpptk.muc.Room.prototype._handleGroupchatPresence = function(oPres) {
 			this.publish('nick_conflict');
 		}
 	} else if (oPres.getType() == 'unavailable') {
+        var status = oPres.getChild('status', xmpptk.muc.NS.USER);
+        if (status && status.getAttribute('code') == '307') {
+            event.kicked = true;
+            var actor = oPres.getChild('actor', xmpptk.muc.NS.USER);
+            if (actor)
+                event.actor = actor.getAttribute('nick');
+            var reason = oPres.getChild('reason', xmpptk.muc.NS.USER);
+            if (reason && reason.firstChild) 
+                event.reason = reason.firstChild.nodeValue;
+        }
         if (this.roster.hasItem(from)) {
             this.roster.removeItem(from);
-
-			this.publish('occupant_left', event);
-            this.events.push(goog.object.extend(event, {'type': 'occupant_left'}));
-            this.set('events', this.events);
         }
+		this.publish('occupant_left', event);
+        this.events.push(goog.object.extend(event, {'type': 'occupant_left'}));
+        this.set('events', this.events);
     } else {
         var occupant = this.roster.getItem(from);
 
