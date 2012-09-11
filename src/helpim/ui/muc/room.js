@@ -362,6 +362,8 @@ helpim.ui.muc.Room.prototype._render = function() {
                 function(e) {
                     var emoticon = e.target.title;
 
+                    this._sendTextarea.getElement().click();
+
                     var setSelectionRange = function(input, selectionStart, selectionEnd) {
                         if (input.setSelectionRange) {
                             input.focus();
