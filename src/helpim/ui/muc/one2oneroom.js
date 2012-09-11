@@ -43,7 +43,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
         return;
     }
 
-    if (xmpptk.Config['is_staff']) {
+    if (xmpptk.getConfig('is_staff')) {
         if (!this._ringing) {
             // taken from
             // http://stackoverflow.com/questions/37122/make-browser-window-blink-in-task-bar
@@ -54,7 +54,7 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
             var ring = 0;
             var timeoutId = setInterval(function() {
                 document.title = (document.title == msg)?oldTitle:msg;
-                if ((ring % 5) == 0) {
+                if ((ring % 5) === 0) {
                     xmpptk.ui.sound.play('ring');
                 }
                 ring++;
@@ -97,12 +97,14 @@ helpim.ui.muc.One2OneRoom.prototype._occupantJoined = function(event) {
                     stopRinging);
             }
         }
-        if (!xmpptk.Config['disable_blocking']) {
+
+        if (!xmpptk.getConfig('disable_blocking') && !xmpptk.getConfig('no_block')) {
             // this is for blocking participants which is only available for staff at one2one rooms
             this._participant = event.from;
             
             this._blockParticipantButton.setEnabled(true);
         }
+
     } else { // end is_staff
         xmpptk.ui.sound.play('ring_client');
     }
@@ -131,7 +133,7 @@ helpim.ui.muc.One2OneRoom.prototype._render = function() {
     goog.style.setStyle(this._messagesPanel, 'margin-right', '0');
     goog.style.setStyle(goog.dom.getElementByClass('sendPanel', this._panel), 'margin-right', '0');
 
-    if (xmpptk.Config['is_staff'] && !xmpptk.Config['disable_blocking']) {
+    if (xmpptk.getConfig('is_staff') && !xmpptk.getConfig('disable_blocking') && !xmpptk.getConfig('no_block')) {
         this._blockParticipantButton =  new goog.ui.Button(gettext('Block Participant'),
                                                            goog.ui.FlatButtonRenderer.getInstance());
         this._blockParticipantButton.render(goog.dom.getElementByClass('blockParticipantButton', this._panel));
