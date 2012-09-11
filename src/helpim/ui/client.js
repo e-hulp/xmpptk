@@ -34,11 +34,15 @@ helpim.ui.Client = function(client) {
 
     this._rooms = {};
 
-    xmpptk.ui.emoticons.init(xmpptk.Config['static_url']);
-    xmpptk.ui.sound.init(xmpptk.Config['static_url']+'xmpptk/');
+    if (xmpptk.getConfig('emoticons_path'))
+        xmpptk.ui.emoticons.init(xmpptk.getConfig('emoticons_path'));
+    else
+        xmpptk.ui.emoticons.init(xmpptk.getConfig('static_url'));
+
+    xmpptk.ui.sound.init(xmpptk.getConfig('static_url')+'xmpptk/');
 
     client.subscribeOnce('disconnected', function() {
-        document.location.replace(xmpptk.Config['logout_redirect']);
+        document.location.replace(xmpptk.getConfig('logout_redirect'));
     });
 
     client.subscribe('error', function(e) {
@@ -54,7 +58,7 @@ helpim.ui.Client = function(client) {
         dlg.setHasTitleCloseButton(false);
         
         goog.events.listen(dlg, goog.ui.Dialog.EventType.SELECT, function(e) {
-            document.location.replace(xmpptk.Config['logout_redirect']);
+            document.location.replace(xmpptk.getConfig('logout_redirect'));
         });
         dlg.setVisible(true);
     }, this);
@@ -84,8 +88,8 @@ helpim.ui.Client = function(client) {
 
             if (goog.object.some(room.roster.get('items'), 
                                  function(occupant) {
-                                     return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.Config['bot_nick']
-                                 }) && (xmpptk.Config['mode'] == 'light' || !xmpptk.Config['is_staff'] || this.tabBar.getSelectedTabIndex() > 0)) {
+                                     return occupant.getNick() != room['nick'] && occupant.getNick() != xmpptk.getConfig('bot_nick')
+                                 }) && (xmpptk.getConfig('mode') == 'light' || !xmpptk.getConfig('is_staff') || this.tabBar.getSelectedTabIndex() > 0)) {
                 var dlg = new helpim.ui.Dialog();
                 dlg.setTitle(gettext('Confirm'));
                 dlg.setContent('<div class="goog_dialog">'+gettext("Are you sure you want to end this conversation?")+'</div>');
@@ -131,7 +135,7 @@ helpim.ui.Client = function(client) {
             this._rooms[tabSelected.getId()].show(true);
             this._lastRoomSelected = tabSelected.getId();
             this.logoutButton.setEnabled(
-                !xmpptk.Config['is_staff'] || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
+                !xmpptk.getConfig('is_staff') || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
             );
         }, this)
     );
@@ -156,8 +160,8 @@ helpim.ui.Client = function(client) {
                 cond = 'Bad Request';
                 break;
             case 'item-not-found':
-                if (!xmpptk.Config['is_staff']) {
-                    document.location.replace(xmpptk.Config['unavailable_redirect']);
+                if (!xmpptk.getConfig('is_staff')) {
+                    document.location.replace(xmpptk.getConfig('unavailable_redirect'));
                     return;
                 }
                 break;
@@ -191,7 +195,7 @@ helpim.ui.Client = function(client) {
             var dialog = new helpim.ui.Dialog();
             dialog.setTitle(gettext('Join Chat'));
             var content = '<div id="form_error" class="error"></div><form><div><label for="muc_nick">'+gettext('Nickname')+': </label><input id="muc_nick" maxlength="64"/></div>';
-            if (xmpptk.Config['mode'] == 'light') {
+            if (xmpptk.getConfig('mode') == 'light') {
                 content += '<div><label for="muc_subject">'+gettext('Subject')+': </label><input id="muc_subject" maxlength="64"/></div>';
             }
             content += '</form>';
@@ -204,14 +208,14 @@ helpim.ui.Client = function(client) {
                     // get nick and subject from form submitted
                     var nick = goog.dom.getElement('muc_nick').value;
                     this._logger.info(nick);
-                    if (!nick || nick == '') {
+                    if (!nick || nick === '') {
                         goog.dom.setTextContent(
                             goog.dom.getElement('form_error'),
                             gettext('Please provide a nickname!'));
                         return false;
                     }
                     var subject = goog.dom.getElement('muc_subject');
-                    if (subject && subject.value && subject.value != '') {
+                    if (subject && subject.value && subject.value !== '') {
                         subject = subject.value;
                     } else {
                         subject = '';
@@ -260,7 +264,7 @@ helpim.ui.Client = function(client) {
     goog.style.showElement(goog.dom.getElement('tab_content'), false);
     goog.style.showElement(goog.dom.getElement('helpimClient'), false);
 
-    if (!xmpptk.Config['is_staff'] || xmpptk.Config['mode'] == 'light') {
+    if (!xmpptk.getConfig('is_staff') || xmpptk.getConfig('mode') == 'light') {
         goog.style.showElement(goog.dom.getElement('tabBar'), false);
     }
 };
@@ -280,7 +284,7 @@ helpim.ui.Client.prototype.update = function() {
         this.subject.rooms,
         function(room, id) {
             this._logger.info("got room with id "+id);
-            if (xmpptk.Config['mode'] == 'light') {
+            if (xmpptk.getConfig('mode') == 'light') {
                 if (!this._rooms[id]) {
                     this._rooms[id] = new helpim.ui.muc.One2OneRoom(room);
                     this._clientRoom = room;
@@ -288,15 +292,16 @@ helpim.ui.Client.prototype.update = function() {
                 // nothing left to do in light mode - we don't know tabs or any other rooms
                 return;
             }
-            if (xmpptk.Config['is_staff']) {
+            if (xmpptk.getConfig('is_staff')) {
                 if (!this.tabBar.getChild(id)) {
                     this._logger.info("creating new room for "+id);
-                    if (count == 0) {
+                    var tab;
+                    if (count === 0) {
                         // we're at the lobby
-                        var tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
+                        tab = new goog.ui.Tab(gettext('staff'), new goog.ui.RoundedTabRenderer());
                         this._rooms[id] = new helpim.ui.muc.LobbyRoom(room, tab);
                     } else {
-                        var tab = new goog.ui.Tab(gettext("waiting..."), new goog.ui.RoundedTabRenderer());
+                        tab = new goog.ui.Tab(gettext("waiting..."), new goog.ui.RoundedTabRenderer());
                         this._rooms[id] = new helpim.ui.muc.One2OneRoom(room, tab);
                     }
                     tab.setId(id);
@@ -307,7 +312,7 @@ helpim.ui.Client.prototype.update = function() {
                 }
             } else {
                 if (!this._rooms[id]) {
-                    if (count == 0) {
+                    if (count === 0) {
                         this._rooms[id] = new helpim.ui.muc.WaitingRoom(room);
                         this._waitingRoom = this._rooms[id];
                     } else {

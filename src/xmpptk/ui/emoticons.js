@@ -11,16 +11,11 @@ xmpptk.ui.emoticons.Replacement;
 /** @type {object.<xmpptk.ui.emoticons.Replacement>} */
 xmpptk.ui.emoticons.replacements = {};
 
-xmpptk.ui.emoticons.path = "xmpptk/images/emoticons/";
+xmpptk.ui.emoticons.path = "images/emoticons/";
 
 xmpptk.ui.emoticons.init = function(base_url) {
 
-    if (base_url) {
-        if (!goog.string.endsWith(base_url, '/')) {
-            base_url += '/';
-        }
-        xmpptk.ui.emoticons.path = base_url + xmpptk.ui.emoticons.path;
-    }
+    xmpptk.ui.emoticons.path = base_url || xmpptk.ui.emoticons.path;
 
     goog.net.XhrIo.send(
         xmpptk.ui.emoticons.path + 'icondef.xml',
