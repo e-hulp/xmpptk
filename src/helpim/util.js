@@ -36,3 +36,5 @@ helpim.Util.iosTabAlert.Warn = function() {
    };
 
 goog.exportSymbol("helpim.Util.iosTabAlert.Init", helpim.Util.iosTabAlert.Init)
+goog.exportSymbol("helpim.Util.iosTabAlert.VisibilityChange", helpim.Util.iosTabAlert.VisibilityChange)
+goog.exportSymbol("helpim.Util.iosTabAlert.Warn", helpim.Util.iosTabAlert.Warn)
