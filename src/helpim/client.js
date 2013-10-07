@@ -15,6 +15,7 @@ goog.require('helpim.jsjac_ext');
 goog.require('helpim.muc.Room');
 goog.require('helpim.ui.Client');
 goog.require('helpim.ui.ClientRunning');
+goog.require('helpim.Util.iosTabAlert');
 
 /**
  * @constructor
@@ -228,6 +229,8 @@ helpim.Client.prototype.login = function() {
 	} , this));
 
     this._con.registerIQSet('query', helpim.Client.NS.HELPIM_ROOMS, goog.bind(this._handleIQSetRooms, this));
+    helpim.Util.iosTabAlert.Init();
+
 };
 
 /**
