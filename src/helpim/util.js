@@ -1,6 +1,9 @@
 goog.provide('helpim.Util');
 goog.provide('helpim.Util.iosTabAlert');
 
+goog.require('goog.events');
+goog.require('goog.events.EventType');
+
 helpim.Util.iosTabAlert.Init = function() {
        /* IOS halts execution when a new browser tab is opened.
           That behaviour kills the XMPP session. We can't prevent
@@ -16,7 +19,7 @@ helpim.Util.iosTabAlert.Init = function() {
            if(typeof document.addEventListener == 'function') {
                document.addEventListener("visibilitychange", helpim.Util.iosTabAlert.VisibilityChange);
            };
-           window.onpagehide = helpim.Util.iosTabAlert.Warn;
+           goog.events.listen(window, goog.events.EventType.PAGEHIDE, helpim.Util.iosTabAlert.Warn);
        };
    };
 
