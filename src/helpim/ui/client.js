@@ -130,6 +130,11 @@ helpim.ui.Client = function(client) {
             this._logger.info("tab selected for "+tabSelected.getId());
             var contentElement = goog.dom.getElement('tab_content');
             if (this._lastRoomSelected) {
+                this._rooms[this._lastRoomSelected]._scrolling = 
+                    this._rooms[this._lastRoomSelected]._messagesPanel.scrollTop+
+                    this._rooms[this._lastRoomSelected]._messagesPanel.clientHeight>=
+                    this._rooms[this._lastRoomSelected]._messagesPanel.scrollHeight;
+                this._logger.info("scrolling: "+this._rooms[this._lastRoomSelected]._scrolling)
                 this._rooms[this._lastRoomSelected].show(false);
             }
             this._rooms[tabSelected.getId()].show(true);
@@ -137,6 +142,9 @@ helpim.ui.Client = function(client) {
             this.logoutButton.setEnabled(
                 !xmpptk.getConfig('is_staff') || goog.object.getCount(client.rooms) == 1 || this.tabBar.getSelectedTabIndex() > 0
             );
+            if (this._rooms[tabSelected.getId()]._scrolling) {
+                this._rooms[tabSelected.getId()]._messagesPanel.scrollTop = this._rooms[tabSelected.getId()]._messagesPanel.scrollHeight;
+            }
         }, this)
     );
 

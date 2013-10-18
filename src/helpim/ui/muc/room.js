@@ -37,6 +37,8 @@ helpim.ui.muc.Room = function(room, tab) {
 
     this.subject.subscribe('occupant_joined', this._occupantJoined, this);
     this.subject.subscribe('occupant_left',   this._occupantLeft,   this);
+
+    this._scrolling = true;
 };
 goog.inherits(helpim.ui.muc.Room, xmpptk.ui.View);
 
